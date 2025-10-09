@@ -10,6 +10,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../containers/Footer";
 import MenuCategoriesBar from "../components/MenuCategoriesBar";
 import AnnouncementBanner from "../components/AnnouncementBanner";
+import ScrollToTopButton from "../components/ScrollToTopButton";
 import {
   createWhatsAppMessage,
   createFoodMenuMessage,
@@ -25,8 +26,7 @@ const featuredPizzas = [
     description:
       "Salsa de tomate artesanal, mozzarella fresca, albahaca y aceite de oliva extra virgen",
     price: "$18.990",
-    image:
-      "https://ipbxcphqipulqm7d.public.blob.vercel-storage.com/images/pizzas/margarita.jpg",
+    image: "/images/pizza_1.jpg",
   },
   {
     id: 2,
@@ -34,8 +34,7 @@ const featuredPizzas = [
     description:
       "Generosas rodajas de pepperoni, mozzarella derretida y orégano fresco",
     price: "$21.990",
-    image:
-      "https://ipbxcphqipulqm7d.public.blob.vercel-storage.com/images/pizzas/pepperoni.jpg",
+    image: "/images/pizza_2.jpg",
   },
   {
     id: 3,
@@ -43,8 +42,7 @@ const featuredPizzas = [
     description:
       "Jamón premium, piña tropical, mozzarella y un toque de cilantro",
     price: "$22.990",
-    image:
-      "https://ipbxcphqipulqm7d.public.blob.vercel-storage.com/images/pizzas/hawaiana-gourmet.jpg",
+    image: "/images/pizza_3.jpg",
   },
 ];
 
@@ -78,12 +76,12 @@ const specialOffer = {
 };
 
 const chefRecommendation = {
-  name: "Trufa y Prosciutto",
+  name: "Vegetariana",
   description:
-    "Salsa de trufa negra, prosciutto di Parma, rúcula fresca, parmesano y aceite de trufa",
-  price: "$32.990",
+    "Una exquisita combinación de vegetales frescos: pimientos, champiñones, cebolla morada, aceitunas negras y tomate, sobre una base de salsa de tomate artesanal y mozzarella derretida. Perfecta para quienes buscan sabor y frescura en cada bocado.",
+  price: "$32.900",
   image:
-    "https://ipbxcphqipulqm7d.public.blob.vercel-storage.com/images/pizzas/trufa-prosciutto.jpg",
+    "https://ipbxcphqipulqm7d.public.blob.vercel-storage.com/images/pizzas/vegetariana.jpg",
   badge: "",
 };
 
@@ -157,7 +155,9 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50">
       <AnnouncementBanner />
       <Navbar />
-      <MenuCategoriesBar />
+      <div className="pt-28">
+        <MenuCategoriesBar />
+      </div>
 
       <section id="inicio" className="py-6 px-4 sm:px-6 lg:px-8">
         <ImageSlider
@@ -243,7 +243,7 @@ export default function Home() {
                     )}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-emerald-600 text-white px-8 py-4 text-lg rounded-lg hover:bg-emerald-700 transition-colors inline-block shadow-lg"
+                    className="bg-[#0c6b58] text-white px-8 py-4 text-lg rounded-lg hover:bg-[#0a5647] transition-colors inline-block shadow-lg"
                   >
                     Pedir por WhatsApp
                   </Link>
@@ -296,7 +296,7 @@ export default function Home() {
                     )}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-orange-600 text-white px-8 py-4 text-lg rounded-lg hover:bg-orange-700 transition-colors inline-block shadow-lg"
+                    className="bg-[#0c6b58] text-white px-8 py-4 text-lg rounded-lg hover:bg-[#0a5647] transition-colors inline-block shadow-lg"
                   >
                     Pedir por WhatsApp
                   </Link>
@@ -320,7 +320,7 @@ export default function Home() {
 
             <div className="bg-gradient-to-r from-red-100 to-pink-100 rounded-2xl p-8 max-w-4xl mx-auto relative">
               {/* Badge de descuento */}
-              <div className="absolute -top-4 -right-4 bg-red-600 text-white px-4 py-2 rounded-full font-bold text-sm transform rotate-12 shadow-lg">
+              <div className="absolute -top-4 -right-4 bg-[#0c6b58] text-white px-4 py-2 rounded-full font-bold text-sm transform rotate-12 shadow-lg">
                 {specialOffer.discount}
               </div>
               <div className="flex flex-col items-center text-center">
@@ -360,7 +360,7 @@ export default function Home() {
                     )}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-red-600 text-white px-8 py-4 text-lg rounded-lg hover:bg-red-700 transition-colors inline-block shadow-lg"
+                    className="bg-[#0c6b58] text-white px-8 py-4 text-lg rounded-lg hover:bg-[#0a5647] transition-colors inline-block shadow-lg"
                   >
                     Aprovechar Oferta
                   </Link>
@@ -384,7 +384,7 @@ export default function Home() {
 
             <div className="bg-gradient-to-r from-purple-100 to-indigo-100 rounded-2xl p-8 max-w-4xl mx-auto relative">
               {/* Badge de chef */}
-              <div className="absolute -top-4 -left-4 bg-purple-600 text-white px-4 py-2 rounded-full font-bold text-sm shadow-lg">
+              <div className="absolute -top-4 -left-4 bg-[#0c6b58] text-white px-4 py-2 rounded-full font-bold text-sm shadow-lg">
                 Chef Choice
               </div>
               <div className="flex flex-col items-center text-center">
@@ -419,7 +419,7 @@ export default function Home() {
                     )}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-purple-600 text-white px-8 py-4 text-lg rounded-lg hover:bg-purple-700 transition-colors inline-block shadow-lg"
+                    className="bg-[#0c6b58] text-white px-8 py-4 text-lg rounded-lg hover:bg-[#0a5647] transition-colors inline-block shadow-lg"
                   >
                     Pedir por WhatsApp
                   </Link>
@@ -458,7 +458,7 @@ export default function Home() {
                 className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all hover:scale-105 duration-200 ease-in-out"
               >
                 <div className="p-6">
-                  <div className="w-24 h-24 mx-auto mb-4 relative rounded-full overflow-hidden shadow-md">
+                  <div className="w-48 h-48 mx-auto mb-6 relative rounded-full overflow-hidden shadow-lg">
                     <Image
                       src={pizza.image}
                       alt={pizza.name}
@@ -466,10 +466,10 @@ export default function Home() {
                       className="object-cover"
                     />
                   </div>
-                  <h4 className="text-xl font-bold text-gray-900 mb-2">
+                  <h4 className="text-2xl font-bold text-gray-900 mb-4 text-center">
                     {pizza.name}
                   </h4>
-                  <p className="text-gray-600 mb-4 text-sm">
+                  <p className="text-gray-600 mb-6 text-center">
                     {pizza.description}
                   </p>
                   <div className="flex items-center justify-between">
@@ -486,7 +486,7 @@ export default function Home() {
                       href={createWhatsAppMessage(pizza.name, pizza.price)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors text-sm inline-block"
+                      className="bg-[#0c6b58] text-white px-4 py-2 rounded-lg hover:bg-[#0a5647] transition-colors text-sm inline-block"
                     >
                       Pedir por WhatsApp
                     </Link>
@@ -567,7 +567,7 @@ export default function Home() {
                 href={createFoodMenuMessage()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center bg-emerald-600 text-white px-8 py-4 text-lg rounded-lg hover:bg-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                className="inline-flex items-center bg-[#0c6b58] text-white px-8 py-4 text-lg rounded-lg hover:bg-[#0a5647] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 <Utensils className="h-6 w-6 mr-2" />
                 Ver Menú Completo
@@ -615,6 +615,8 @@ export default function Home() {
       <Footer />
 
       <FloatingFooter />
+
+      <ScrollToTopButton />
     </div>
   );
 }

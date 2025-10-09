@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { MessageCircle, Facebook, Instagram, Phone } from 'lucide-react';
+import { Phone } from "lucide-react";
+import Image from "next/image";
 
 const FloatingFooter = () => {
   const [menuOption, setMenuOptions] = useState(false);
@@ -83,33 +84,37 @@ const FloatingFooter = () => {
 
   const createWhatsAppMessage = () => {
     const message = "¡Hola! Me gustaría hacer un pedido de pizza.";
-    return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+      message
+    )}`;
   };
 
   return (
     <>
       {/* Floating Action Button */}
-      <button 
-        ref={flechaRef} 
+      <button
+        ref={flechaRef}
         onClick={switchOptions}
         className="fixed bottom-4 left-4 w-14 h-14 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-50 flex items-center justify-center group cursor-pointer"
         aria-label="Abrir redes sociales"
       >
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
-          fill="none" 
-          viewBox="0 0 24 24" 
-          strokeWidth="1.5" 
-          stroke="currentColor" 
-          className={`h-6 w-6 transition-transform duration-300 ${menuOption ? 'rotate-45' : ''}`}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth="1.5"
+          stroke="currentColor"
+          className={`h-6 w-6 transition-transform duration-300 ${
+            menuOption ? "rotate-45" : ""
+          }`}
         >
-          <path 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
-            d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" 
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
           />
         </svg>
-        
+
         {/* Pulse animation when closed */}
         {!menuOption && showPulse && (
           <div className="absolute inset-0 rounded-full bg-emerald-600 animate-ping opacity-30"></div>
@@ -121,9 +126,9 @@ const FloatingFooter = () => {
         <div
           ref={menuRef}
           className={`fixed bottom-20 left-4 z-40 transition-all duration-300 ${
-            menuOption 
-              ? 'opacity-100 transform translate-y-0 scale-100' 
-              : 'opacity-0 transform translate-y-4 scale-95 pointer-events-none'
+            menuOption
+              ? "opacity-100 transform translate-y-0 scale-100"
+              : "opacity-0 transform translate-y-4 scale-95 pointer-events-none"
           }`}
         >
           <div className="flex flex-col gap-3">
@@ -132,10 +137,16 @@ const FloatingFooter = () => {
               href={createWhatsAppMessage()}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-12 h-12 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
+              className="w-12 h-12   transition-all duration-300 flex items-center justify-center group"
               title="WhatsApp"
             >
-              <MessageCircle className="h-6 w-6" />
+              {/* <MessageCircle className="h-6 w-6" /> */}
+              <Image
+                src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/redes/social%20%281%29.png"
+                alt="Facebook"
+                width={48}
+                height={48}
+              />
             </Link>
 
             {/* Facebook */}
@@ -143,10 +154,16 @@ const FloatingFooter = () => {
               href={facebookUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
+              className="w-12 h-12   transition-all duration-300 flex items-center justify-center group"
               title="Facebook"
             >
-              <Facebook className="h-6 w-6" />
+              {/* <Facebook className="h-6 w-6" /> */}
+              <Image
+                src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/redes/facebook.png"
+                alt="Facebook"
+                width={48}
+                height={48}
+              />
             </Link>
 
             {/* Instagram */}
@@ -154,10 +171,15 @@ const FloatingFooter = () => {
               href={instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
+              className="w-12 h-12   transition-all duration-300 flex items-center justify-center group"
               title="Instagram"
             >
-              <Instagram className="h-6 w-6" />
+              <Image
+                src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/redes/instagram.png"
+                alt="Facebook"
+                width={48}
+                height={48}
+              />
             </Link>
 
             {/* Phone */}

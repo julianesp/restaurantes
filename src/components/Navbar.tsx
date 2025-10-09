@@ -205,7 +205,7 @@ const Navbar = () => {
               href={generalWhatsAppMessage()}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
+              className="bg-[#0c6b58] text-white px-4 py-2 rounded-lg hover:bg-[#0a5647] transition-colors"
             >
               Pedir Ahora
             </a>
@@ -264,7 +264,7 @@ const Navbar = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 transition-colors font-medium shadow-lg"
+                className="bg-[#0c6b58] text-white px-6 py-3 rounded-lg hover:bg-[#0a5647] transition-colors font-medium shadow-lg"
               >
                 Pedir Ahora
               </Link>

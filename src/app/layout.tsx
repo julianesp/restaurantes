@@ -21,11 +21,20 @@ export const metadata: Metadata = {
   keywords:
     "pizzas, artesanales, Putumayo, Saboreos, comida italiana, delivery",
   authors: [{ name: "Saboreos Pizza" }],
+  manifest: "/manifest.json",
   openGraph: {
     title: "Saboreos Pizza - Pizzas Artesanales del Putumayo",
     description:
       "Las mejores pizzas artesanales con ingredientes frescos y masa casera",
     type: "website",
+    images: [
+      {
+        url: "https://ipbxcphqipulqm7d.public.blob.vercel-storage.com/images/logo_saboreos.png",
+        width: 512,
+        height: 512,
+        alt: "Saboreos Pizza Logo",
+      },
+    ],
   },
 };
 
