@@ -8,7 +8,8 @@ import ImageSlider from "../components/ImageSlider";
 import FloatingFooter from "../components/FloatingFooter";
 import Navbar from "../components/Navbar";
 import Footer from "../containers/Footer";
-import VisitStats from "../components/VisitStats";
+import MenuCategoriesBar from "../components/MenuCategoriesBar";
+import AnnouncementBanner from "../components/AnnouncementBanner";
 import {
   createWhatsAppMessage,
   createFoodMenuMessage,
@@ -154,7 +155,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50">
+      <AnnouncementBanner />
       <Navbar />
+      <MenuCategoriesBar />
 
       <section id="inicio" className="py-6 px-4 sm:px-6 lg:px-8">
         <ImageSlider
@@ -573,9 +576,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Estadísticas de Visitas */}
-      <VisitStats />
 
       {/* Información Adicional */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-900 text-white">

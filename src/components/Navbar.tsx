@@ -107,7 +107,7 @@ const Navbar = () => {
   return (
     <nav
       ref={navRef}
-      className={`top-0 z-50 fixed w-full h-14 backdrop-blur-md bg-white/60 ${styles.navbar}`}
+      className={`top-12 z-40 fixed w-full h-14 backdrop-blur-md bg-white/60 ${styles.navbar}`}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-10">
         <div className={`flex justify-items items-center h-16 max-[768px]:justify-center max-[768px]:relative ${styles.navContainer}`}>
