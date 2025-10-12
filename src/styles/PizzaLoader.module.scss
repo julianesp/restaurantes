@@ -1,0 +1,517 @@
+/* Contenedor principal del loader */
+.pizza-loader-container {
+  position: fixed;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  /* background: linear-gradient(135deg, #0c6b58 0%, #0a5647 100%); */
+  /* background: linear-gradient(135deg, #0c6b58 0%, #0a5647 50%); */
+  backdrop-filter: blur(4px);
+
+  z-index: 9999;
+  animation: fadeOut 0.5s ease-in-out 3s forwards;
+  overflow: hidden;
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* Contenedor de la pizza */
+.pizza-loader {
+  position: relative;
+  width: 300px;
+  height: 300px;
+}
+
+/* Cuadrante de pizza circular */
+.pizza-slice {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  background: linear-gradient(135deg, #f4c542 0%, #e8a628 100%);
+  border: 6px solid #d4a028;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Posiciones y animaciones de cada trozo */
+.slice-1 {
+  top: 0;
+  left: 0;
+  border-radius: 100% 0 0 0;
+  animation: slideSlice1 1.2s ease-out forwards;
+}
+
+.slice-2 {
+  top: 0;
+  right: 0;
+  border-radius: 0 100% 0 0;
+  animation: slideSlice2 1.2s ease-out forwards;
+}
+
+.slice-3 {
+  bottom: 0;
+  left: 0;
+  border-radius: 0 0 0 100%;
+  animation: slideSlice3 1.2s ease-out forwards;
+}
+
+.slice-4 {
+  bottom: 0;
+  right: 0;
+  border-radius: 0 0 100% 0;
+  animation: slideSlice4 1.2s ease-out forwards;
+}
+
+/* Animaciones desde diferentes esquinas */
+@keyframes slideSlice1 {
+  0% {
+    transform: translate(-200vw, -200vh) rotate(-180deg) scale(0.5);
+    opacity: 0;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slideSlice2 {
+  0% {
+    transform: translate(200vw, -200vh) rotate(180deg) scale(0.5);
+    opacity: 0;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slideSlice3 {
+  0% {
+    transform: translate(-200vw, 200vh) rotate(180deg) scale(0.5);
+    opacity: 0;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slideSlice4 {
+  0% {
+    transform: translate(200vw, 200vh) rotate(-180deg) scale(0.5);
+    opacity: 0;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Contenido de cada trozo */
+.slice-content {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+/* Borde de corteza (masa tostada) */
+.crust-border {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Lomitas de corteza */
+.crust-bump {
+  position: absolute;
+  background: radial-gradient(
+    circle at 30% 30%,
+    #daa574 0%,
+    #c89060 40%,
+    #a67548 100%
+  );
+  border-radius: 50%;
+  box-shadow: inset -2px -2px 4px rgba(0, 0, 0, 0.3),
+    inset 1px 1px 3px rgba(255, 255, 255, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Posiciones de las lomitas para cuadrante superior izquierdo */
+.crust-slice-1 .crust-bump-1 {
+  top: -8px;
+  left: 5%;
+  width: 20px;
+  height: 20px;
+}
+
+.crust-slice-1 .crust-bump-2 {
+  top: 8%;
+  left: -8px;
+  width: 22px;
+  height: 22px;
+}
+
+.crust-slice-1 .crust-bump-3 {
+  top: -5px;
+  left: 25%;
+  width: 18px;
+  height: 18px;
+}
+
+.crust-slice-1 .crust-bump-4 {
+  top: 25%;
+  left: -5px;
+  width: 19px;
+  height: 19px;
+}
+
+/* Posiciones de las lomitas para cuadrante superior derecho */
+.crust-slice-2 .crust-bump-1 {
+  top: -8px;
+  right: 5%;
+  width: 20px;
+  height: 20px;
+}
+
+.crust-slice-2 .crust-bump-2 {
+  top: 8%;
+  right: -8px;
+  width: 22px;
+  height: 22px;
+}
+
+.crust-slice-2 .crust-bump-3 {
+  top: -5px;
+  right: 25%;
+  width: 18px;
+  height: 18px;
+}
+
+.crust-slice-2 .crust-bump-4 {
+  top: 25%;
+  right: -5px;
+  width: 19px;
+  height: 19px;
+}
+
+/* Posiciones de las lomitas para cuadrante inferior izquierdo */
+.crust-slice-3 .crust-bump-1 {
+  bottom: -8px;
+  left: 5%;
+  width: 20px;
+  height: 20px;
+}
+
+.crust-slice-3 .crust-bump-2 {
+  bottom: 8%;
+  left: -8px;
+  width: 22px;
+  height: 22px;
+}
+
+.crust-slice-3 .crust-bump-3 {
+  bottom: -5px;
+  left: 25%;
+  width: 18px;
+  height: 18px;
+}
+
+.crust-slice-3 .crust-bump-4 {
+  bottom: 25%;
+  left: -5px;
+  width: 19px;
+  height: 19px;
+}
+
+/* Posiciones de las lomitas para cuadrante inferior derecho */
+.crust-slice-4 .crust-bump-1 {
+  bottom: -8px;
+  right: 5%;
+  width: 20px;
+  height: 20px;
+}
+
+.crust-slice-4 .crust-bump-2 {
+  bottom: 8%;
+  right: -8px;
+  width: 22px;
+  height: 22px;
+}
+
+.crust-slice-4 .crust-bump-3 {
+  bottom: -5px;
+  right: 25%;
+  width: 18px;
+  height: 18px;
+}
+
+.crust-slice-4 .crust-bump-4 {
+  bottom: 25%;
+  right: -5px;
+  width: 19px;
+  height: 19px;
+}
+
+/* Salsa de tomate */
+.pizza-sauce {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 85%;
+  height: 85%;
+  background: radial-gradient(circle, #e74c3c 0%, #c0392b 100%);
+  border-radius: 50%;
+  box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Pepperoni */
+.pepperoni {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  background: radial-gradient(circle, #8b2e1f 0%, #6b1e0f 100%);
+  border-radius: 50%;
+  border: 2px solid #5a1809;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.4), 0 2px 5px rgba(0, 0, 0, 0.2);
+  animation: popIn 0.6s ease-out backwards;
+  opacity: 0;
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  80% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.pepperoni-1 {
+  top: 20%;
+  right: 35%;
+  animation-delay: 1.3s;
+}
+
+.pepperoni-2 {
+  top: 45%;
+  right: 25%;
+  animation-delay: 1.4s;
+}
+
+.pepperoni-3 {
+  top: 20%;
+  right: 35%;
+  animation-delay: 1.5s;
+}
+
+.pepperoni-4 {
+  top: 45%;
+  right: 25%;
+  animation-delay: 1.6s;
+}
+
+.pepperoni-5 {
+  top: 35%;
+  right: 30%;
+  animation-delay: 1.7s;
+}
+
+.pepperoni-6 {
+  top: 35%;
+  right: 30%;
+  animation-delay: 1.8s;
+}
+
+/* Burbujas de queso */
+.cheese-bubble {
+  position: absolute;
+  background: radial-gradient(circle, #fff9e6 0%, #ffeaa7 100%);
+  border-radius: 50%;
+  box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.8),
+    0 2px 4px rgba(0, 0, 0, 0.1);
+  animation: bubbleUp 2s ease-in-out infinite;
+  opacity: 0;
+}
+
+@keyframes bubbleUp {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.bubble-1 {
+  top: 15%;
+  right: 45%;
+  width: 12px;
+  height: 12px;
+  animation-delay: 2s;
+}
+
+.bubble-2 {
+  top: 30%;
+  right: 40%;
+  width: 14px;
+  height: 14px;
+  animation-delay: 2.1s;
+}
+
+.bubble-3 {
+  top: 20%;
+  right: 42%;
+  width: 13px;
+  height: 13px;
+  animation-delay: 2.2s;
+}
+
+.bubble-4 {
+  top: 25%;
+  right: 38%;
+  width: 12px;
+  height: 12px;
+  animation-delay: 2.3s;
+}
+
+/* Texto de carga */
+.loading-text {
+  margin-top: 40px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.loading-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.loading-dots span {
+  animation: dotBlink 1.4s infinite;
+}
+
+.loading-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dotBlink {
+  0%,
+  20% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .pizza-loader {
+    width: 240px;
+    height: 240px;
+  }
+
+  .pizza-slice {
+    width: 120px;
+    height: 120px;
+  }
+
+  .pepperoni {
+    width: 22px;
+    height: 22px;
+  }
+
+  .cheese-bubble {
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  .crust-bump {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .loading-text {
+    font-size: 1.2rem;
+  }
+
+  .mensaje-loader {
+    font-size: 1.3rem;
+    margin-top: 10px;
+  }
+}
+
+.mensaje-loader {
+  margin-top: 20px;
+  color: white;
+
+  font-size: 2rem;
+  font-weight: 500;
+
+  /* Borde negro con sombra difuminada */
+  text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000,
+    2px 2px 0 #000, 0 0 10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.6),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+
+  animation-name: pizza;
+  animation-delay: 2s;
+
+  @media (min-width: 320px) {
+    font-size: 1.5rem;
+    text-align: center;
+  }
+}

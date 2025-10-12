@@ -30,10 +30,13 @@ const FloatingFooter = () => {
     if (!isClient) return;
 
     const startPulseAnimation = () => {
-      setShowPulse(true);
-      pulseTimeoutRef.current = setTimeout(() => {
-        setShowPulse(false);
-      }, 2000); // Mostrar pulsación por 2 segundos
+      if (!isClient) return;
+      requestAnimationFrame(() => {
+        setShowPulse(true);
+        pulseTimeoutRef.current = setTimeout(() => {
+          requestAnimationFrame(() => setShowPulse(false));
+        }, 2000);
+      });
     };
 
     // Iniciar inmediatamente y repetir cada 10 segundos
