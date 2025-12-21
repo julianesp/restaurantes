@@ -1,0 +1,45 @@
+@use "@/styles/variables.scss" as m;
+
+.navbar {
+  // Color azul con transparencia para efecto cristal
+  background-color: rgba(0, 119, 247, 0.55); // #0077f7 con 85% opacidad
+  backdrop-filter: blur(4px) saturate(18%);
+  -webkit-backdrop-filter: blur(4px) saturate(18%);
+
+  // Sombra sutil para dar profundidad
+  box-shadow: 10px 4px 20px rgba(0, 119, 247, 0.6);
+
+  border-end-start-radius: 40px;
+  border-end-end-radius: 40px;
+
+  @media (width >= 768px) {
+    .navContainer {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      width: 100% !important;
+    }
+
+    .logoSection {
+      display: flex !important;
+      align-items: center !important;
+      gap: 0.75rem !important;
+      justify-content: flex-start !important;
+      width: auto !important;
+    }
+
+    .navigationLinks {
+      display: flex !important;
+      align-items: center !important;
+      gap: 1.5rem !important;
+    }
+  }
+
+  // Para tablets (769px - 1023px) mantener el logo centrado
+  @media (width >= 769px) and (width <= 1023px) {
+    .logoSection {
+      // justify-content: center !important;
+      // width: 100% !important;
+    }
+  }
+}

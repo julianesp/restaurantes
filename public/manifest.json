@@ -1,31 +1,13 @@
 {
-  "name": "Saboreos Pizza - Pizzas Artesanales del Putumayo",
-  "short_name": "Saboreos Pizza",
-  "description": "Las mejores pizzas artesanales con ingredientes frescos y masa casera",
+  "name": "Tu Restaurante - Gastronomía de Calidad",
+  "short_name": "Restaurante",
+  "description": "Los mejores platos con ingredientes frescos y recetas tradicionales",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#0c6b58",
+  "theme_color": "#dc2626",
   "orientation": "portrait",
-  "icons": [
-    {
-      "src": "/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png"
-    }
-  ],
+  "icons": [],
   "categories": ["food", "restaurant"],
   "lang": "es",
   "dir": "ltr"

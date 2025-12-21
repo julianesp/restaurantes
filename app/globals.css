@@ -1,0 +1,275 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  /* Paleta de 3 colores azules */
+  --color-primary: #0077f7; /* Azul principal brillante */
+  --color-secondary: #0a0b0c; /* Azul intermedio */
+  --color-accent: #33b5ff; /* Azul claro/acento */
+
+  /* Variantes oscuras */
+  --color-primary-dark: #0066aa;
+  --color-secondary-dark: #005599;
+
+  /* Variantes claras */
+  --color-primary-light: #4dc4ff;
+  --color-accent-light: #80d4ff;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-darkest: var(--primary-darkest);
+  --color-primary-light: var(--primary-light);
+  --color-primary-lighter: var(--primary-lighter);
+  --color-primary-lightest: var(--primary-lightest);
+  --color-secondary-light: var(--secondary-light);
+  --color-secondary-lightest: var(--secondary-lightest);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* Modo oscuro controlado por next-themes */
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ========================================
+   ANIMACIONES REVEAL ON SCROLL
+   ======================================== */
+
+/* Variables de animación */
+:root {
+  --ros-opacity: 0;
+  --ros-distance-y: 4rem;
+  --ros-distance-x: 0;
+  --ros-scale: 0.8;
+  --transition-duration-long: 1.2s;
+  --transition-duration-medium: 0.8s;
+  --transition-duration-short: 0.5s;
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Estado inicial - elemento no visible */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(var(--ros-distance-y)) translateX(var(--ros-distance-x))
+    scale(var(--ros-scale));
+  transition: opacity var(--transition-duration-long) var(--ease-in-out-quart),
+    transform var(--transition-duration-long) var(--ease-in-out-quart);
+}
+
+/* Estado visible - cuando entra en viewport */
+.reveal-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0) translateX(0) scale(1);
+}
+
+/* Variantes de dirección */
+.reveal-from-bottom {
+  --ros-distance-y: 4rem;
+  --ros-scale: 1;
+}
+
+.reveal-from-top {
+  --ros-distance-y: -4rem;
+  --ros-scale: 1;
+}
+
+.reveal-from-left {
+  --ros-distance-y: 0;
+  --ros-distance-x: -4rem;
+  --ros-scale: 1;
+}
+
+.reveal-from-right {
+  --ros-distance-y: 0;
+  --ros-distance-x: 4rem;
+  --ros-scale: 1;
+}
+
+.reveal-scale-up {
+  --ros-distance-y: 0;
+  --ros-distance-x: 0;
+  --ros-scale: 0.8;
+}
+
+/* Delays para secuencias */
+.delay-100 {
+  transition-delay: 0.1s;
+}
+.delay-200 {
+  transition-delay: 0.2s;
+}
+.delay-300 {
+  transition-delay: 0.3s;
+}
+.delay-400 {
+  transition-delay: 0.4s;
+}
+.delay-500 {
+  transition-delay: 0.5s;
+}
+.delay-600 {
+  transition-delay: 0.6s;
+}
+
+/* ========================================
+   EFECTOS PARALLAX
+   ======================================== */
+
+.parallax-container {
+  overflow: hidden;
+  position: relative;
+}
+
+.parallax-element {
+  transition: transform 0.1s ease-out;
+  will-change: transform;
+}
+
+/* Parallax con escala */
+.parallax-scale {
+  transform: scale(1.1);
+  transition: transform 0.5s var(--ease-out-quart);
+}
+
+.parallax-scale.in-view {
+  transform: scale(1);
+}
+
+/* ========================================
+   ANIMACIONES HOVER MEJORADAS
+   ======================================== */
+
+/* Underline animado */
+.animated-underline {
+  position: relative;
+  display: inline-block;
+}
+
+.animated-underline::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--transition-duration-short) var(--ease-out-quart);
+}
+
+.animated-underline:hover::after {
+  transform: scaleX(1);
+}
+
+/* Efecto lift en hover */
+.hover-lift {
+  transition: transform var(--transition-duration-short) var(--ease-out-quart),
+    box-shadow var(--transition-duration-short) var(--ease-out-quart);
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* ========================================
+   ANIMACIONES DE BOTONES
+   ======================================== */
+
+.btn-animated {
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-duration-short) var(--ease-out-quart);
+}
+
+.btn-animated::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-animated:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* ========================================
+   ANIMACIONES INFINITAS
+   ======================================== */
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes pulse-slow {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+
+/* ========================================
+   SMOOTH SCROLL
+   ======================================== */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ========================================
+   UTILIDADES
+   ======================================== */
+
+.backdrop-blur-strong {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
