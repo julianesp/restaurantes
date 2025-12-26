@@ -78,10 +78,10 @@ export default function ImageSlider({
   return (
     <div className="relative w-full mb-8 mt-8 ">
       <div className="text-center mb-4">
-        <h3 className="text-2xl font-bold text-gray-900 capitalize">{title}</h3>
+        <h3 className="text-2xl font-bold text-gray-900 dark:text-white capitalize">{title}</h3>
       </div>
 
-      <div className="relative overflow-hidden rounded-lg shadow-lg bg-white ">
+      <div className="relative overflow-hidden rounded-lg shadow-lg bg-white dark:bg-gray-800">
         <div className="relative h-64 md:h-80 lg:h-96">
           <Image
             src={`/images/${category}_${images[currentIndex]}.jpg`}
@@ -119,7 +119,7 @@ export default function ImageSlider({
         </div>
 
         {/* Dots indicator */}
-        <div className="flex justify-center space-x-2 p-4 bg-white">
+        <div className="flex justify-center space-x-2 p-4 bg-white dark:bg-gray-800">
           {images.map((_, index) => (
             <button
               key={index}

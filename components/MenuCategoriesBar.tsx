@@ -111,13 +111,13 @@ export default function MenuCategoriesBar() {
   }, []);
 
   return (
-    <div className="w-full bg-white border-b shadow-sm z-40 relative">
+    <div className="w-full bg-white dark:bg-gray-900 border-b dark:border-gray-800 shadow-sm z-40 relative">
       <div className="max-w-7xl mx-auto px-4 py-3 relative">
         {/* Botón izquierdo */}
         {showLeftButton && (
           <button
             onClick={() => scroll("left")}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/95 hover:bg-[#0c6b58] hover:text-white text-gray-700 p-2 rounded-full shadow-lg transition-all duration-200"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/95 dark:bg-gray-800/95 hover:bg-[#0c6b58] hover:text-white text-gray-700 dark:text-gray-300 p-2 rounded-full shadow-lg transition-all duration-200"
             aria-label="Desplazar a la izquierda"
           >
             <ChevronLeft className="h-5 w-5" />
@@ -135,7 +135,7 @@ export default function MenuCategoriesBar() {
             <button
               key={category.id}
               onClick={() => handleCategoryClick(category.id)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0c6b58] text-white hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 whitespace-nowrap border border-transparent hover:border-emerald-200 flex-shrink-0"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0c6b58] dark:bg-primary-600 text-white hover:bg-emerald-50 dark:hover:bg-gray-700 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all duration-200 whitespace-nowrap border border-transparent hover:border-emerald-200 dark:hover:border-gray-600 flex-shrink-0"
             >
               {category.icon}
               <span className="text-sm font-medium">{category.name}</span>
@@ -147,7 +147,7 @@ export default function MenuCategoriesBar() {
         {showRightButton && (
           <button
             onClick={() => scroll("right")}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/95 hover:bg-[#0c6b58] hover:text-white text-gray-700 p-2 rounded-full shadow-lg transition-all duration-200"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/95 dark:bg-gray-800/95 hover:bg-[#0c6b58] hover:text-white text-gray-700 dark:text-gray-300 p-2 rounded-full shadow-lg transition-all duration-200"
             aria-label="Desplazar a la derecha"
           >
             <ChevronRight className="h-5 w-5" />

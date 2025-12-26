@@ -25,6 +25,8 @@ import FloatingFooter from "../components/FloatingFooter";
 import Navbar from "../components/Navbar/page";
 import Footer from "../containers/Footer";
 import ScrollToTopButton from "../components/ScrollToTopButton";
+import FoodSlider from "../components/FoodSlider";
+import LocationMap from "../components/LocationMap";
 import {
   createWhatsAppMessage,
   createFoodMenuMessage,
@@ -113,6 +115,50 @@ const menuCategories = [
   { icon: UtensilsCrossed, label: "Platos Fuertes", color: "text-red-700" },
 ];
 
+// Comidas especiales para el slider
+const specialFoods = [
+  {
+    id: 1,
+    name: "Buñuelos Artesanales",
+    description:
+      "Deliciosos buñuelos recién hechos con receta tradicional. Crujientes por fuera, suaves por dentro. Perfectos para cualquier ocasión.",
+    image: "/images/bunuelos.jpg",
+    price: "$8.000",
+  },
+  {
+    id: 2,
+    name: "Empanadas Caseras",
+    description:
+      "Empanadas rellenas con los ingredientes más frescos. Disponibles en carne, pollo, queso y vegetales. Un sabor que te transportará a casa.",
+    image: "/images/empanadas.jpg",
+    price: "$3.500",
+  },
+  {
+    id: 3,
+    name: "Papas Rellenas",
+    description:
+      "Papas doradas rellenas de carne molida sazonada con especias tradicionales. Una explosión de sabor en cada bocado.",
+    image: "/images/papas-rellenas.jpg",
+    price: "$5.500",
+  },
+  {
+    id: 4,
+    name: "Arepas de Chócolo",
+    description:
+      "Arepas dulces de maíz tierno hechas al estilo tradicional. Perfectas para el desayuno o la merienda.",
+    image: "/images/arepas.jpg",
+    price: "$4.000",
+  },
+  {
+    id: 5,
+    name: "Tamales Caseros",
+    description:
+      "Tamales envueltos en hoja de plátano con el auténtico sabor de la cocina tradicional. Rellenos generosos y masa suave.",
+    image: "/images/tamales.jpg",
+    price: "$12.000",
+  },
+];
+
 export default function Home() {
   // Hooks de animación para diferentes secciones
   const heroReveal = useRevealOnScroll<HTMLDivElement>();
@@ -131,11 +177,24 @@ export default function Home() {
       {/* <AnnouncementBanner /> */}
       <Navbar />
 
-      {/* <div className="pt-28">
-        <MenuCategoriesBar />
-      </div> */}
+      {/* Slider de Comidas Especiales */}
+      <div
+        ref={specialtiesReveal.ref}
+        id="especialidades"
+        className={` w-full reveal-on-scroll reveal-from-bottom ${
+          specialtiesReveal.isVisible ? "visible" : ""
+        }`}
+      >
+        {/* <h3 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-8 pt-6 px-4">
+          Nuestras Especialidades
+        </h3> */}
+        <FoodSlider foods={specialFoods} autoplayInterval={5000} />
+      </div>
 
-      <section id="inicio" className="py-12 px-4 sm:px-6 lg:px-8 bg-white">
+      <section
+        id="inicio"
+        className="py-12 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900"
+      >
         {/* Hero Section with Icon */}
         <div
           ref={heroReveal.ref}
@@ -158,7 +217,7 @@ export default function Home() {
             Bienvenido a{" "}
             <span className="text-primary-500">Tu Restaurante</span>
           </h2>
-          <p className="text-xl text-black mb-8 max-w-3xl mx-auto">
+          <p className="text-xl text-black dark:text-gray-300 mb-8 max-w-3xl mx-auto">
             Donde cada plato es una obra maestra. Ingredientes frescos, recetas
             tradicionales y la pasión por la auténtica cocina se encuentran en
             cada bocado.
@@ -166,16 +225,10 @@ export default function Home() {
         </div>
 
         {/* Menu Categories */}
-        <div
-          ref={specialtiesReveal.ref}
-          id="especialidades"
-          className={`max-w-6xl mx-auto py-6 reveal-on-scroll reveal-from-bottom ${
-            specialtiesReveal.isVisible ? "visible" : ""
-          }`}
-        >
-          <h3 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-8">
-            Nuestras Especialidades
-          </h3>
+        <div className="max-w-6xl mx-auto py-12">
+          <h4 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">
+            Explora Nuestro Menú
+          </h4>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
             {menuCategories.map((category, index) => (
               <div
@@ -677,7 +730,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="mt-6 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+            <div className="mt-6 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-600 p-4 rounded">
               <div className="flex items-start">
                 <div className="flex-shrink-0">
                   <svg
@@ -693,7 +746,7 @@ export default function Home() {
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm text-yellow-700">
+                  <p className="text-sm text-yellow-700 dark:text-yellow-300">
                     <strong>Importante:</strong> El costo de envío se debe
                     cancelar antes de que el repartidor salga con tu pedido. Te
                     confirmaremos el monto según tu ubicación.
@@ -779,6 +832,16 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Sección de Ubicación */}
+      <LocationMap
+        businessName="Tu Restaurante"
+        address="Calle 123 #45-67, Tu Ciudad, País"
+        phone="+57 300 000 0000"
+        hours="Lunes-Domingo: 7:00 AM - 6:00 PM"
+        latitude={4.711}
+        longitude={-74.0721}
+      />
 
       <Footer />
 
