@@ -9,6 +9,14 @@
   // Sombra sutil para dar profundidad
   box-shadow: 10px 4px 20px rgba(0, 119, 247, 0.6);
 
+  // Estilos para modo oscuro
+  :global(.dark) & {
+    background-color: rgba(20, 20, 20, 0.75); // Fondo oscuro con transparencia
+    backdrop-filter: blur(8px) saturate(150%);
+    -webkit-backdrop-filter: blur(8px) saturate(150%);
+    box-shadow: 10px 4px 20px rgba(0, 0, 0, 0.8);
+  }
+
   border-end-start-radius: 40px;
   border-end-end-radius: 40px;
 

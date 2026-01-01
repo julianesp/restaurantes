@@ -1,6 +1,15 @@
 "use client";
 
-import { Pizza, Sandwich, Cake, Coffee, IceCream, Wine, ChevronRight, ChevronLeft } from "lucide-react";
+import {
+  Pizza,
+  Sandwich,
+  Cake,
+  Coffee,
+  IceCream,
+  Wine,
+  ChevronRight,
+  ChevronLeft,
+} from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 
 interface Category {
@@ -83,7 +92,8 @@ export default function MenuCategoriesBar() {
 
   const checkScroll = () => {
     if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      const { scrollLeft, scrollWidth, clientWidth } =
+        scrollContainerRef.current;
       setShowLeftButton(scrollLeft > 0);
       setShowRightButton(scrollLeft < scrollWidth - clientWidth - 10);
     }
@@ -111,7 +121,7 @@ export default function MenuCategoriesBar() {
   }, []);
 
   return (
-    <div className="w-full bg-white dark:bg-gray-900 border-b dark:border-gray-800 shadow-sm z-40 relative">
+    <div className="w-full bg-white dark:bg-gray-900 border-b-2 border-white dark:border-gray-800 shadow-sm z-40 relative">
       <div className="max-w-7xl mx-auto px-4 py-3 relative">
         {/* Botón izquierdo */}
         {showLeftButton && (
@@ -135,7 +145,7 @@ export default function MenuCategoriesBar() {
             <button
               key={category.id}
               onClick={() => handleCategoryClick(category.id)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0c6b58] dark:bg-primary-600 text-white hover:bg-emerald-50 dark:hover:bg-gray-700 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all duration-200 whitespace-nowrap border border-transparent hover:border-emerald-200 dark:hover:border-gray-600 flex-shrink-0"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-primary-500 to-accent-500 dark:bg-gradient-to-r dark:from-gray-700 dark:to-gray-600 text-white hover:from-primary-600 hover:to-accent-600 dark:hover:from-gray-600 dark:hover:to-gray-500 transition-all duration-200 whitespace-nowrap border border-transparent hover:border-primary-300 dark:hover:border-gray-500 flex-shrink-0 shadow-md hover:shadow-lg"
             >
               {category.icon}
               <span className="text-sm font-medium">{category.name}</span>

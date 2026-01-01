@@ -40,7 +40,7 @@ export default function LocationMap({
   };
 
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+    <section className="py-16 px-4 sm:px-6 lg:px-8 location-section-bg">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -52,7 +52,7 @@ export default function LocationMap({
           <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             📍 Encuéntranos Aquí
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
             Visítanos en nuestra ubicación o solicita delivery. ¡Estamos listos
             para atenderte!
           </p>
@@ -141,9 +141,9 @@ export default function LocationMap({
                 <strong className="text-primary-600 dark:text-primary-400">
                   💡 Consejo:
                 </strong>{" "}
-                Haz clic en <span className="font-bold text-">Cómo Llegar</span> para obtener direcciones desde tu
-                ubicación actual. También ofrecemos servicio de delivery a
-                domicilio.
+                Haz clic en <span className="font-bold text-gray-900 dark:text-white">Cómo Llegar</span>{" "}
+                para obtener direcciones desde tu ubicación actual. También
+                ofrecemos servicio de delivery a domicilio.
               </p>
             </div>
           </div>

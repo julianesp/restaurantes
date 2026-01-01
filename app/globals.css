@@ -3,6 +3,10 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* Backgrounds específicos por sección */
+  --loc-from: #f8fafc; /* claro */
+  --loc-to: #ffffff; /* claro */
+
   /* Paleta de 3 colores azules */
   --color-primary: #0077f7; /* Azul principal brillante */
   --color-secondary: #0a0b0c; /* Azul intermedio */
@@ -34,15 +38,77 @@
 
 /* Modo oscuro controlado por next-themes */
 .dark {
-  --background: #0a0a0a;
+  --background: #000000;
+  --background-gradient-start: #434343;
+  --background-gradient-end: #000000;
   --foreground: #ededed;
+
+  /* Overrides para secciones específicas */
+  --loc-from: #111827; /* gris oscuro */
+  --loc-to: #374151; /* gris menos oscuro */
 }
 
 body {
-  background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+
+  /* Cursor personalizado - Gorro de Chef */
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="%23FFFFFF" stroke="%23000000" stroke-width="1.5" d="M16 8c-3 0-5.5 2-6 5-1.5 0-3 1.5-3 3.5S8 20 9.5 20h13c1.5 0 2.5-1.5 2.5-3.5S24 13 22.5 13c-0.5-3-3-5-6-5zm-6 14v4c0 1 0.5 2 2 2h8c1.5 0 2-1 2-2v-4z"/><ellipse fill="%23FFFFFF" cx="16" cy="12" rx="4" ry="3"/></svg>'),
+    auto;
+
+  /* Aplicar gradiente en modo claro */
+  background: #2980b9; /* fallback for old browsers */
+  background: -webkit-linear-gradient(
+    to right,
+    #ffffff,
+    #6dd5fa,
+    #2980b9
+  ); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(
+    to right,
+    #ffffff,
+    #6dd5fa,
+    #2980b9
+  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+/* Aplicar gradiente en modo oscuro */
+.dark body {
+  background: #000000; /* fallback for old browsers */
+  background: -webkit-linear-gradient(
+    to right,
+    #434343,
+    #000000
+  ); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(
+    to right,
+    #434343,
+    #000000
+  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+/* Cursor personalizado para elementos interactivos - Tenedor y Cuchillo */
+a,
+button,
+input[type="submit"],
+input[type="button"],
+[role="button"],
+.cursor-pointer,
+[href],
+a:hover,
+button:hover,
+a *,
+button * {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><g transform="translate(6, 4)"><path fill="%23C0C0C0" stroke="%23000000" stroke-width="1.2" d="M3 2 L3 10 L3.5 10 L3.5 22 C3.5 23 4 24 5 24 C6 24 6.5 23 6.5 22 L6.5 10 L7 10 L7 2 M4 2 L4 9 M6 2 L6 9"/><path fill="%23C0C0C0" stroke="%23000000" stroke-width="1.2" d="M13 2 L13 8 C13 10 14 11 15 11 L15 22 C15 23 15.5 24 16.5 24 C17.5 24 18 23 18 22 L18 11 C19 11 20 10 20 8 L20 2"/></g></svg>'),
+    pointer !important;
+}
+
+/* Asegurar que los elementos dentro de enlaces también tengan el cursor correcto */
+a > *,
+button > * {
+  cursor: inherit !important;
 }
 
 /* ========================================
@@ -106,6 +172,77 @@ body {
   --ros-scale: 0.8;
 }
 
+/* Per-letter hover / wave animation */
+.char {
+  display: inline-block;
+  will-change: transform;
+  transition: transform 0.32s var(--ease-out-quart),
+    filter 0.32s var(--ease-out-quart);
+  transform-origin: center;
+}
+
+.char:hover {
+  transform: translateY(-10px);
+}
+
+/* Si pasas el cursor por la sección completa, se genera una ola (delays por índice) */
+.wave-parent:hover .char {
+  transform: translateY(-10px);
+}
+
+.wave-parent .char {
+  transition-delay: calc(var(--i) * 28ms);
+}
+
+/* Animación automática: cuando se añade la clase .wave-animate se reproduce la ola */
+.wave-animate .char {
+  animation: wave 0.72s var(--ease-out-quart) both;
+  animation-delay: calc(var(--i) * 28ms);
+}
+
+@keyframes wave {
+  0% {
+    transform: translateY(0);
+  }
+
+  30% {
+    transform: translateY(-14px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Location section background using CSS vars to ensure theme responsiveness */
+.location-section-bg {
+  background: linear-gradient(to bottom right, var(--loc-from), var(--loc-to));
+  transition: background 0.35s var(--ease-in-out-quart),
+    color 0.35s var(--ease-in-out-quart);
+}
+
+/* Asegurar contraste adecuado en modo claro para todos los textos */
+body:not(.dark) h1,
+body:not(.dark) h2,
+body:not(.dark) h3,
+body:not(.dark) h4,
+body:not(.dark) h5,
+body:not(.dark) h6,
+body:not(.dark) p:not([class*="text-"]) {
+  color: #1f2937 !important; /* gray-800 */
+}
+
+/* Asegurar que los textos con clases específicas se respeten */
+body:not(.dark) .text-white {
+  color: #1f2937 !important; /* Convertir text-white a oscuro en modo claro */
+}
+
+body:not(.dark) .text-gray-100,
+body:not(.dark) .text-gray-200,
+body:not(.dark) .text-gray-300 {
+  color: #4b5563 !important; /* gray-600 */
+}
+
 /* Delays para secuencias */
 .delay-100 {
   transition-delay: 0.1s;
@@ -124,6 +261,40 @@ body {
 }
 .delay-600 {
   transition-delay: 0.6s;
+}
+
+/* Animación disparada por cambio de tema (dark <-> light) */
+.theme-animate {
+  animation: theme-pulse 0.85s var(--ease-out-quart) both;
+}
+
+@keyframes theme-pulse {
+  0% {
+    transform: translateY(0) scale(1);
+    filter: brightness(1);
+    opacity: 1;
+  }
+
+  40% {
+    transform: translateY(-6px) scale(1.02);
+    filter: brightness(1.06);
+    opacity: 0.98;
+  }
+
+  100% {
+    transform: translateY(0) scale(1);
+    filter: brightness(1);
+    opacity: 1;
+  }
+}
+
+/* Asegurar transiciones suaves para color y background en cambios de tema */
+.reveal-on-scroll,
+.reveal-on-scroll * {
+  transition-property: color, background-color, border-color, box-shadow,
+    transform, filter, opacity;
+  transition-duration: 0.35s;
+  transition-timing-function: var(--ease-in-out-quart);
 }
 
 /* ========================================

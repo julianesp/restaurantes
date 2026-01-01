@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect, useState, useRef } from "react";
+import { useTheme } from "next-themes";
+
 import {
   Star,
   Utensils,
@@ -36,36 +39,6 @@ import {
 import Link from "next/link";
 import styles from "../styles/Home.module.scss";
 import { useRevealOnScroll } from "../utils/useRevealOnScroll";
-
-const featuredDishes = [
-  {
-    id: 1,
-    name: "Plato Especial",
-    description:
-      "Una exquisita combinación de sabores frescos y ingredientes de la más alta calidad",
-    price: "$18.990",
-    icon: ChefHat,
-    color: "text-primary-500",
-  },
-  {
-    id: 2,
-    name: "Entrada Gourmet",
-    description:
-      "Deliciosa selección de entradas preparadas con ingredientes premium",
-    price: "$21.990",
-    icon: Soup,
-    color: "text-accent-500",
-  },
-  {
-    id: 3,
-    name: "Especialidad de la Casa",
-    description:
-      "El favorito de nuestros clientes, preparado con receta tradicional",
-    price: "$22.990",
-    icon: UtensilsCrossed,
-    color: "text-red-700",
-  },
-];
 
 const mostPopular = {
   name: "Plato Estrella",
@@ -167,10 +140,60 @@ export default function Home() {
   const dishOfDayReveal = useRevealOnScroll<HTMLDivElement>();
   const specialOfferReveal = useRevealOnScroll<HTMLDivElement>();
   const chefReveal = useRevealOnScroll<HTMLDivElement>();
-  const featuredReveal = useRevealOnScroll<HTMLDivElement>();
   const menuReveal = useRevealOnScroll<HTMLDivElement>();
   const deliveryReveal = useRevealOnScroll<HTMLDivElement>();
   const infoReveal = useRevealOnScroll<HTMLDivElement>();
+
+  const { theme } = useTheme();
+  const [themePulse, setThemePulse] = useState(false);
+  const [waveAuto, setWaveAuto] = useState(false);
+  const h2Ref = useRef<HTMLHeadingElement | null>(null);
+
+  useEffect(() => {
+    // Disparar animación de tema solo si el hero está visible
+    if (!heroReveal.isVisible) return;
+
+    // Reiniciar para permitir reproducir animación varias veces
+    setThemePulse(false);
+    const start = setTimeout(() => setThemePulse(true), 10);
+    const stop = setTimeout(() => setThemePulse(false), 900);
+
+    return () => {
+      clearTimeout(start);
+      clearTimeout(stop);
+    };
+  }, [theme, heroReveal.isVisible]);
+
+  // Observer para ejecutar la ola automáticamente cuando el h2 esté al 50% del viewport
+  useEffect(() => {
+    const el = h2Ref.current;
+    if (!el) return;
+
+    let startTimeout: number | undefined;
+    let stopTimeout: number | undefined;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            // reproducir animación (se puede volver a reproducir al salir/entrar)
+            setWaveAuto(false);
+            startTimeout = window.setTimeout(() => setWaveAuto(true), 10);
+            stopTimeout = window.setTimeout(() => setWaveAuto(false), 900);
+          }
+        });
+      },
+      { threshold: [0.5] }
+    );
+
+    observer.observe(el);
+
+    return () => {
+      observer.disconnect();
+      if (startTimeout) clearTimeout(startTimeout);
+      if (stopTimeout) clearTimeout(stopTimeout);
+    };
+  }, [h2Ref]);
 
   return (
     <div className="min-h-screen bg-transparent flex flex-col">
@@ -191,9 +214,10 @@ export default function Home() {
         <FoodSlider foods={specialFoods} autoplayInterval={5000} />
       </div>
 
+      {/* Bienvenida */}
       <section
         id="inicio"
-        className="py-12 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900"
+        className="py-12 px-4 mt-20 sm:px-6 lg:px-8 backdrop-blur-sm "
       >
         {/* Hero Section with Icon */}
         <div
@@ -208,16 +232,56 @@ export default function Home() {
                 <ChefHat className="w-16 h-16 text-white" />
               </div>
               <div className="absolute -top-2 -right-2 w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg animate-pulse-slow">
-                <Star className="w-6 h-6 text-gray-900" />
+                <Star className="w-6 h-6 text-gray-900 dark:text-amber-50" />
               </div>
             </div>
           </div>
 
-          <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
-            Bienvenido a{" "}
-            <span className="text-primary-500">Tu Restaurante</span>
-          </h2>
-          <p className="text-xl text-black dark:text-gray-300 mb-8 max-w-3xl mx-auto">
+          <div className="backdrop-blur-sm">
+            <h2
+              ref={h2Ref}
+              className={`text-5xl font-bold text-black dark:text-white mb-6 wave-parent ${
+                waveAuto ? "wave-animate" : ""
+              }`}
+              aria-label="Bienvenido a Tu Restaurante"
+            >
+              <span
+                className={`reveal-on-scroll reveal-from-left delay-200 inline-block ${
+                  heroReveal.isVisible ? "visible" : ""
+                } ${themePulse ? "theme-animate" : ""}`}
+                aria-label="Bienvenido a"
+              >
+                {"Bienvenido a ".split("").map((ch, i) => (
+                  <span
+                    key={i}
+                    className="char inline-block"
+                    style={{ ["--i" as unknown as string]: `${i}` }}
+                    aria-hidden
+                  >
+                    {ch === " " ? "\u00A0" : ch}
+                  </span>
+                ))}
+              </span>
+              <span
+                className={`reveal-on-scroll reveal-from-right delay-200 inline-block text-purple-900 ${
+                  heroReveal.isVisible ? "visible" : ""
+                } ${themePulse ? "theme-animate" : ""}`}
+                aria-label="Tu Restaurante"
+              >
+                {"Tu Restaurante".split("").map((ch, i) => (
+                  <span
+                    key={i}
+                    className="char inline-block"
+                    style={{ ["--i" as unknown as string]: `${i}` }}
+                    aria-hidden
+                  >
+                    {ch === " " ? "\u00A0" : ch}
+                  </span>
+                ))}
+              </span>
+            </h2>
+          </div>
+          <p className="text-xl text-black dark:text-white mb-8 max-w-3xl mx-auto">
             Donde cada plato es una obra maestra. Ingredientes frescos, recetas
             tradicionales y la pasión por la auténtica cocina se encuentran en
             cada bocado.
@@ -229,17 +293,17 @@ export default function Home() {
           <h4 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">
             Explora Nuestro Menú
           </h4>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-6 ">
             {menuCategories.map((category, index) => (
               <div
                 key={index}
-                className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg hover-lift cursor-pointer"
+                className="bg-white/90 backdrop-blur-sm dark:bg-gray-800 rounded-xl p-6 shadow-lg hover-lift cursor-pointer border border-gray-200 dark:border-gray-700"
               >
                 <div
                   className={`flex flex-col items-center space-y-3 ${category.color}`}
                 >
                   <category.icon className="w-12 h-12" />
-                  <span className="text-sm font-semibold text-gray-900 dark:text-gray-100 text-center">
+                  <span className="text-sm font-semibold text-gray-900  dark:text-gray-100 text-center">
                     {category.label}
                   </span>
                 </div>
@@ -490,71 +554,8 @@ export default function Home() {
         </section>
       </section>
 
-      {/* Platos Destacados */}
-      <section
-        id="destacadas"
-        className="py-12 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900"
-      >
-        <div
-          ref={featuredReveal.ref}
-          className={`max-w-6xl mx-auto reveal-on-scroll reveal-from-bottom ${
-            featuredReveal.isVisible ? "visible" : ""
-          }`}
-        >
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              Platos Destacados del Día
-            </h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              Nuestras especialidades más populares, preparadas con ingredientes
-              frescos y de la más alta calidad
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {featuredDishes.map((dish) => {
-              const IconComponent = dish.icon;
-              return (
-                <div
-                  key={dish.id}
-                  className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover-lift border-2 border-gray-100 dark:border-gray-700"
-                >
-                  <div className="p-6">
-                    <div className="w-48 h-48 mx-auto mb-6 relative rounded-full bg-gradient-to-br from-primary-100 to-accent-100 dark:from-primary-900/30 dark:to-accent-900/30 flex items-center justify-center shadow-lg">
-                      <IconComponent className={`w-24 h-24 ${dish.color}`} />
-                    </div>
-                    <h4 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 text-center">
-                      {dish.name}
-                    </h4>
-                    <p className="text-gray-600 dark:text-gray-300 mb-6 text-center">
-                      {dish.description}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span
-                        className="text-2xl font-bold text-primary-500"
-                        style={{
-                          textShadow:
-                            "0 0 2px #000, 0 1px 4px #000, 1px 0 2px #000",
-                        }}
-                      >
-                        {dish.price}
-                      </span>
-                      <Link
-                        href={createWhatsAppMessage(dish.name, dish.price)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors text-sm inline-block"
-                      >
-                        Pedir por WhatsApp
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      {/* Platos destacados */}
+      {/* </PlatosDestacados /> */}
 
       {/* Nuestro Menú */}
       <section
