@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { CheckCircle, Loader2, XCircle, ArrowLeft } from "lucide-react";
+import { CheckCircle, Loader2, XCircle, ArrowLeft, FileText } from "lucide-react";
 import Link from "next/link";
 
 function PaymentSuccessContent() {
@@ -126,8 +126,15 @@ function PaymentSuccessContent() {
             <p className="text-gray-600 dark:text-gray-300 mb-6">{message}</p>
             <div className="space-y-3">
               <Link
+                href={`/invoice?type=${type}&reference=${reference}`}
+                className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg hover:shadow-lg transition-all duration-300 font-semibold"
+              >
+                <FileText className="w-5 h-5" />
+                Ver y Descargar Factura
+              </Link>
+              <Link
                 href="/"
-                className="block w-full px-6 py-3 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg hover:shadow-lg transition-all duration-300 font-semibold"
+                className="block w-full px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-300 font-semibold"
               >
                 Volver al Inicio
               </Link>
