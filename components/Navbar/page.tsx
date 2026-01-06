@@ -2,13 +2,16 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Menu, X, ChefHat } from "lucide-react";
-import { generalWhatsAppMessage } from "../../utils/whatsapp";
 import styles from "./NavBar.module.scss";
 import Link from "next/link";
 import ThemeSwitcher from "../ThemeSwitcher";
+import ReservationModal from "../ReservationModal";
+import OrderModal from "../OrderModal";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
 
   const toggleMobileMenu = () => {
@@ -107,7 +110,11 @@ const Navbar = () => {
   return (
     <nav
       ref={navRef}
-      className={`z-40 fixed w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-md ${styles.navbar}`}
+      className={`z-40 fixed w-full ${
+        isReservationModalOpen || isOrderModalOpen
+          ? "bg-white dark:bg-gray-900"
+          : "bg-white/90 dark:bg-gray-900/90 backdrop-blur-md"
+      } shadow-md transition-colors duration-300 ${styles.navbar}`}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
@@ -127,23 +134,19 @@ const Navbar = () => {
             <ThemeSwitcher />
 
             {/* Botón Reserva destacado */}
-            <Link
-              href={generalWhatsAppMessage()}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => setIsReservationModalOpen(true)}
               className="relative group bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-6 py-2.5 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-500 overflow-hidden btn-animated"
             >
               <span className="relative z-10">Reserva</span>
-            </Link>
+            </button>
 
-            <Link
-              href={generalWhatsAppMessage()}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => setIsOrderModalOpen(true)}
               className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-5 py-2 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-500 hover:shadow-lg"
             >
               Pedir Ahora
-            </Link>
+            </button>
 
             {/* Botón menú hamburguesa */}
             <button
@@ -254,27 +257,37 @@ const Navbar = () => {
 
           {/* Botones CTA en mobile */}
           <div className="flex md:hidden flex-col space-y-3">
-            <Link
-              href={generalWhatsAppMessage()}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => setIsMobileMenuOpen(false)}
+            <button
+              onClick={() => {
+                setIsReservationModalOpen(true);
+                setIsMobileMenuOpen(false);
+              }}
               className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-6 py-3 rounded-full hover:shadow-xl transition-all duration-500 font-semibold shadow-lg btn-animated text-center"
             >
               Reserva
-            </Link>
-            <Link
-              href={generalWhatsAppMessage()}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => setIsMobileMenuOpen(false)}
+            </button>
+            <button
+              onClick={() => {
+                setIsOrderModalOpen(true);
+                setIsMobileMenuOpen(false);
+              }}
               className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-6 py-3 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-500 font-medium shadow-lg text-center"
             >
               Pedir Ahora
-            </Link>
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Modales */}
+      <ReservationModal
+        isOpen={isReservationModalOpen}
+        onClose={() => setIsReservationModalOpen(false)}
+      />
+      <OrderModal
+        isOpen={isOrderModalOpen}
+        onClose={() => setIsOrderModalOpen(false)}
+      />
     </nav>
   );
 };
