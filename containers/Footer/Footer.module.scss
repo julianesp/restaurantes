@@ -1,0 +1,23 @@
+.footer {
+  border-top-left-radius: 30px;
+  border-top-right-radius: 30px;
+}
+
+// Animación tipo "bomba de agua" - squeeze/bulge effect
+@keyframes bulge {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.02) translateY(-2px);
+  }
+  50% {
+    transform: scale(1.04) translateY(-4px);
+  }
+  75% {
+    transform: scale(1.02) translateY(-2px);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

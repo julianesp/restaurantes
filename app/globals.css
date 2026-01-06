@@ -1,8 +1,11 @@
-@import "tailwindcss";
+/* @import "tailwindcss"; */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: 255 255 255;
+  --foreground: 23 23 23;
   /* Backgrounds específicos por sección */
   --loc-from: #f8fafc; /* claro */
   --loc-to: #ffffff; /* claro */
@@ -38,10 +41,8 @@
 
 /* Modo oscuro controlado por next-themes */
 .dark {
-  --background: #000000;
-  --background-gradient-start: #434343;
-  --background-gradient-end: #000000;
-  --foreground: #ededed;
+  --background: 17 24 39;
+  --foreground: 237 237 237;
 
   /* Overrides para secciones específicas */
   --loc-from: #111827; /* gris oscuro */
@@ -49,44 +50,12 @@
 }
 
 body {
-  color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
-  transition: background 0.3s ease, color 0.3s ease;
   min-height: 100vh;
 
   /* Cursor personalizado - Gorro de Chef */
   cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="%23FFFFFF" stroke="%23000000" stroke-width="1.5" d="M16 8c-3 0-5.5 2-6 5-1.5 0-3 1.5-3 3.5S8 20 9.5 20h13c1.5 0 2.5-1.5 2.5-3.5S24 13 22.5 13c-0.5-3-3-5-6-5zm-6 14v4c0 1 0.5 2 2 2h8c1.5 0 2-1 2-2v-4z"/><ellipse fill="%23FFFFFF" cx="16" cy="12" rx="4" ry="3"/></svg>'),
     auto;
-
-  /* Aplicar gradiente en modo claro */
-  background: #2980b9; /* fallback for old browsers */
-  background: -webkit-linear-gradient(
-    to right,
-    #ffffff,
-    #6dd5fa,
-    #2980b9
-  ); /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(
-    to right,
-    #ffffff,
-    #6dd5fa,
-    #2980b9
-  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-}
-
-/* Aplicar gradiente en modo oscuro */
-.dark body {
-  background: #000000; /* fallback for old browsers */
-  background: -webkit-linear-gradient(
-    to right,
-    #434343,
-    #000000
-  ); /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(
-    to right,
-    #434343,
-    #000000
-  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 
 /* Cursor personalizado para elementos interactivos - Tenedor y Cuchillo */
@@ -221,26 +190,9 @@ button > * {
     color 0.35s var(--ease-in-out-quart);
 }
 
-/* Asegurar contraste adecuado en modo claro para todos los textos */
-body:not(.dark) h1,
-body:not(.dark) h2,
-body:not(.dark) h3,
-body:not(.dark) h4,
-body:not(.dark) h5,
-body:not(.dark) h6,
-body:not(.dark) p:not([class*="text-"]) {
-  color: #1f2937 !important; /* gray-800 */
-}
-
-/* Asegurar que los textos con clases específicas se respeten */
-body:not(.dark) .text-white {
-  color: #1f2937 !important; /* Convertir text-white a oscuro en modo claro */
-}
-
-body:not(.dark) .text-gray-100,
-body:not(.dark) .text-gray-200,
-body:not(.dark) .text-gray-300 {
-  color: #4b5563 !important; /* gray-600 */
+/* Asegurar contraste adecuado en modo claro solo para textos sin clase */
+body:not(.dark) p:not([class*="text-"]):not([class]) {
+  color: #1f2937;
 }
 
 /* Delays para secuencias */

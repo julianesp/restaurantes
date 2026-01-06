@@ -43,7 +43,10 @@ export default function RootLayout({
           attribute="class"
           defaultTheme="light"
           enableSystem={false}
+          enableColorScheme={false}
           disableTransitionOnChange
+          storageKey="restaurant-theme"
+          forcedTheme={undefined}
         >
           {children}
           <Analytics />

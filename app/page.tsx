@@ -26,7 +26,7 @@ import {
 
 import FloatingFooter from "../components/FloatingFooter";
 import Navbar from "../components/Navbar/page";
-import Footer from "../containers/Footer";
+import Footer from "../containers/Footer/page";
 import ScrollToTopButton from "../components/ScrollToTopButton";
 import FoodSlider from "../components/FoodSlider";
 import LocationMap from "../components/LocationMap";

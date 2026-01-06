@@ -52,7 +52,7 @@ export default function LocationMap({
           <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             📍 Encuéntranos Aquí
           </h2>
-          <p className="text-xl text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-black max-w-2xl mx-auto dark:text-white">
             Visítanos en nuestra ubicación o solicita delivery. ¡Estamos listos
             para atenderte!
           </p>

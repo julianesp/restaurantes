@@ -116,7 +116,9 @@ const Navbar = () => {
             <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center shadow-lg transition-transform duration-700 ease-in-out hover:rotate-[360deg]">
               <ChefHat className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">Tu Restaurante</h1>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+              Tu Restaurante
+            </h1>
           </div>
 
           {/* Botones principales y menú hamburguesa - Desktop */}
