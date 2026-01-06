@@ -94,40 +94,45 @@ const specialFoods = [
     id: 1,
     name: "Buñuelos Artesanales",
     description:
-      "Deliciosos buñuelos recién hechos con receta tradicional. Crujientes por fuera, suaves por dentro. Perfectos para cualquier ocasión.",
-    image: "/images/bunuelos.jpg",
+      "Deliciosos buñuelos recién hechos con receta tradicional. Crujientes por fuera, suaves por dentro. Preparados con queso fresco y papa selecta. Un clásico que no puede faltar en tu mesa.",
+    image:
+      "https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/restaurants/1.jpg",
     price: "$8.000",
   },
   {
     id: 2,
     name: "Empanadas Caseras",
     description:
-      "Empanadas rellenas con los ingredientes más frescos. Disponibles en carne, pollo, queso y vegetales. Un sabor que te transportará a casa.",
-    image: "/images/empanadas.jpg",
+      "Empanadas rellenas con los ingredientes más frescos. Disponibles en carne molida jugosa, pollo desmenuzado, queso derretido y vegetales selectos. Un sabor auténtico que te transportará a casa.",
+    image:
+      "https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/restaurants/2.jpg",
     price: "$3.500",
   },
   {
     id: 3,
     name: "Papas Rellenas",
     description:
-      "Papas doradas rellenas de carne molida sazonada con especias tradicionales. Una explosión de sabor en cada bocado.",
-    image: "/images/papas-rellenas.jpg",
+      "Papas criollas doradas y crujientes rellenas de carne molida sazonada con especias tradicionales y cebolla caramelizada. Una explosión de sabor y textura en cada bocado.",
+    image:
+      "https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/restaurants/3.jpg",
     price: "$5.500",
   },
   {
     id: 4,
-    name: "Arepas de Chócolo",
+    name: "Arepas de Maíz",
     description:
-      "Arepas dulces de maíz tierno hechas al estilo tradicional. Perfectas para el desayuno o la merienda.",
-    image: "/images/arepas.jpg",
+      "Arepas dulces de maíz tierno hechas al estilo tradicional con queso fresco derretido. Perfectas para el desayuno, almuerzo o merienda. Suaves, esponjosas y llenas de sabor.",
+    image:
+      "https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/restaurants/4.jpg",
     price: "$4.000",
   },
   {
     id: 5,
     name: "Tamales Caseros",
     description:
-      "Tamales envueltos en hoja de plátano con el auténtico sabor de la cocina tradicional. Rellenos generosos y masa suave.",
-    image: "/images/tamales.jpg",
+      "Tamales envueltos en hoja de plátano con el auténtico sabor de la cocina tradicional. Rellenos generosos de carne de cerdo, pollo y verduras. Masa suave y aromática, elaborados con ingredientes seleccionados.",
+    image:
+      "https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/restaurants/5.jpg",
     price: "$12.000",
   },
 ];
@@ -204,7 +209,9 @@ export default function Home() {
       <div
         ref={specialtiesReveal.ref}
         id="especialidades"
-        className={` w-full reveal-on-scroll reveal-from-bottom ${
+        className={`${
+          styles.foodsPresentation
+        } w-full reveal-on-scroll reveal-from-bottom ${
           specialtiesReveal.isVisible ? "visible" : ""
         }`}
       >

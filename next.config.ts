@@ -8,7 +8,13 @@ const nextConfig: NextConfig = {
   },
   // Configuración de imágenes remotas (opcional para futuras imágenes)
   images: {
-    remotePatterns: [],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '0dwas2ied3dcs14f.public.blob.vercel-storage.com',
+        pathname: '/restaurants/**',
+      },
+    ],
   },
 };
 
