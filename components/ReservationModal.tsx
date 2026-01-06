@@ -50,9 +50,17 @@ const ReservationModal = ({ isOpen, onClose }: ReservationModalProps) => {
     if (!formData.fecha) {
       newErrors.fecha = "La fecha es requerida";
     } else {
-      const selectedDate = new Date(formData.fecha);
+      // Crear fecha del input (siempre viene en formato YYYY-MM-DD)
+      const [year, month, day] = formData.fecha.split('-').map(Number);
+      const selectedDate = new Date(year, month - 1, day);
+
+      // Fecha de hoy a las 00:00:00
       const today = new Date();
       today.setHours(0, 0, 0, 0);
+
+      // Normalizar la fecha seleccionada también a 00:00:00
+      selectedDate.setHours(0, 0, 0, 0);
+
       if (selectedDate < today) {
         newErrors.fecha = "La fecha no puede ser anterior a hoy";
       }
