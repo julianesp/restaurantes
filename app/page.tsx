@@ -32,7 +32,6 @@ import FoodSlider from "../components/FoodSlider";
 import LocationMap from "../components/LocationMap";
 import {
   createWhatsAppMessage,
-  createFoodMenuMessage,
   createDeliveryMessage,
   createTableReservationMessage,
 } from "../utils/whatsapp";
@@ -617,9 +616,7 @@ export default function Home() {
             {/* CTA Button */}
             <div className="text-center mt-8">
               <Link
-                href={createFoodMenuMessage()}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/menu"
                 className="inline-flex items-center bg-primary-500 text-white px-8 py-4 text-lg rounded-lg hover:bg-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 <Utensils className="h-6 w-6 mr-2" />
@@ -846,9 +843,9 @@ export default function Home() {
         businessName="Tu Restaurante"
         address="Calle 123 #45-67, Tu Ciudad, País"
         phone="+57 300 000 0000"
-        hours="Lunes-Domingo: 7:00 AM - 6:00 PM"
-        latitude={4.711}
-        longitude={-74.0721}
+        hours="Lunes-Domingo: 11:00 AM - 6:00 PM"
+        latitude={1.2059389}
+        longitude={-76.9288038}
       />
 
       <Footer />

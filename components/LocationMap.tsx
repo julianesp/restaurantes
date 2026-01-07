@@ -14,11 +14,11 @@ interface LocationMapProps {
 
 export default function LocationMap({
   businessName = "Tu Restaurante",
-  address = "Calle 123 #45-67, Ciudad, País",
+  address = "Calle 123 #45-67, Ciudad",
   phone = "+57 300 000 0000",
-  hours = "Lun-Dom: 7:00 AM - 6:00 PM",
-  latitude = 4.711,
-  longitude = -74.0721,
+  hours = "Lun-Dom: 11:00 AM - 6:00 PM",
+  latitude = 1.2059389,
+  longitude = -76.9288038,
 }: LocationMapProps) {
   const [mapLoaded, setMapLoaded] = useState(false);
 
@@ -28,8 +28,8 @@ export default function LocationMap({
   // URL para obtener direcciones
   const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
 
-  // URL para el iframe del mapa embebido
-  const embedMapUrl = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.514!2d${longitude}!3d${latitude}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNMKwNDInNDAuOCJOIDc0wrAwNCcxOS42Ilc!5e0!3m2!1ses!2sco!4v1234567890!5m2!1ses!2sco`;
+  // URL para el iframe del mapa embebido con las coordenadas correctas
+  const embedMapUrl = `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${latitude},${longitude}&zoom=15`;
 
   const handleGetDirections = () => {
     window.open(directionsUrl, "_blank");
@@ -141,7 +141,10 @@ export default function LocationMap({
                 <strong className="text-primary-600 dark:text-primary-400">
                   💡 Consejo:
                 </strong>{" "}
-                Haz clic en <span className="font-bold text-gray-900 dark:text-white">Cómo Llegar</span>{" "}
+                Haz clic en{" "}
+                <span className="font-bold text-gray-900 dark:text-white">
+                  Cómo Llegar
+                </span>{" "}
                 para obtener direcciones desde tu ubicación actual. También
                 ofrecemos servicio de delivery a domicilio.
               </p>
@@ -194,7 +197,7 @@ export default function LocationMap({
               ¿Prefieres que llevemos la comida hasta ti?
             </h3>
             <p className="text-lg mb-6 opacity-90">
-              Solicita nuestro servicio de delivery y disfruta de nuestros
+              Solicita nuestro servicio de entrega y disfruta de nuestros
               platillos en la comodidad de tu hogar
             </p>
             <button
@@ -206,7 +209,7 @@ export default function LocationMap({
               }}
               className="bg-white text-primary-600 px-8 py-4 rounded-full font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 inline-flex items-center space-x-2"
             >
-              <span>🏍️ Ver Opciones de Delivery</span>
+              <span>🏍️ Ver Opciones de entrega</span>
             </button>
           </div>
         </div>

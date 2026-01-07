@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "next-themes";
+import AOSInit from "@/components/AOSInit";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -49,6 +50,7 @@ export default function RootLayout({
           forcedTheme={undefined}
         >
           {children}
+          <AOSInit />
           <Analytics />
         </ThemeProvider>
       </body>

@@ -1,0 +1,438 @@
+"use client";
+
+import { useState } from "react";
+import { ArrowLeft, Coffee, Wine, Soup, Salad, UtensilsCrossed, Pizza, IceCream, Cake } from "lucide-react";
+import Link from "next/link";
+import Navbar from "../../components/Navbar/page";
+import Footer from "../../containers/Footer/page";
+
+// Tipos de datos
+interface MenuItem {
+  id: number;
+  name: string;
+  description: string;
+  price: string;
+  isVegetarian?: boolean;
+  isSpicy?: boolean;
+}
+
+interface MenuCategory {
+  id: string;
+  name: string;
+  icon: React.ElementType;
+  color: string;
+  items: MenuItem[];
+}
+
+// Datos del menú
+const menuData: MenuCategory[] = [
+  {
+    id: "bebidas",
+    name: "Bebidas",
+    icon: Coffee,
+    color: "text-amber-600",
+    items: [
+      {
+        id: 1,
+        name: "Café Americano",
+        description: "Café recién molido con agua caliente",
+        price: "$3.000",
+      },
+      {
+        id: 2,
+        name: "Cappuccino",
+        description: "Espresso con leche vaporizada y espuma",
+        price: "$4.500",
+      },
+      {
+        id: 3,
+        name: "Chocolate Caliente",
+        description: "Chocolate artesanal con crema batida",
+        price: "$4.000",
+      },
+      {
+        id: 4,
+        name: "Jugo Natural",
+        description: "Jugos de frutas frescas de temporada",
+        price: "$5.000",
+      },
+      {
+        id: 5,
+        name: "Limonada de Coco",
+        description: "Refrescante limonada con toque de coco",
+        price: "$6.000",
+      },
+    ],
+  },
+  {
+    id: "vinos",
+    name: "Vinos",
+    icon: Wine,
+    color: "text-purple-600",
+    items: [
+      {
+        id: 1,
+        name: "Vino Tinto de la Casa",
+        description: "Vino tinto selección especial",
+        price: "$35.000",
+      },
+      {
+        id: 2,
+        name: "Vino Blanco",
+        description: "Vino blanco seco importado",
+        price: "$40.000",
+      },
+      {
+        id: 3,
+        name: "Rosé",
+        description: "Vino rosado afrutado y ligero",
+        price: "$38.000",
+      },
+      {
+        id: 4,
+        name: "Espumante",
+        description: "Espumante celebración especial",
+        price: "$55.000",
+      },
+    ],
+  },
+  {
+    id: "sopas",
+    name: "Sopas",
+    icon: Soup,
+    color: "text-orange-600",
+    items: [
+      {
+        id: 1,
+        name: "Sopa de Pollo",
+        description: "Sopa casera con pollo y verduras frescas",
+        price: "$12.000",
+      },
+      {
+        id: 2,
+        name: "Sancocho Campesino",
+        description: "Tradicional sancocho con carne y plátano",
+        price: "$15.000",
+      },
+      {
+        id: 3,
+        name: "Ajiaco Bogotano",
+        description: "Sopa de papa con pollo, alcaparras y crema",
+        price: "$16.000",
+      },
+      {
+        id: 4,
+        name: "Crema de Tomate",
+        description: "Suave crema de tomate con albahaca",
+        price: "$10.000",
+        isVegetarian: true,
+      },
+    ],
+  },
+  {
+    id: "ensaladas",
+    name: "Ensaladas",
+    icon: Salad,
+    color: "text-green-600",
+    items: [
+      {
+        id: 1,
+        name: "Ensalada César",
+        description: "Lechuga romana, pollo, crutones y parmesano",
+        price: "$14.000",
+      },
+      {
+        id: 2,
+        name: "Ensalada Griega",
+        description: "Tomate, pepino, cebolla, aceitunas y queso feta",
+        price: "$13.000",
+        isVegetarian: true,
+      },
+      {
+        id: 3,
+        name: "Ensalada Caprese",
+        description: "Tomate, mozzarella fresca y albahaca",
+        price: "$12.000",
+        isVegetarian: true,
+      },
+      {
+        id: 4,
+        name: "Ensalada Tropical",
+        description: "Mix de lechugas con frutas tropicales",
+        price: "$15.000",
+        isVegetarian: true,
+      },
+    ],
+  },
+  {
+    id: "platos-fuertes",
+    name: "Platos Fuertes",
+    icon: UtensilsCrossed,
+    color: "text-red-700",
+    items: [
+      {
+        id: 1,
+        name: "Bandeja Paisa",
+        description: "Frijoles, arroz, carne molida, chicharrón, chorizo, huevo, aguacate y arepa",
+        price: "$28.000",
+      },
+      {
+        id: 2,
+        name: "Pechuga a la Plancha",
+        description: "Pechuga de pollo con arroz y ensalada",
+        price: "$22.000",
+      },
+      {
+        id: 3,
+        name: "Lomo de Cerdo",
+        description: "Lomo de cerdo en salsa BBQ con papas",
+        price: "$26.000",
+      },
+      {
+        id: 4,
+        name: "Pescado Frito",
+        description: "Mojarra frita con arroz de coco y patacón",
+        price: "$30.000",
+      },
+      {
+        id: 5,
+        name: "Cazuela de Mariscos",
+        description: "Mariscos frescos en salsa criolla",
+        price: "$35.000",
+      },
+      {
+        id: 6,
+        name: "Churrasco",
+        description: "Carne de res con chimichurri y papas",
+        price: "$32.000",
+      },
+    ],
+  },
+  {
+    id: "pizzas",
+    name: "Pizzas",
+    icon: Pizza,
+    color: "text-yellow-600",
+    items: [
+      {
+        id: 1,
+        name: "Pizza Margarita",
+        description: "Salsa de tomate, mozzarella y albahaca",
+        price: "$25.000",
+        isVegetarian: true,
+      },
+      {
+        id: 2,
+        name: "Pizza Pepperoni",
+        description: "Pepperoni y doble queso mozzarella",
+        price: "$28.000",
+      },
+      {
+        id: 3,
+        name: "Pizza Hawaiana",
+        description: "Jamón, piña y queso mozzarella",
+        price: "$27.000",
+      },
+      {
+        id: 4,
+        name: "Pizza Cuatro Quesos",
+        description: "Mozzarella, parmesano, gorgonzola y provolone",
+        price: "$30.000",
+        isVegetarian: true,
+      },
+    ],
+  },
+  {
+    id: "postres",
+    name: "Postres",
+    icon: Cake,
+    color: "text-pink-600",
+    items: [
+      {
+        id: 1,
+        name: "Tiramisú",
+        description: "Clásico postre italiano con café y mascarpone",
+        price: "$8.000",
+      },
+      {
+        id: 2,
+        name: "Cheesecake",
+        description: "Tarta de queso con frutos rojos",
+        price: "$9.000",
+      },
+      {
+        id: 3,
+        name: "Brownie con Helado",
+        description: "Brownie de chocolate con helado de vainilla",
+        price: "$10.000",
+      },
+      {
+        id: 4,
+        name: "Tres Leches",
+        description: "Tradicional pastel empapado en tres leches",
+        price: "$7.500",
+      },
+    ],
+  },
+  {
+    id: "helados",
+    name: "Helados",
+    icon: IceCream,
+    color: "text-cyan-600",
+    items: [
+      {
+        id: 1,
+        name: "Copa de Helado",
+        description: "Tres bolas de helado con salsa a elección",
+        price: "$8.000",
+      },
+      {
+        id: 2,
+        name: "Sundae de Chocolate",
+        description: "Helado con salsa de chocolate y crema",
+        price: "$9.000",
+      },
+      {
+        id: 3,
+        name: "Milkshake",
+        description: "Batido cremoso en sabores variados",
+        price: "$10.000",
+      },
+      {
+        id: 4,
+        name: "Banana Split",
+        description: "Plátano con helado, salsa y frutos secos",
+        price: "$12.000",
+      },
+    ],
+  },
+];
+
+export default function MenuPage() {
+  const [selectedCategory, setSelectedCategory] = useState<string>("bebidas");
+
+  const currentCategory = menuData.find((cat) => cat.id === selectedCategory);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-primary-50 dark:from-gray-900 dark:to-primary-950">
+      <Navbar />
+
+      {/* Header */}
+      <div className="pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-gray-800 dark:to-gray-900">
+        <div className="max-w-7xl mx-auto">
+          <Link
+            href="/"
+            className="inline-flex items-center text-white hover:text-gray-200 mb-6 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Volver al Inicio
+          </Link>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            🍽️ Nuestro Menú Completo
+          </h1>
+          <p className="text-white/90 text-lg max-w-2xl">
+            Descubre todos nuestros platos y bebidas. Preparados con ingredientes frescos y mucho amor.
+          </p>
+        </div>
+      </div>
+
+      {/* Categories Navigation */}
+      <div className="sticky top-16 z-30 bg-white dark:bg-gray-800 shadow-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex overflow-x-auto gap-3 pb-2 scrollbar-hide">
+            {menuData.map((category) => {
+              const Icon = category.icon;
+              const isSelected = selectedCategory === category.id;
+              return (
+                <button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all ${
+                    isSelected
+                      ? "bg-primary-500 text-white shadow-lg scale-105"
+                      : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                  }`}
+                >
+                  <Icon className={`w-5 h-5 ${isSelected ? "text-white" : category.color}`} />
+                  {category.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Menu Items */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {currentCategory && (
+          <div>
+            <div className="flex items-center gap-3 mb-8">
+              {(() => {
+                const Icon = currentCategory.icon;
+                return <Icon className={`w-10 h-10 ${currentCategory.color}`} />;
+              })()}
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+                {currentCategory.name}
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {currentCategory.items.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-700"
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                      {item.name}
+                    </h3>
+                    <div className="flex gap-2">
+                      {item.isVegetarian && (
+                        <span className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs px-2 py-1 rounded-full">
+                          🌱 Veggie
+                        </span>
+                      )}
+                      {item.isSpicy && (
+                        <span className="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-xs px-2 py-1 rounded-full">
+                          🌶️ Picante
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
+                    {item.description}
+                  </p>
+                  <div className="flex justify-between items-center">
+                    <span className="text-2xl font-bold text-primary-500">
+                      {item.price}
+                    </span>
+                    <Link
+                      href={`https://wa.me/573174503604?text=Hola!%20Quiero%20pedir:%20${encodeURIComponent(item.name)}%20-%20${item.price}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                    >
+                      Pedir
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <Footer />
+
+      <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
+    </div>
+  );
+}
