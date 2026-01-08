@@ -136,7 +136,7 @@ export default function FoodSlider({
               )}
 
               {/* Content Overlay */}
-              <div className="absolute bottom-40 md:bottom-0 left-0 right-0 z-20 p-8 md:p-6 lg:p-8 text-white text-center md:text-left backdrop-blur-md mx-auto md:mx-0 w-3/4 rounded-3xl">
+              <div className="absolute bottom-48 md:top-2/4 md:bottom-auto left-0 right-0 md:right-auto z-20 p-8 md:p-6 lg:p-8 text-white text-center md:text-left backdrop-blur-md md:backdrop-blur-none mx-auto md:mx-0 w-3/4 md:w-auto md:max-w-2xl rounded-3xl md:rounded-none">
                 <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 drop-shadow-lg">
                   {food.name}
                 </h3>
