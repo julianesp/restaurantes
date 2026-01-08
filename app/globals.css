@@ -49,6 +49,21 @@
   --loc-to: #374151; /* gris menos oscuro */
 }
 
+/* Tema Dark Minimalist */
+.dark-minimalist {
+  --background: 17 24 39; /* bg-gray-900 */
+  --foreground: 255 255 255;
+
+  /* Overrides para secciones específicas */
+  --loc-from: #111827;
+  --loc-to: #111827;
+}
+
+.dark-minimalist body {
+  background-color: rgb(17, 24, 39) !important;
+  color: rgb(255, 255, 255) !important;
+}
+
 body {
   font-family: Arial, Helvetica, sans-serif;
   min-height: 100vh;
@@ -245,6 +260,15 @@ body:not(.dark) p:not([class*="text-"]):not([class]) {
 
 .parallax-scale.in-view {
   transform: scale(1);
+}
+
+/* Parallax para dark-minimalist */
+.dark-minimalist .parallax-section {
+  position: relative;
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 /* ========================================

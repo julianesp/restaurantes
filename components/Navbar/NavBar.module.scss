@@ -3,11 +3,12 @@
 .navbar {
   // Color azul con transparencia para efecto cristal
   background-color: rgba(0, 119, 247, 0.55); // #0077f7 con 85% opacidad
+  background-color: rgba(17, 24, 39, 0.55); // para modo oscuro
   backdrop-filter: blur(4px) saturate(18%);
   -webkit-backdrop-filter: blur(4px) saturate(18%);
 
   // Sombra sutil para dar profundidad
-  box-shadow: 10px 4px 20px rgba(0, 119, 247, 0.6);
+  // box-shadow: 10px 4px 20px rgba(0, 119, 247, 0.6);
 
   // Estilos para modo oscuro
   :global(.dark) & {
@@ -50,4 +51,9 @@
       // width: 100% !important;
     }
   }
+}
+
+.bordes {
+  border-bottom-left-radius: 80px;
+  border-bottom-right-radius: 80px;
 }

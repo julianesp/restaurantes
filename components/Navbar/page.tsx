@@ -2,11 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Menu, X, ChefHat } from "lucide-react";
-import styles from "./NavBar.module.scss";
 import Link from "next/link";
-import ThemeSwitcher from "../ThemeSwitcher";
 import ReservationModal from "../ReservationModal";
 import OrderModal from "../OrderModal";
+import FloatingActionButtons from "../FloatingActionButtons";
+import ThemeSwitcher from "../ThemeSwitcher";
+import PulseAnimation from "../PulseAnimation";
+import styles from "./NavBar.module.scss";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -110,14 +112,10 @@ const Navbar = () => {
   return (
     <nav
       ref={navRef}
-      className={`z-40 fixed w-full ${
-        isReservationModalOpen || isOrderModalOpen
-          ? "bg-white dark:bg-gray-900"
-          : "bg-white/90 dark:bg-gray-900/90 backdrop-blur-md"
-      } shadow-md transition-colors duration-300 ${styles.navbar}`}
+      className={`${styles.bordes} z-40 fixed w-full bg-transparent transition-colors duration-300 ease-in-out top-0 left-0`}
     >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+      <div className="w-full backdrop-blur-[3px]">
+        <div className="flex justify-between items-center h-[65px] bg-gray-900/50 px-4 sm:px-6 lg:px-8">
           {/* Logo a la izquierda */}
           <div className="flex items-center space-x-3">
             <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center shadow-lg transition-transform duration-700 ease-in-out hover:rotate-[360deg]">
@@ -125,83 +123,54 @@ const Navbar = () => {
                 <ChefHat className="w-6 h-6 text-white" />
               </Link>
             </div>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-              Tu Restaurante
-            </h1>
+            <h1 className="text-xl font-bold text-white">Tu Restaurante</h1>
           </div>
 
-          {/* Botones principales y menú hamburguesa - Desktop */}
-          <div className="hidden md:flex items-center space-x-4">
-            {/* Theme Switcher */}
-            <ThemeSwitcher />
-
-            {/* Botón Reserva destacado */}
-            <button
-              onClick={() => setIsReservationModalOpen(true)}
-              className="relative group bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-6 py-2.5 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-500 overflow-hidden btn-animated"
-            >
-              <span className="relative z-10">Reserva</span>
-            </button>
-
-            <button
-              onClick={() => setIsOrderModalOpen(true)}
-              className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-5 py-2 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-500 hover:shadow-lg"
-            >
-              Pedir Ahora
-            </button>
-
-            {/* Botón menú hamburguesa */}
-            <button
-              onClick={toggleMobileMenu}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              aria-label="Toggle menu"
-            >
-              {isMobileMenuOpen ? (
-                <X className="h-6 w-6 text-gray-700 dark:text-gray-300" />
-              ) : (
-                <Menu className="h-6 w-6 text-gray-700 dark:text-gray-300" />
-              )}
-            </button>
-          </div>
-
-          {/* Menú hamburguesa - Mobile */}
-          <div className="flex md:hidden items-center space-x-2">
-            {/* Theme Switcher Mobile */}
-            <ThemeSwitcher />
+          {/* Theme Switcher y menú hamburguesa */}
+          <div className="flex items-center space-x-3">
+            <PulseAnimation interval={5000} duration={1200}>
+              <ThemeSwitcher />
+            </PulseAnimation>
 
             <button
               onClick={toggleMobileMenu}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="p-2 rounded-lg hover:bg-white/10 transition-all duration-300"
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? (
-                <X className="h-6 w-6 text-gray-700 dark:text-gray-300" />
+                <X className="h-6 w-6 text-white transition-transform duration-300 rotate-90" />
               ) : (
-                <Menu className="h-6 w-6 text-gray-700 dark:text-gray-300" />
+                <Menu className="h-6 w-6 text-white transition-transform duration-300" />
               )}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Menú desplegable */}
+      {/* Menú desplegable con animación mejorada */}
       <div
-        className={`absolute top-full left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-lg transition-all duration-300 ease-in-out ${
+        className={`absolute top-full left-0 right-0 bg-gray-900/98 backdrop-blur-xl shadow-2xl transition-all duration-500 ease-out overflow-hidden ${
           isMobileMenuOpen
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 -translate-y-4 pointer-events-none"
+            ? "opacity-100 translate-y-0 max-h-screen"
+            : "opacity-0 -translate-y-8 max-h-0 pointer-events-none"
         }`}
       >
-        <div className="max-w-6xl mx-auto px-4 py-6">
+        <div className="max-w-6xl mx-auto px-6 py-8">
           {/* Navigation Links */}
-          <div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-6 md:justify-center mb-6">
+          <div
+            className={`flex flex-col space-y-3 transition-all duration-700 ${
+              isMobileMenuOpen
+                ? "translate-x-0 opacity-100"
+                : "-translate-x-8 opacity-0"
+            }`}
+          >
             <Link
               href="#inicio"
               onClick={(e) => {
                 handleSmoothScroll(e, "inicio");
                 setIsMobileMenuOpen(false);
               }}
-              className="text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors font-medium text-center py-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
+              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-lg py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm transform hover:translate-x-2"
             >
               Inicio
             </Link>
@@ -211,7 +180,7 @@ const Navbar = () => {
                 handleSmoothScroll(e, "especialidades");
                 setIsMobileMenuOpen(false);
               }}
-              className="text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors font-medium text-center py-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
+              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-lg py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm transform hover:translate-x-2"
             >
               Especialidades
             </Link>
@@ -221,7 +190,7 @@ const Navbar = () => {
                 handleSmoothScroll(e, "destacadas");
                 setIsMobileMenuOpen(false);
               }}
-              className="text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors font-medium text-center py-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
+              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-lg py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm transform hover:translate-x-2"
             >
               Destacados
             </Link>
@@ -231,7 +200,7 @@ const Navbar = () => {
                 handleSmoothScroll(e, "menu-comidas");
                 setIsMobileMenuOpen(false);
               }}
-              className="text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors font-medium text-center py-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
+              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-lg py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm transform hover:translate-x-2"
             >
               Menú
             </Link>
@@ -241,7 +210,7 @@ const Navbar = () => {
                 handleSmoothScroll(e, "delivery");
                 setIsMobileMenuOpen(false);
               }}
-              className="text-secondary-600 dark:text-secondary-400 hover:text-primary-500 dark:hover:text-primary-400 transition-colors font-semibold text-center py-2 hover:bg-primary-50 dark:hover:bg-gray-800 rounded-lg"
+              className="text-secondary-300 hover:text-primary-400 transition-all duration-300 font-semibold text-lg py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-secondary-300/30 backdrop-blur-sm transform hover:translate-x-2"
             >
               🏍️ Delivery
             </Link>
@@ -251,32 +220,10 @@ const Navbar = () => {
                 handleSmoothScroll(e, "contacto");
                 setIsMobileMenuOpen(false);
               }}
-              className="text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 transition-colors font-medium text-center py-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg"
+              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-lg py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm transform hover:translate-x-2"
             >
               Contacto
             </Link>
-          </div>
-
-          {/* Botones CTA en mobile */}
-          <div className="flex md:hidden flex-col space-y-3">
-            <button
-              onClick={() => {
-                setIsReservationModalOpen(true);
-                setIsMobileMenuOpen(false);
-              }}
-              className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-6 py-3 rounded-full hover:shadow-xl transition-all duration-500 font-semibold shadow-lg btn-animated text-center"
-            >
-              Reserva
-            </button>
-            <button
-              onClick={() => {
-                setIsOrderModalOpen(true);
-                setIsMobileMenuOpen(false);
-              }}
-              className="bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-6 py-3 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-500 font-medium shadow-lg text-center"
-            >
-              Pedir Ahora
-            </button>
           </div>
         </div>
       </div>
@@ -289,6 +236,12 @@ const Navbar = () => {
       <OrderModal
         isOpen={isOrderModalOpen}
         onClose={() => setIsOrderModalOpen(false)}
+      />
+
+      {/* Botones flotantes */}
+      <FloatingActionButtons
+        onReservaClick={() => setIsReservationModalOpen(true)}
+        onPedirClick={() => setIsOrderModalOpen(true)}
       />
     </nav>
   );

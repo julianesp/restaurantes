@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight, Play, Pause } from "lucide-react";
 import Image from "next/image";
+import { useParallax } from "@/utils/useParallax";
 
 interface FoodItem {
   id: number;
@@ -23,7 +24,21 @@ export default function FoodSlider({
 }: FoodSliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const scrollY = useParallax();
+
+  // Detectar si es móvil
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const goToPrevious = () => {
     setCurrentIndex((prevIndex) =>
@@ -39,10 +54,6 @@ export default function FoodSlider({
 
   const toggleAutoplay = () => {
     setIsAutoPlaying(!isAutoPlaying);
-  };
-
-  const goToSlide = (index: number) => {
-    setCurrentIndex(index);
   };
 
   useEffect(() => {
@@ -78,12 +89,18 @@ export default function FoodSlider({
     return null;
   }
 
+  // Calcular el desplazamiento parallax
+  // Usamos un efecto inverso para que la imagen se mueva más lento que el scroll
+  // En móvil usamos un factor mayor para que sea más visible
+  const parallaxFactor = isMobile ? 0.5 : 0.3;
+  const parallaxOffset = scrollY * parallaxFactor;
+
   return (
-    <div className="relative w-full top-18">
+    <div className="absolute top-0 left-0 w-full h-full z-0">
       {/* Main Slider Container */}
-      <div className="relative overflow-hidden shadow-2xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900">
+      <div className="relative overflow-hidden h-full shadow-none">
         {/* Image Section */}
-        <div className="relative h-[40vh] min-h-[300px] max-h-[500px]">
+        <div className="relative h-screen">
           {foods.map((food, index) => (
             <div
               key={food.id}
@@ -95,13 +112,21 @@ export default function FoodSlider({
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10"></div>
 
               {food.image ? (
-                <Image
-                  src={food.image}
-                  alt={food.name}
-                  fill
-                  className="object-cover"
-                  priority={index === 0}
-                />
+                <div
+                  className="absolute inset-0 overflow-hidden"
+                  style={{
+                    transform: `translateY(-${parallaxOffset}px) scale(1.1)`,
+                    transition: "transform 0.1s ease-out",
+                  }}
+                >
+                  <Image
+                    src={food.image}
+                    alt={food.name}
+                    fill
+                    className="object-cover"
+                    priority={index === 0}
+                  />
+                </div>
               ) : (
                 <div className="absolute inset-0 bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
                   <div className="text-white text-6xl font-bold opacity-20">
@@ -149,7 +174,7 @@ export default function FoodSlider({
           {/* Play/Pause Button */}
           <button
             onClick={toggleAutoplay}
-            className="absolute top-2 md:top-4 right-2 md:right-4 z-30 bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-700 text-gray-900 dark:text-white p-2 md:p-3 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl"
+            className="absolute bottom-4  right-2 md:right-4 z-30 bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-700 text-gray-900 dark:text-white p-2 md:p-3 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl"
             aria-label={isAutoPlaying ? "Pausar" : "Reproducir"}
           >
             {isAutoPlaying ? (
@@ -160,21 +185,6 @@ export default function FoodSlider({
           </button>
         </div>
 
-        {/* Dots Indicator */}
-        <div className="flex justify-center items-center space-x-2 md:space-x-3 p-3 md:p-4 bg-white dark:bg-gray-800">
-          {foods.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToSlide(index)}
-              className={`transition-all duration-300 rounded-full ${
-                index === currentIndex
-                  ? "w-8 md:w-10 h-2 md:h-2.5 bg-primary-500 dark:bg-primary-600"
-                  : "w-2 md:w-2.5 h-2 md:h-2.5 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500"
-              }`}
-              aria-label={`Ir a slide ${index + 1}`}
-            />
-          ))}
-        </div>
 
         {/* Progress Bar */}
         {isAutoPlaying && (
