@@ -21,6 +21,30 @@
   border-end-start-radius: 40px;
   border-end-end-radius: 40px;
 
+  @media (width >= 320px) and (width <= 768px) {
+    .menuMobile {
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 20px;
+      margin: 0 auto;
+    }
+  }
+
+  // Para tablets y pantallas mayores
+  @media (width > 768px) {
+    .menuMobile {
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 20px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+  }
+
   @media (width >= 768px) {
     .navContainer {
       display: flex !important;
@@ -44,13 +68,6 @@
     }
   }
 
-  // Para tablets (769px - 1023px) mantener el logo centrado
-  @media (width >= 769px) and (width <= 1023px) {
-    .logoSection {
-      // justify-content: center !important;
-      // width: 100% !important;
-    }
-  }
 }
 
 .bordes {

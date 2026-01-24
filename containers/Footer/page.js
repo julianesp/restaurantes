@@ -2,7 +2,8 @@
 
 import React from "react";
 import Link from "next/link";
-import { Phone, MapPin, Clock, ChefHat } from "lucide-react";
+import { Phone, MapPin, Clock } from "lucide-react";
+import Image from "next/image";
 import { generalWhatsAppMessage } from "../../utils/whatsapp";
 // href=""
 import styles from "./Footer.module.scss";
@@ -20,14 +21,20 @@ const Footer = () => {
         >
           {/* Logo y título - aparece primero */}
           <div
-            className="flex items-center space-x-2 mb-4"
+            className="flex items-center space-x-3 mb-4"
             data-aos="fade-right"
           >
-            <ChefHat className={`h-8 w-8 text-white ${styles.slideInLogo}`} />
+            <Image
+              src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/munay/images/logo%20en%20blanco%20png.png"
+              alt="Logo Restaurante Munay"
+              width={60}
+              height={60}
+              className={`object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.6)] ${styles.slideInLogo}`}
+            />
             <h3
               className={`text-2xl font-bold text-white ${styles.slideInLogo}`}
             >
-              Tu Restaurante
+              Restaurante Munay
             </h3>
           </div>
 

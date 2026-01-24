@@ -31,6 +31,7 @@ import ScrollToTopButton from "../components/ScrollToTopButton";
 import FoodSlider from "../components/FoodSlider";
 import LocationMap from "../components/LocationMap";
 import OrderCTAModal from "../components/OrderCTAModal";
+import TestimonialsSection from "../components/TestimonialsSection";
 import { createWhatsAppMessage } from "../utils/whatsapp";
 import Link from "next/link";
 import styles from "../styles/Home.module.scss";
@@ -268,9 +269,9 @@ export default function Home() {
                   className={`reveal-on-scroll reveal-from-right delay-200 inline-block text-purple-900 ${
                     heroReveal.isVisible ? "visible" : ""
                   } ${themePulse ? "theme-animate" : ""}`}
-                  aria-label="Tu Restaurante"
+                  aria-label="Restaurante Munay"
                 >
-                  {"Tu Restaurante".split("").map((ch, i) => (
+                  {"Restaurante Munay".split("").map((ch, i) => (
                     <span
                       key={i}
                       className="char inline-block"
@@ -821,14 +822,17 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Sección de Testimonios */}
+        <TestimonialsSection />
+
         {/* Sección de Ubicación */}
         <LocationMap
-          businessName="Tu Restaurante"
-          address="Calle 123 #45-67, Tu Ciudad, País"
+          businessName="Restaurante Munay"
+          address="Valle de Sibundoy, Putumayo, Colombia"
           phone="+57 300 000 0000"
-          hours="Lunes-Domingo: 11:00 AM - 6:00 PM"
-          latitude={1.2059389}
-          longitude={-76.9288038}
+          hours="Lunes-Domingo: 8:00 AM - 8:00 PM"
+          latitude={1.1557}
+          longitude={-76.8978}
         />
 
         <Footer />

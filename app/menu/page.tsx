@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, Coffee, Wine, Soup, Salad, UtensilsCrossed, Pizza, IceCream, Cake } from "lucide-react";
+import { ArrowLeft, Coffee, Wine, Soup, Salad, UtensilsCrossed, Pizza, IceCream, Cake, ShoppingCart, Plus } from "lucide-react";
 import Link from "next/link";
 import Navbar from "../../components/Navbar/page";
 import Footer from "../../containers/Footer/page";
+import { useCart } from "../../context/CartContext";
 
 // Tipos de datos
 interface MenuItem {
@@ -26,6 +27,50 @@ interface MenuCategory {
 
 // Datos del menú
 const menuData: MenuCategory[] = [
+  {
+    id: "desayunos",
+    name: "Desayunos",
+    icon: Coffee,
+    color: "text-yellow-600",
+    items: [
+      {
+        id: 1,
+        name: "Desayuno Tradicional",
+        description: "Huevos al gusto, arepa, queso, chocolate y pan",
+        price: "$12.000",
+      },
+      {
+        id: 2,
+        name: "Calentado Campesino",
+        description: "Arroz, frijoles, carne desmechada, huevo frito y arepa",
+        price: "$15.000",
+      },
+      {
+        id: 3,
+        name: "Changua",
+        description: "Sopa de leche con huevo, cilantro y cebolla larga, acompañada de pan tostado",
+        price: "$10.000",
+      },
+      {
+        id: 4,
+        name: "Tamal con Chocolate",
+        description: "Tamal tradicional envuelto en hoja de plátano, servido con chocolate caliente",
+        price: "$14.000",
+      },
+      {
+        id: 5,
+        name: "Huevos Pericos",
+        description: "Huevos revueltos con tomate y cebolla, arepa y café",
+        price: "$11.000",
+      },
+      {
+        id: 6,
+        name: "Caldo de Costilla",
+        description: "Caldo de costilla de res con papa criolla, cilantro y cebolla larga",
+        price: "$16.000",
+      },
+    ],
+  },
   {
     id: "bebidas",
     name: "Bebidas",
@@ -306,12 +351,78 @@ const menuData: MenuCategory[] = [
       },
     ],
   },
+  {
+    id: "cenas",
+    name: "Cenas",
+    icon: UtensilsCrossed,
+    color: "text-indigo-600",
+    items: [
+      {
+        id: 1,
+        name: "Cena Ejecutiva",
+        description: "Pechuga a la plancha, arroz, ensalada y jugo natural",
+        price: "$20.000",
+      },
+      {
+        id: 2,
+        name: "Cena Familiar",
+        description: "Pollo asado, arroz, papas fritas, ensalada y gaseosa (4 personas)",
+        price: "$65.000",
+      },
+      {
+        id: 3,
+        name: "Hamburguesa Especial",
+        description: "Carne de res, queso, tocineta, lechuga, tomate y papas fritas",
+        price: "$18.000",
+      },
+      {
+        id: 4,
+        name: "Sándwich Club",
+        description: "Triple capa con pollo, tocineta, queso, lechuga, tomate y papas",
+        price: "$16.000",
+      },
+      {
+        id: 5,
+        name: "Wrap de Pollo",
+        description: "Tortilla de trigo rellena de pollo, vegetales y salsa especial",
+        price: "$15.000",
+      },
+      {
+        id: 6,
+        name: "Sopa de la Noche",
+        description: "Sopa del día con pan y mantequilla",
+        price: "$12.000",
+      },
+    ],
+  },
 ];
 
 export default function MenuPage() {
-  const [selectedCategory, setSelectedCategory] = useState<string>("bebidas");
+  const [selectedCategory, setSelectedCategory] = useState<string>("desayunos");
+  const { addToCart } = useCart();
+  const [addedItems, setAddedItems] = useState<Set<number>>(new Set());
 
   const currentCategory = menuData.find((cat) => cat.id === selectedCategory);
+
+  const handleAddToCart = (item: MenuItem) => {
+    addToCart({
+      id: item.id,
+      name: item.name,
+      description: item.description,
+      price: item.price,
+      category: selectedCategory,
+    });
+
+    // Mostrar feedback visual
+    setAddedItems(new Set(addedItems).add(item.id));
+    setTimeout(() => {
+      setAddedItems((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(item.id);
+        return newSet;
+      });
+    }, 2000);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-primary-50 dark:from-gray-900 dark:to-primary-950">
@@ -402,18 +513,29 @@ export default function MenuPage() {
                   <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">
                     {item.description}
                   </p>
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center gap-2">
                     <span className="text-2xl font-bold text-primary-500">
                       {item.price}
                     </span>
-                    <Link
-                      href={`https://wa.me/573174503604?text=Hola!%20Quiero%20pedir:%20${encodeURIComponent(item.name)}%20-%20${item.price}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
-                    >
-                      Pedir
-                    </Link>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleAddToCart(item)}
+                        className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold transition-all ${
+                          addedItems.has(item.id)
+                            ? "bg-green-500 text-white"
+                            : "bg-primary-500 hover:bg-primary-600 text-white"
+                        }`}
+                      >
+                        {addedItems.has(item.id) ? (
+                          <>✓ Agregado</>
+                        ) : (
+                          <>
+                            <Plus className="w-4 h-4" />
+                            Carrito
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}

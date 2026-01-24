@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Menu, X, ChefHat } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import ReservationModal from "../ReservationModal";
 import OrderModal from "../OrderModal";
 import FloatingActionButtons from "../FloatingActionButtons";
@@ -49,29 +50,29 @@ const Navbar = () => {
     if (isMobileMenuOpen) {
       document.addEventListener(
         "mousedown",
-        handleClickOutside as EventListener
+        handleClickOutside as EventListener,
       );
       document.addEventListener(
         "touchstart",
-        handleClickOutside as EventListener
+        handleClickOutside as EventListener,
       );
     }
 
     return () => {
       document.removeEventListener(
         "mousedown",
-        handleClickOutside as EventListener
+        handleClickOutside as EventListener,
       );
       document.removeEventListener(
         "touchstart",
-        handleClickOutside as EventListener
+        handleClickOutside as EventListener,
       );
     };
   }, [isMobileMenuOpen]);
 
   const handleSmoothScroll = (
     e: React.MouseEvent<HTMLAnchorElement>,
-    targetId: string
+    targetId: string,
   ) => {
     e.preventDefault();
     const element = document.getElementById(targetId);
@@ -118,12 +119,22 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-[65px] bg-gray-900/50 px-4 sm:px-6 lg:px-8">
           {/* Logo a la izquierda */}
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center shadow-lg transition-transform duration-700 ease-in-out hover:rotate-[360deg]">
-              <Link href="/" title="Ir a inicio">
-                <ChefHat className="w-6 h-6 text-white" />
-              </Link>
-            </div>
-            <h1 className="text-xl font-bold text-white">Tu Restaurante</h1>
+            <Link
+              href="/"
+              title="Ir a inicio"
+              className="transition-transform duration-700 ease-in-out hover:scale-110 p-2 rounded-full bg-white/10 backdrop-blur-sm shadow-lg hover:bg-white/20"
+            >
+              <Image
+                src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/munay/images/logo%20en%20blanco%20png.png"
+                alt="Logo Restaurante Munay"
+                title="Logo Restaurante Munay"
+                width={70}
+                height={70}
+                className="object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+                priority
+              />
+            </Link>
+            {/* <h1 className="text-xl font-bold text-white">Munay</h1> */}
           </div>
 
           {/* Theme Switcher y menú hamburguesa */}
@@ -149,81 +160,142 @@ const Navbar = () => {
 
       {/* Menú desplegable con animación mejorada */}
       <div
-        className={`absolute top-full left-0 right-0 bg-gray-900/98 backdrop-blur-xl shadow-2xl transition-all duration-500 ease-out overflow-hidden ${
+        className={`absolute top-full left-0 right-0 transition-all duration-500 ease-out overflow-hidden ${
           isMobileMenuOpen
             ? "opacity-100 translate-y-0 max-h-screen"
             : "opacity-0 -translate-y-8 max-h-0 pointer-events-none"
         }`}
       >
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          {/* Navigation Links */}
+        <div className="w-full flex justify-center">
           <div
-            className={`flex flex-col space-y-3 transition-all duration-700 ${
-              isMobileMenuOpen
-                ? "translate-x-0 opacity-100"
-                : "-translate-x-8 opacity-0"
-            }`}
+            className={`max-w-md w-full mx-auto px-6 py-8 bg-gray-900/98 backdrop-blur-xl shadow-2xl ${styles.menuMobile}`}
           >
-            <Link
-              href="#inicio"
-              onClick={(e) => {
-                handleSmoothScroll(e, "inicio");
-                setIsMobileMenuOpen(false);
-              }}
-              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-lg py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm transform hover:translate-x-2"
+            {/* Navigation Links */}
+            <div
+              className={`flex flex-col space-y-3 transition-all duration-700 ${
+                isMobileMenuOpen
+                  ? "translate-x-0 opacity-100"
+                  : "-translate-x-8 opacity-0"
+              }`}
             >
-              Inicio
-            </Link>
-            <Link
-              href="#especialidades"
-              onClick={(e) => {
-                handleSmoothScroll(e, "especialidades");
-                setIsMobileMenuOpen(false);
-              }}
-              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-lg py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm transform hover:translate-x-2"
-            >
-              Especialidades
-            </Link>
-            <Link
-              href="#destacadas"
-              onClick={(e) => {
-                handleSmoothScroll(e, "destacadas");
-                setIsMobileMenuOpen(false);
-              }}
-              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-lg py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm transform hover:translate-x-2"
-            >
-              Destacados
-            </Link>
-            <Link
-              href="#menu-comidas"
-              onClick={(e) => {
-                handleSmoothScroll(e, "menu-comidas");
-                setIsMobileMenuOpen(false);
-              }}
-              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-lg py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm transform hover:translate-x-2"
-            >
-              Menú
-            </Link>
-            <Link
-              href="#delivery"
-              onClick={(e) => {
-                handleSmoothScroll(e, "delivery");
-                setIsMobileMenuOpen(false);
-              }}
-              className="text-secondary-300 hover:text-primary-400 transition-all duration-300 font-semibold text-lg py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-secondary-300/30 backdrop-blur-sm transform hover:translate-x-2"
-            >
-              🏍️ Delivery
-            </Link>
-            <Link
-              href="#contacto"
-              onClick={(e) => {
-                handleSmoothScroll(e, "contacto");
-                setIsMobileMenuOpen(false);
-              }}
-              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-lg py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm transform hover:translate-x-2"
-            >
-              Contacto
-            </Link>
+              <Link
+                href="#inicio"
+                onClick={(e) => {
+                  handleSmoothScroll(e, "inicio");
+                  setIsMobileMenuOpen(false);
+                }}
+                className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm text-center shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
+                style={{
+                  textShadow:
+                    "2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)",
+                }}
+              >
+                Inicio
+              </Link>
+              <Link
+                href="#especialidades"
+                onClick={(e) => {
+                  handleSmoothScroll(e, "especialidades");
+                  setIsMobileMenuOpen(false);
+                }}
+                className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm text-center shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
+                style={{
+                  textShadow:
+                    "2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)",
+                }}
+              >
+                Especialidades
+              </Link>
+              <Link
+                href="#destacadas"
+                onClick={(e) => {
+                  handleSmoothScroll(e, "destacadas");
+                  setIsMobileMenuOpen(false);
+                }}
+                className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm text-center shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
+                style={{
+                  textShadow:
+                    "2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)",
+                }}
+              >
+                Destacados
+              </Link>
+              <Link
+                href="/galeria"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm text-center shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
+                style={{
+                  textShadow:
+                    "2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)",
+                }}
+              >
+                📸 Galería
+              </Link>
+              <Link
+                href="#menu-comidas"
+                onClick={(e) => {
+                  handleSmoothScroll(e, "menu-comidas");
+                  setIsMobileMenuOpen(false);
+                }}
+                className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm text-center shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
+                style={{
+                  textShadow:
+                    "2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)",
+                }}
+              >
+                Menú
+              </Link>
+              <Link
+                href="/nosotros"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm text-center shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
+                style={{
+                  textShadow:
+                    "2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)",
+                }}
+              >
+                Sobre Nosotros
+              </Link>
+              <Link
+                href="/blog"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm text-center shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
+                style={{
+                  textShadow:
+                    "2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)",
+                }}
+              >
+                Blog & Noticias
+              </Link>
+              <Link
+                href="#delivery"
+                onClick={(e) => {
+                  handleSmoothScroll(e, "delivery");
+                  setIsMobileMenuOpen(false);
+                }}
+                className="text-secondary-300 hover:text-primary-400 transition-all duration-300 font-semibold text-xl py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-secondary-300/30 backdrop-blur-sm text-center shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
+                style={{
+                  textShadow:
+                    "2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)",
+                }}
+              >
+                🏍️ Delivery
+              </Link>
+              <Link
+                href="#contacto"
+                onClick={(e) => {
+                  handleSmoothScroll(e, "contacto");
+                  setIsMobileMenuOpen(false);
+                }}
+                className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm text-center shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
+                style={{
+                  textShadow:
+                    "2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)",
+                }}
+              >
+                Contacto
+              </Link>
+            </div>
           </div>
         </div>
       </div>
