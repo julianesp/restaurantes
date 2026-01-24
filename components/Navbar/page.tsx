@@ -17,6 +17,7 @@ const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
 
   const toggleMobileMenu = () => {
@@ -122,33 +123,50 @@ const Navbar = () => {
         <div className="hidden lg:flex items-center justify-center h-[80px] bg-gray-900/50 px-8 relative">
           {/* Enlaces izquierda */}
           <div className="flex items-center space-x-6 absolute left-8">
-            <Link
-              href="#inicio"
-              onClick={(e) => handleSmoothScroll(e, "inicio")}
-              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm"
+            {/* Menú Inicio con submenú */}
+            <div
+              className="relative group"
+              onMouseEnter={() => setOpenDropdown('inicio')}
+              onMouseLeave={() => setOpenDropdown(null)}
             >
-              Inicio
-            </Link>
-            <Link
-              href="#especialidades"
-              onClick={(e) => handleSmoothScroll(e, "especialidades")}
-              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm"
-            >
-              Especialidades
-            </Link>
-            <Link
-              href="#destacadas"
-              onClick={(e) => handleSmoothScroll(e, "destacadas")}
-              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm"
-            >
-              Destacados
-            </Link>
-            <Link
-              href="/galeria"
-              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm"
-            >
-              📸 Galería
-            </Link>
+              <Link
+                href="#inicio"
+                onClick={(e) => handleSmoothScroll(e, "inicio")}
+                className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm flex items-center gap-1"
+              >
+                Inicio
+                <svg className="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </Link>
+              {/* Submenú */}
+              <div className={`absolute top-full left-0 mt-2 w-48 bg-gray-900/95 backdrop-blur-xl rounded-lg shadow-2xl overflow-hidden transition-all duration-300 origin-top ${
+                openDropdown === 'inicio'
+                  ? 'opacity-100 scale-y-100 translate-y-0'
+                  : 'opacity-0 scale-y-0 -translate-y-4 pointer-events-none'
+              }`}>
+                <Link
+                  href="#especialidades"
+                  onClick={(e) => {
+                    handleSmoothScroll(e, "especialidades");
+                    setOpenDropdown(null);
+                  }}
+                  className="block px-4 py-3 text-white hover:bg-primary-500/20 hover:text-primary-400 transition-all duration-200 text-sm"
+                >
+                  Especialidades
+                </Link>
+                <Link
+                  href="#destacadas"
+                  onClick={(e) => {
+                    handleSmoothScroll(e, "destacadas");
+                    setOpenDropdown(null);
+                  }}
+                  className="block px-4 py-3 text-white hover:bg-primary-500/20 hover:text-primary-400 transition-all duration-200 text-sm border-t border-white/10"
+                >
+                  Destacados
+                </Link>
+              </div>
+            </div>
           </div>
 
           {/* Logo centrado */}
@@ -177,12 +195,48 @@ const Navbar = () => {
             >
               Menú
             </Link>
-            <Link
-              href="/nosotros"
-              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm"
+
+            {/* Menú Sobre Nosotros con submenú */}
+            <div
+              className="relative group"
+              onMouseEnter={() => setOpenDropdown('nosotros')}
+              onMouseLeave={() => setOpenDropdown(null)}
             >
-              Sobre Nosotros
-            </Link>
+              <Link
+                href="/nosotros"
+                className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm flex items-center gap-1"
+              >
+                Sobre Nosotros
+                <svg className="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </Link>
+              {/* Submenú */}
+              <div className={`absolute top-full left-0 mt-2 w-48 bg-gray-900/95 backdrop-blur-xl rounded-lg shadow-2xl overflow-hidden transition-all duration-300 origin-top ${
+                openDropdown === 'nosotros'
+                  ? 'opacity-100 scale-y-100 translate-y-0'
+                  : 'opacity-0 scale-y-0 -translate-y-4 pointer-events-none'
+              }`}>
+                <Link
+                  href="/galeria"
+                  onClick={() => setOpenDropdown(null)}
+                  className="block px-4 py-3 text-white hover:bg-primary-500/20 hover:text-primary-400 transition-all duration-200 text-sm"
+                >
+                  📸 Galería
+                </Link>
+                <Link
+                  href="#contacto"
+                  onClick={(e) => {
+                    handleSmoothScroll(e, "contacto");
+                    setOpenDropdown(null);
+                  }}
+                  className="block px-4 py-3 text-white hover:bg-primary-500/20 hover:text-primary-400 transition-all duration-200 text-sm border-t border-white/10"
+                >
+                  Contacto
+                </Link>
+              </div>
+            </div>
+
             <Link
               href="/blog"
               className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm"
@@ -195,13 +249,6 @@ const Navbar = () => {
               className="text-secondary-300 hover:text-primary-400 transition-all duration-300 font-semibold text-sm"
             >
               🏍️ Delivery
-            </Link>
-            <Link
-              href="#contacto"
-              onClick={(e) => handleSmoothScroll(e, "contacto")}
-              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm"
-            >
-              Contacto
             </Link>
 
             <PulseAnimation interval={5000} duration={1200}>
