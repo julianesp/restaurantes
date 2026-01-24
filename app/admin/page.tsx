@@ -9,5 +9,14 @@ export default async function AdminPage() {
     redirect("/sign-in");
   }
 
-  return <AdminDashboard user={user} />;
+  // Serializar solo los datos necesarios para el Client Component
+  const serializedUser = {
+    firstName: user.firstName,
+    lastName: user.lastName,
+    emailAddresses: user.emailAddresses.map(email => ({
+      emailAddress: email.emailAddress
+    }))
+  };
+
+  return <AdminDashboard user={serializedUser} />;
 }
