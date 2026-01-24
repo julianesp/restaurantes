@@ -147,12 +147,12 @@ const Navbar = () => {
     >
       <div className="w-full backdrop-blur-[3px]">
         {/* Navbar para pantallas grandes (lg+) */}
-        <div className="hidden lg:flex items-center justify-center h-[80px] bg-gray-900/50 px-8 relative">
+        <div className="hidden lg:flex items-center justify-center h-[80px] bg-gray-900/50 dark:bg-gray-900/50 bg-white/70 px-8 relative border-b border-gray-200/20 dark:border-gray-700/20">
           {/* Enlaces izquierda - cerca del logo */}
-          <div className="flex items-center gap-4 absolute left-1/2 -translate-x-[280px]">
+          <div className="flex items-center gap-4 absolute left-1/2 -translate-x-[380px]">
             {/* Menú Inicio con submenú */}
             <div
-              className={`relative group transition-all duration-500 ${
+              className={`relative group transition-all duration-200 ${
                 showNavLinks
                   ? 'opacity-100 translate-x-0'
                   : 'opacity-0 -translate-x-20'
@@ -164,7 +164,7 @@ const Navbar = () => {
               <Link
                 href="#inicio"
                 onClick={(e) => handleSmoothScroll(e, "inicio")}
-                className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm flex items-center gap-1"
+                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-sm flex items-center gap-1"
               >
                 Inicio
                 <svg className="w-4 h-4 transition-transform group-hover:rotate-180 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -173,7 +173,7 @@ const Navbar = () => {
               </Link>
               {/* Submenú */}
               <div
-                className={`absolute top-full left-0 mt-2 w-48 bg-gray-900/95 backdrop-blur-xl rounded-lg shadow-2xl overflow-hidden transition-all duration-300 origin-top ${
+                className={`absolute top-full left-0 mt-2 w-48 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-lg shadow-2xl overflow-hidden transition-all duration-300 origin-top border border-gray-200 dark:border-gray-700 ${
                   openDropdown === 'inicio'
                     ? 'opacity-100 scale-y-100 translate-y-0'
                     : 'opacity-0 scale-y-0 -translate-y-4 pointer-events-none'
@@ -187,7 +187,7 @@ const Navbar = () => {
                     handleSmoothScroll(e, "especialidades");
                     setOpenDropdown(null);
                   }}
-                  className="block px-4 py-3 text-white hover:bg-primary-500/20 hover:text-primary-400 transition-all duration-200 text-sm"
+                  className="block px-4 py-3 text-gray-900 dark:text-white hover:bg-primary-500/20 hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-200 text-sm"
                 >
                   Especialidades
                 </Link>
@@ -197,7 +197,7 @@ const Navbar = () => {
                     handleSmoothScroll(e, "destacadas");
                     setOpenDropdown(null);
                   }}
-                  className="block px-4 py-3 text-white hover:bg-primary-500/20 hover:text-primary-400 transition-all duration-200 text-sm border-t border-white/10"
+                  className="block px-4 py-3 text-gray-900 dark:text-white hover:bg-primary-500/20 hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-200 text-sm border-t border-gray-200 dark:border-white/10"
                 >
                   Destacados
                 </Link>
@@ -217,7 +217,7 @@ const Navbar = () => {
             >
               <Link
                 href="/nosotros"
-                className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm flex items-center gap-1"
+                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-sm flex items-center gap-1"
               >
                 Sobre Nosotros
                 <svg className="w-4 h-4 transition-transform group-hover:rotate-180 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -226,7 +226,7 @@ const Navbar = () => {
               </Link>
               {/* Submenú */}
               <div
-                className={`absolute top-full left-0 mt-2 w-48 bg-gray-900/95 backdrop-blur-xl rounded-lg shadow-2xl overflow-hidden transition-all duration-300 origin-top ${
+                className={`absolute top-full left-0 mt-2 w-48 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-lg shadow-2xl overflow-hidden transition-all duration-300 origin-top border border-gray-200 dark:border-gray-700 ${
                   openDropdown === 'nosotros'
                     ? 'opacity-100 scale-y-100 translate-y-0'
                     : 'opacity-0 scale-y-0 -translate-y-4 pointer-events-none'
@@ -237,7 +237,7 @@ const Navbar = () => {
                 <Link
                   href="/galeria"
                   onClick={() => setOpenDropdown(null)}
-                  className="block px-4 py-3 text-white hover:bg-primary-500/20 hover:text-primary-400 transition-all duration-200 text-sm"
+                  className="block px-4 py-3 text-gray-900 dark:text-white hover:bg-primary-500/20 hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-200 text-sm"
                 >
                   📸 Galería
                 </Link>
@@ -247,7 +247,7 @@ const Navbar = () => {
                     handleSmoothScroll(e, "contacto");
                     setOpenDropdown(null);
                   }}
-                  className="block px-4 py-3 text-white hover:bg-primary-500/20 hover:text-primary-400 transition-all duration-200 text-sm border-t border-white/10"
+                  className="block px-4 py-3 text-gray-900 dark:text-white hover:bg-primary-500/20 hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-200 text-sm border-t border-gray-200 dark:border-white/10"
                 >
                   Contacto
                 </Link>
@@ -273,11 +273,11 @@ const Navbar = () => {
           </Link>
 
           {/* Enlaces derecha - cerca del logo */}
-          <div className="flex items-center gap-4 absolute left-1/2 translate-x-[110px]">
+          <div className="flex items-center gap-4 absolute left-1/2 translate-x-[210px]">
             <Link
               href="#menu-comidas"
               onClick={(e) => handleSmoothScroll(e, "menu-comidas")}
-              className={`text-white hover:text-primary-400 transition-all duration-500 font-medium text-sm ${
+              className={`text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-500 font-medium text-sm ${
                 showNavLinks
                   ? 'opacity-100 translate-x-0'
                   : 'opacity-0 translate-x-20'
@@ -289,7 +289,7 @@ const Navbar = () => {
 
             <Link
               href="/blog"
-              className={`text-white hover:text-primary-400 transition-all duration-500 font-medium text-sm ${
+              className={`text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-500 font-medium text-sm ${
                 showNavLinks
                   ? 'opacity-100 translate-x-0'
                   : 'opacity-0 translate-x-20'
@@ -302,7 +302,7 @@ const Navbar = () => {
             <Link
               href="#delivery"
               onClick={(e) => handleSmoothScroll(e, "delivery")}
-              className={`text-secondary-300 hover:text-primary-400 transition-all duration-500 font-semibold text-sm ${
+              className={`text-primary-600 dark:text-secondary-300 hover:text-primary-700 dark:hover:text-primary-400 transition-all duration-500 font-semibold text-sm ${
                 showNavLinks
                   ? 'opacity-100 translate-x-0'
                   : 'opacity-0 translate-x-20'
@@ -347,7 +347,7 @@ const Navbar = () => {
         </div>
 
         {/* Navbar para móviles y tablets (< lg) */}
-        <div className="flex lg:hidden justify-between items-center h-[65px] bg-gray-900/50 px-4 sm:px-6">
+        <div className="flex lg:hidden justify-between items-center h-[65px] bg-white/70 dark:bg-gray-900/50 px-4 sm:px-6 border-b border-gray-200/20 dark:border-gray-700/20">
           {/* Logo a la izquierda */}
           <div className="flex items-center space-x-3">
             <Link
@@ -387,13 +387,13 @@ const Navbar = () => {
 
             <button
               onClick={toggleMobileMenu}
-              className="p-2 rounded-lg hover:bg-white/10 transition-all duration-300"
+              className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-white/10 transition-all duration-300"
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? (
-                <X className="h-6 w-6 text-white transition-transform duration-300 rotate-90" />
+                <X className="h-6 w-6 text-gray-900 dark:text-white transition-transform duration-300 rotate-90" />
               ) : (
-                <Menu className="h-6 w-6 text-white transition-transform duration-300" />
+                <Menu className="h-6 w-6 text-gray-900 dark:text-white transition-transform duration-300" />
               )}
             </button>
           </div>
@@ -410,7 +410,7 @@ const Navbar = () => {
       >
         <div className="w-full flex justify-center">
           <div
-            className={`max-w-md w-full mx-auto px-6 py-8 bg-gray-900/98 backdrop-blur-xl shadow-2xl ${styles.menuMobile}`}
+            className={`max-w-md w-full mx-auto px-6 py-8 bg-white/98 dark:bg-gray-900/98 backdrop-blur-xl shadow-2xl border border-gray-200 dark:border-gray-700 ${styles.menuMobile}`}
           >
             {/* Navigation Links */}
             <div
@@ -426,11 +426,7 @@ const Navbar = () => {
                   handleSmoothScroll(e, "inicio");
                   setIsMobileMenuOpen(false);
                 }}
-                className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm text-center shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
-                style={{
-                  textShadow:
-                    "2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)",
-                }}
+                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-md"
               >
                 Inicio
               </Link>
@@ -440,11 +436,7 @@ const Navbar = () => {
                   handleSmoothScroll(e, "especialidades");
                   setIsMobileMenuOpen(false);
                 }}
-                className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm text-center shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
-                style={{
-                  textShadow:
-                    "2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)",
-                }}
+                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-md"
               >
                 Especialidades
               </Link>
@@ -454,22 +446,14 @@ const Navbar = () => {
                   handleSmoothScroll(e, "destacadas");
                   setIsMobileMenuOpen(false);
                 }}
-                className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm text-center shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
-                style={{
-                  textShadow:
-                    "2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)",
-                }}
+                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-md"
               >
                 Destacados
               </Link>
               <Link
                 href="/galeria"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm text-center shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
-                style={{
-                  textShadow:
-                    "2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)",
-                }}
+                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-md"
               >
                 📸 Galería
               </Link>
@@ -479,33 +463,21 @@ const Navbar = () => {
                   handleSmoothScroll(e, "menu-comidas");
                   setIsMobileMenuOpen(false);
                 }}
-                className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm text-center shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
-                style={{
-                  textShadow:
-                    "2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)",
-                }}
+                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-md"
               >
                 Menú
               </Link>
               <Link
                 href="/nosotros"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm text-center shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
-                style={{
-                  textShadow:
-                    "2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)",
-                }}
+                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-md"
               >
                 Sobre Nosotros
               </Link>
               <Link
                 href="/blog"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm text-center shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
-                style={{
-                  textShadow:
-                    "2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)",
-                }}
+                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-md"
               >
                 Blog & Noticias
               </Link>
@@ -515,11 +487,7 @@ const Navbar = () => {
                   handleSmoothScroll(e, "delivery");
                   setIsMobileMenuOpen(false);
                 }}
-                className="text-secondary-300 hover:text-primary-400 transition-all duration-300 font-semibold text-xl py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-secondary-300/30 backdrop-blur-sm text-center shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
-                style={{
-                  textShadow:
-                    "2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)",
-                }}
+                className="text-primary-600 dark:text-secondary-300 hover:text-primary-700 dark:hover:text-primary-400 transition-all duration-300 font-semibold text-xl py-4 px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-secondary-300/30 backdrop-blur-sm text-center shadow-md"
               >
                 🏍️ Delivery
               </Link>
@@ -529,11 +497,7 @@ const Navbar = () => {
                   handleSmoothScroll(e, "contacto");
                   setIsMobileMenuOpen(false);
                 }}
-                className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-white/10 rounded-xl border border-transparent hover:border-white/20 backdrop-blur-sm text-center shadow-[0_2px_8px_rgba(0,0,0,0.3)]"
-                style={{
-                  textShadow:
-                    "2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8), 1px -1px 2px rgba(0,0,0,0.8), -1px 1px 2px rgba(0,0,0,0.8)",
-                }}
+                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-xl py-4 px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-md"
               >
                 Contacto
               </Link>
