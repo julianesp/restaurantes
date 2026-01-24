@@ -9,9 +9,11 @@ import OrderModal from "../OrderModal";
 import FloatingActionButtons from "../FloatingActionButtons";
 import ThemeSwitcher from "../ThemeSwitcher";
 import PulseAnimation from "../PulseAnimation";
+import { UserButton, useUser } from "@clerk/nextjs";
 import styles from "./NavBar.module.scss";
 
 const Navbar = () => {
+  const { isSignedIn } = useUser();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
@@ -137,11 +139,24 @@ const Navbar = () => {
             {/* <h1 className="text-xl font-bold text-white">Munay</h1> */}
           </div>
 
-          {/* Theme Switcher y menú hamburguesa */}
+          {/* Theme Switcher, User Button y menú hamburguesa */}
           <div className="flex items-center space-x-3">
             <PulseAnimation interval={5000} duration={1200}>
               <ThemeSwitcher />
             </PulseAnimation>
+
+            {/* Botón de usuario de Clerk si está autenticado */}
+            {isSignedIn && (
+              <div className="flex items-center">
+                <UserButton
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-9 h-9 ring-2 ring-white/20 hover:ring-white/40 transition-all"
+                    }
+                  }}
+                />
+              </div>
+            )}
 
             <button
               onClick={toggleMobileMenu}

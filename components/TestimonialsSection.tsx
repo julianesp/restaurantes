@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Star, ThumbsUp, MessageSquare, User } from "lucide-react";
 import { useRevealOnScroll } from "../utils/useRevealOnScroll";
-import { useUser, SignInButton } from "@clerk/nextjs";
+import { useUser, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 
 interface Testimonial {
