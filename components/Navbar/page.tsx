@@ -147,7 +147,7 @@ const Navbar = () => {
     >
       <div className="w-full backdrop-blur-[3px]">
         {/* Navbar para pantallas grandes (lg+) */}
-        <div className="hidden lg:flex items-center justify-center h-[80px] bg-gray-900/50 dark:bg-gray-900/50 bg-white/70 px-8 relative border-b border-gray-200/20 dark:border-gray-700/20">
+        <div className="hidden lg:flex items-center justify-center h-[80px] bg-white/70 dark:bg-gray-900/50 px-8 relative border-b border-gray-200/20 dark:border-gray-700/20">
           {/* Enlaces izquierda - cerca del logo */}
           <div className="flex items-center gap-4 absolute left-1/2 -translate-x-[380px]">
             {/* Menú Inicio con submenú */}
@@ -259,7 +259,7 @@ const Navbar = () => {
           <Link
             href="/"
             title="Ir a inicio"
-            className="transition-transform duration-700 ease-in-out hover:scale-110 p-2 rounded-full bg-white/10 backdrop-blur-sm shadow-lg hover:bg-white/20 z-10"
+            className="transition-transform duration-700 ease-in-out hover:scale-110 p-2 rounded-full bg-gray-100/80 dark:bg-white/10 backdrop-blur-sm shadow-lg hover:bg-gray-200/90 dark:hover:bg-white/20 z-10"
           >
             <Image
               src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/munay/images/logo%20en%20blanco%20png.png"
@@ -353,7 +353,7 @@ const Navbar = () => {
             <Link
               href="/"
               title="Ir a inicio"
-              className="transition-transform duration-700 ease-in-out hover:scale-110 p-2 rounded-full bg-white/10 backdrop-blur-sm shadow-lg hover:bg-white/20"
+              className="transition-transform duration-700 ease-in-out hover:scale-110 p-2 rounded-full bg-gray-100/80 dark:bg-white/10 backdrop-blur-sm shadow-lg hover:bg-gray-200/90 dark:hover:bg-white/20"
             >
               <Image
                 src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/munay/images/logo%20en%20blanco%20png.png"
