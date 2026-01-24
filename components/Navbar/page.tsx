@@ -18,7 +18,9 @@ const Navbar = () => {
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [showNavLinks, setShowNavLinks] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -73,6 +75,31 @@ const Navbar = () => {
     };
   }, [isMobileMenuOpen]);
 
+  // Animación de entrada de los enlaces después de 500ms
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowNavLinks(true);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Funciones para manejar el hover con delay
+  const handleMouseEnter = (dropdown: string) => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    setOpenDropdown(dropdown);
+  };
+
+  const handleMouseLeave = () => {
+    // Delay de 300ms antes de cerrar
+    closeTimeoutRef.current = setTimeout(() => {
+      setOpenDropdown(null);
+    }, 300);
+  };
+
   const handleSmoothScroll = (
     e: React.MouseEvent<HTMLAnchorElement>,
     targetId: string,
@@ -121,13 +148,18 @@ const Navbar = () => {
       <div className="w-full backdrop-blur-[3px]">
         {/* Navbar para pantallas grandes (lg+) */}
         <div className="hidden lg:flex items-center justify-center h-[80px] bg-gray-900/50 px-8 relative">
-          {/* Enlaces izquierda */}
-          <div className="flex items-center space-x-6 absolute left-8">
+          {/* Enlaces izquierda - cerca del logo */}
+          <div className="flex items-center gap-4 absolute left-1/2 -translate-x-[280px]">
             {/* Menú Inicio con submenú */}
             <div
-              className="relative group"
-              onMouseEnter={() => setOpenDropdown('inicio')}
-              onMouseLeave={() => setOpenDropdown(null)}
+              className={`relative group transition-all duration-500 ${
+                showNavLinks
+                  ? 'opacity-100 translate-x-0'
+                  : 'opacity-0 -translate-x-20'
+              }`}
+              style={{ transitionDelay: '0ms' }}
+              onMouseEnter={() => handleMouseEnter('inicio')}
+              onMouseLeave={handleMouseLeave}
             >
               <Link
                 href="#inicio"
@@ -135,16 +167,20 @@ const Navbar = () => {
                 className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm flex items-center gap-1"
               >
                 Inicio
-                <svg className="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 transition-transform group-hover:rotate-180 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </Link>
               {/* Submenú */}
-              <div className={`absolute top-full left-0 mt-2 w-48 bg-gray-900/95 backdrop-blur-xl rounded-lg shadow-2xl overflow-hidden transition-all duration-300 origin-top ${
-                openDropdown === 'inicio'
-                  ? 'opacity-100 scale-y-100 translate-y-0'
-                  : 'opacity-0 scale-y-0 -translate-y-4 pointer-events-none'
-              }`}>
+              <div
+                className={`absolute top-full left-0 mt-2 w-48 bg-gray-900/95 backdrop-blur-xl rounded-lg shadow-2xl overflow-hidden transition-all duration-300 origin-top ${
+                  openDropdown === 'inicio'
+                    ? 'opacity-100 scale-y-100 translate-y-0'
+                    : 'opacity-0 scale-y-0 -translate-y-4 pointer-events-none'
+                }`}
+                onMouseEnter={() => handleMouseEnter('inicio')}
+                onMouseLeave={handleMouseLeave}
+              >
                 <Link
                   href="#especialidades"
                   onClick={(e) => {
@@ -167,56 +203,37 @@ const Navbar = () => {
                 </Link>
               </div>
             </div>
-          </div>
-
-          {/* Logo centrado */}
-          <Link
-            href="/"
-            title="Ir a inicio"
-            className="transition-transform duration-700 ease-in-out hover:scale-110 p-2 rounded-full bg-white/10 backdrop-blur-sm shadow-lg hover:bg-white/20"
-          >
-            <Image
-              src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/munay/images/logo%20en%20blanco%20png.png"
-              alt="Logo Restaurante Munay"
-              title="Logo Restaurante Munay"
-              width={70}
-              height={70}
-              className="object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
-              priority
-            />
-          </Link>
-
-          {/* Enlaces derecha */}
-          <div className="flex items-center space-x-6 absolute right-8">
-            <Link
-              href="#menu-comidas"
-              onClick={(e) => handleSmoothScroll(e, "menu-comidas")}
-              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm"
-            >
-              Menú
-            </Link>
 
             {/* Menú Sobre Nosotros con submenú */}
             <div
-              className="relative group"
-              onMouseEnter={() => setOpenDropdown('nosotros')}
-              onMouseLeave={() => setOpenDropdown(null)}
+              className={`relative group transition-all duration-500 ${
+                showNavLinks
+                  ? 'opacity-100 translate-x-0'
+                  : 'opacity-0 -translate-x-20'
+              }`}
+              style={{ transitionDelay: '100ms' }}
+              onMouseEnter={() => handleMouseEnter('nosotros')}
+              onMouseLeave={handleMouseLeave}
             >
               <Link
                 href="/nosotros"
                 className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm flex items-center gap-1"
               >
                 Sobre Nosotros
-                <svg className="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 transition-transform group-hover:rotate-180 duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </Link>
               {/* Submenú */}
-              <div className={`absolute top-full left-0 mt-2 w-48 bg-gray-900/95 backdrop-blur-xl rounded-lg shadow-2xl overflow-hidden transition-all duration-300 origin-top ${
-                openDropdown === 'nosotros'
-                  ? 'opacity-100 scale-y-100 translate-y-0'
-                  : 'opacity-0 scale-y-0 -translate-y-4 pointer-events-none'
-              }`}>
+              <div
+                className={`absolute top-full left-0 mt-2 w-48 bg-gray-900/95 backdrop-blur-xl rounded-lg shadow-2xl overflow-hidden transition-all duration-300 origin-top ${
+                  openDropdown === 'nosotros'
+                    ? 'opacity-100 scale-y-100 translate-y-0'
+                    : 'opacity-0 scale-y-0 -translate-y-4 pointer-events-none'
+                }`}
+                onMouseEnter={() => handleMouseEnter('nosotros')}
+                onMouseLeave={handleMouseLeave}
+              >
                 <Link
                   href="/galeria"
                   onClick={() => setOpenDropdown(null)}
@@ -236,27 +253,87 @@ const Navbar = () => {
                 </Link>
               </div>
             </div>
+          </div>
+
+          {/* Logo centrado */}
+          <Link
+            href="/"
+            title="Ir a inicio"
+            className="transition-transform duration-700 ease-in-out hover:scale-110 p-2 rounded-full bg-white/10 backdrop-blur-sm shadow-lg hover:bg-white/20 z-10"
+          >
+            <Image
+              src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/munay/images/logo%20en%20blanco%20png.png"
+              alt="Logo Restaurante Munay"
+              title="Logo Restaurante Munay"
+              width={70}
+              height={70}
+              className="object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+              priority
+            />
+          </Link>
+
+          {/* Enlaces derecha - cerca del logo */}
+          <div className="flex items-center gap-4 absolute left-1/2 translate-x-[110px]">
+            <Link
+              href="#menu-comidas"
+              onClick={(e) => handleSmoothScroll(e, "menu-comidas")}
+              className={`text-white hover:text-primary-400 transition-all duration-500 font-medium text-sm ${
+                showNavLinks
+                  ? 'opacity-100 translate-x-0'
+                  : 'opacity-0 translate-x-20'
+              }`}
+              style={{ transitionDelay: '0ms' }}
+            >
+              Menú
+            </Link>
 
             <Link
               href="/blog"
-              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm"
+              className={`text-white hover:text-primary-400 transition-all duration-500 font-medium text-sm ${
+                showNavLinks
+                  ? 'opacity-100 translate-x-0'
+                  : 'opacity-0 translate-x-20'
+              }`}
+              style={{ transitionDelay: '100ms' }}
             >
               Blog
             </Link>
+
             <Link
               href="#delivery"
               onClick={(e) => handleSmoothScroll(e, "delivery")}
-              className="text-secondary-300 hover:text-primary-400 transition-all duration-300 font-semibold text-sm"
+              className={`text-secondary-300 hover:text-primary-400 transition-all duration-500 font-semibold text-sm ${
+                showNavLinks
+                  ? 'opacity-100 translate-x-0'
+                  : 'opacity-0 translate-x-20'
+              }`}
+              style={{ transitionDelay: '200ms' }}
             >
               🏍️ Delivery
             </Link>
 
-            <PulseAnimation interval={5000} duration={1200}>
-              <ThemeSwitcher />
-            </PulseAnimation>
+            <div
+              className={`transition-all duration-500 ${
+                showNavLinks
+                  ? 'opacity-100 translate-x-0'
+                  : 'opacity-0 translate-x-20'
+              }`}
+              style={{ transitionDelay: '300ms' }}
+            >
+              <PulseAnimation interval={5000} duration={1200}>
+                <ThemeSwitcher />
+              </PulseAnimation>
+            </div>
 
             {isSignedIn && (
-              <div className="flex items-center">
+              <div
+                className={`flex items-center transition-all duration-500 ${
+                  showNavLinks
+                    ? 'opacity-100 translate-x-0'
+                    : 'opacity-0 translate-x-20'
+                }`}
+                style={{ transitionDelay: '400ms' }}
+              >
                 <UserButton
                   appearance={{
                     elements: {
