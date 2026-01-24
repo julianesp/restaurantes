@@ -17,65 +17,9 @@ interface Testimonial {
   verified?: boolean;
 }
 
-// Datos de ejemplo - En producción vendrían de una base de datos
-const testimonials: Testimonial[] = [
-  {
-    id: 1,
-    name: "María González",
-    rating: 5,
-    date: "2026-01-15",
-    comment:
-      "Excelente servicio y comida deliciosa. El sancocho es el mejor que he probado en toda la región. Muy recomendado!",
-    helpful: 12,
-    verified: true,
-  },
-  {
-    id: 2,
-    name: "Carlos Rodríguez",
-    rating: 5,
-    date: "2026-01-10",
-    comment:
-      "La bandeja paisa está espectacular. Ingredientes frescos y porciones generosas. El ambiente es muy acogedor.",
-    helpful: 8,
-    verified: true,
-  },
-  {
-    id: 3,
-    name: "Ana Martínez",
-    rating: 4,
-    date: "2026-01-08",
-    comment:
-      "Muy buena atención al cliente. Los platos son deliciosos y los precios son justos. Definitivamente volveré.",
-    helpful: 15,
-  },
-  {
-    id: 4,
-    name: "Juan Pérez",
-    rating: 5,
-    date: "2026-01-05",
-    comment:
-      "El mejor restaurante del Valle de Sibundoy! La cazuela de mariscos es increíble. El servicio a domicilio es rápido y eficiente.",
-    helpful: 20,
-  },
-  {
-    id: 5,
-    name: "Laura Sánchez",
-    rating: 5,
-    date: "2026-01-03",
-    comment:
-      "Me encanta poder hacer pedidos online. La comida siempre llega caliente y bien empacada. Los tamales son los mejores!",
-    helpful: 10,
-  },
-  {
-    id: 6,
-    name: "Pedro Díaz",
-    rating: 4,
-    date: "2025-12-28",
-    comment:
-      "Buena experiencia en general. La comida es auténtica y sabrosa. El ajiaco bogotano me recordó a casa.",
-    helpful: 6,
-  },
-];
+// Reseñas dinámicas - En producción vendrían de una base de datos conectada a Facebook
+// Array vacío hasta que se integre la autenticación con Facebook
+const testimonials: Testimonial[] = [];
 
 export default function TestimonialsSection() {
   const { isSignedIn, user } = useUser();
@@ -101,11 +45,14 @@ export default function TestimonialsSection() {
 
   // Calcular estadísticas
   const totalReviews = testimonials.length;
-  const averageRating =
-    testimonials.reduce((sum, t) => sum + t.rating, 0) / totalReviews;
+  const averageRating = totalReviews > 0
+    ? testimonials.reduce((sum, t) => sum + t.rating, 0) / totalReviews
+    : 0;
   const ratingDistribution = [5, 4, 3, 2, 1].map(
     (rating) =>
-      testimonials.filter((t) => t.rating === rating).length / totalReviews
+      totalReviews > 0
+        ? testimonials.filter((t) => t.rating === rating).length / totalReviews
+        : 0
   );
 
   // Ordenar testimonios
@@ -185,7 +132,9 @@ export default function TestimonialsSection() {
               </div>
               <div className="text-center">
                 <div className="text-4xl font-bold text-primary-500 mb-1">
-                  {Math.round((testimonials.filter((t) => t.rating === 5).length / totalReviews) * 100)}%
+                  {totalReviews > 0
+                    ? Math.round((testimonials.filter((t) => t.rating === 5).length / totalReviews) * 100)
+                    : 0}%
                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
                   Recomendado
@@ -371,61 +320,88 @@ export default function TestimonialsSection() {
         </div>
 
         {/* Lista de Testimonios */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {sortedTestimonials.map((testimonial) => (
-            <div
-              key={testimonial.id}
-              className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 hover-lift"
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary-400 to-accent-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                    {testimonial.name.charAt(0)}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-bold text-gray-900 dark:text-white">
-                        {testimonial.name}
-                      </h4>
-                      {testimonial.verified && (
-                        <span
-                          className="text-blue-500 text-xs"
-                          title="Usuario verificado con Facebook"
-                        >
-                          ✓
-                        </span>
-                      )}
+        {totalReviews === 0 ? (
+          <div className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-12 text-center">
+            <MessageSquare className="w-20 h-20 text-gray-400 dark:text-gray-600 mx-auto mb-6" />
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+              Aún no hay reseñas
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-6">
+              Sé el primero en compartir tu experiencia en Restaurante Munay. Tus comentarios ayudan a otros comensales y nos permiten mejorar nuestro servicio.
+            </p>
+            {isSignedIn ? (
+              <button
+                onClick={() => setShowReviewForm(true)}
+                className="bg-primary-500 hover:bg-primary-600 text-white px-8 py-3 rounded-lg font-bold transition-all shadow-lg hover:shadow-xl transform hover:scale-105 inline-block"
+              >
+                Dejar la Primera Reseña
+              </button>
+            ) : (
+              <Link
+                href="/sign-in"
+                className="inline-block bg-primary-500 hover:bg-primary-600 text-white px-8 py-3 rounded-lg font-bold transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
+              >
+                Iniciar Sesión para Dejar Reseña
+              </Link>
+            )}
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-6">
+            {sortedTestimonials.map((testimonial) => (
+              <div
+                key={testimonial.id}
+                className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 hover-lift"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary-400 to-accent-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                      {testimonial.name.charAt(0)}
                     </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {formatDate(testimonial.date)}
-                    </p>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-bold text-gray-900 dark:text-white">
+                          {testimonial.name}
+                        </h4>
+                        {testimonial.verified && (
+                          <span
+                            className="text-blue-500 text-xs"
+                            title="Usuario verificado con Facebook"
+                          >
+                            ✓
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {formatDate(testimonial.date)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`w-5 h-5 ${
+                          i < testimonial.rating
+                            ? "text-yellow-400 fill-yellow-400"
+                            : "text-gray-300 dark:text-gray-600"
+                        }`}
+                      />
+                    ))}
                   </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-5 h-5 ${
-                        i < testimonial.rating
-                          ? "text-yellow-400 fill-yellow-400"
-                          : "text-gray-300 dark:text-gray-600"
-                      }`}
-                    />
-                  ))}
+
+                <p className="text-gray-700 dark:text-gray-300 mb-4">
+                  {testimonial.comment}
+                </p>
+
+                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                  <ThumbsUp className="w-4 h-4" />
+                  <span>{testimonial.helpful} personas encontraron esto útil</span>
                 </div>
               </div>
-
-              <p className="text-gray-700 dark:text-gray-300 mb-4">
-                {testimonial.comment}
-              </p>
-
-              <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                <ThumbsUp className="w-4 h-4" />
-                <span>{testimonial.helpful} personas encontraron esto útil</span>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
