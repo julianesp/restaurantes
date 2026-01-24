@@ -33,6 +33,7 @@ import LocationMap from "../components/LocationMap";
 import OrderCTAModal from "../components/OrderCTAModal";
 import TestimonialsSection from "../components/TestimonialsSection";
 import { createWhatsAppMessage } from "../utils/whatsapp";
+import { useCart } from "../context/CartContext";
 import Link from "next/link";
 import styles from "../styles/Home.module.scss";
 import { useRevealOnScroll } from "../utils/useRevealOnScroll";
@@ -57,6 +58,7 @@ const dishOfTheDay = {
 };
 
 const specialOffer = {
+  id: 9001,
   name: "Menú Familiar",
   description:
     "Perfecto para compartir en familia o con amigos. Ingredientes frescos y preparación artesanal que te encantará.",
@@ -67,6 +69,7 @@ const specialOffer = {
 };
 
 const chefRecommendation = {
+  id: 9002,
   name: "Selección del Chef",
   description:
     "Una exquisita combinación de ingredientes cuidadosamente seleccionados por nuestro chef. Preparado con técnicas tradicionales y productos frescos de temporada. Perfecta para quienes buscan sabor y calidad en cada bocado.",
@@ -147,9 +150,11 @@ export default function Home() {
   const infoReveal = useRevealOnScroll<HTMLDivElement>();
 
   const { theme } = useTheme();
+  const { addToCart } = useCart();
   const [themePulse, setThemePulse] = useState(false);
   const [waveAuto, setWaveAuto] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false);
+  const [addedToCart, setAddedToCart] = useState<string | null>(null);
   const h2Ref = useRef<HTMLHeadingElement | null>(null);
 
   useEffect(() => {
@@ -197,6 +202,21 @@ export default function Home() {
       if (stopTimeout) clearTimeout(stopTimeout);
     };
   }, [h2Ref]);
+
+  // Función para agregar productos especiales al carrito
+  const handleAddToCart = (product: { name: string; description: string; price: string; id: number }) => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      category: "Ofertas Especiales"
+    });
+
+    // Mostrar feedback visual
+    setAddedToCart(product.name);
+    setTimeout(() => setAddedToCart(null), 3000);
+  };
 
   return (
     <div className="min-h-screen bg-transparent flex flex-col">
@@ -478,17 +498,20 @@ export default function Home() {
                         {specialOffer.price}
                       </span>
                     </div>
-                    <Link
-                      href={createWhatsAppMessage(
-                        specialOffer.name,
-                        specialOffer.price
-                      )}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-primary-500 text-white px-8 py-4 text-lg rounded-lg hover:bg-primary-700 transition-colors inline-block shadow-lg"
+                    <button
+                      onClick={() => handleAddToCart(specialOffer)}
+                      className="bg-primary-500 text-white px-8 py-4 text-lg rounded-lg hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2"
                     >
-                      Aprovechar Oferta
-                    </Link>
+                      {addedToCart === specialOffer.name ? (
+                        <>
+                          ✓ Agregado al Carrito
+                        </>
+                      ) : (
+                        <>
+                          🛒 Agregar al Carrito
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -539,17 +562,20 @@ export default function Home() {
                     >
                       {chefRecommendation.price}
                     </span>
-                    <Link
-                      href={createWhatsAppMessage(
-                        chefRecommendation.name,
-                        chefRecommendation.price
-                      )}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-primary-500 text-white px-8 py-4 text-lg rounded-lg hover:bg-primary-700 transition-colors inline-block shadow-lg"
+                    <button
+                      onClick={() => handleAddToCart(chefRecommendation)}
+                      className="bg-primary-500 text-white px-8 py-4 text-lg rounded-lg hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2"
                     >
-                      Pedir por WhatsApp
-                    </Link>
+                      {addedToCart === chefRecommendation.name ? (
+                        <>
+                          ✓ Agregado al Carrito
+                        </>
+                      ) : (
+                        <>
+                          🛒 Agregar al Carrito
+                        </>
+                      )}
+                    </button>
                   </div>
                 </div>
               </div>
