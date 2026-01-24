@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "../../components/Navbar/page";
 import Footer from "../../containers/Footer/page";
 import { useCart } from "../../context/CartContext";
+import { createPaymentLink, generatePaymentReference } from "../../utils/wompi";
 import {
   CreditCard,
   Building2,
@@ -75,19 +76,49 @@ export default function CheckoutPage() {
     e.preventDefault();
     setIsProcessing(true);
 
-    // Simular procesamiento de pago
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      // Generar referencia única para el pedido
+      const reference = generatePaymentReference('PEDIDO');
 
-    // En producción, aquí se integraría con la API de pago (Wompi, PayU, etc.)
+      // Crear descripción del pedido
+      const itemsDescription = cart.map(item => `${item.quantity}x ${item.name}`).join(', ');
+      const description = `Pedido Restaurante Munay - ${itemsDescription}`;
 
-    setIsProcessing(false);
-    setShowSuccess(true);
-    clearCart();
+      // URL de retorno después del pago
+      const redirectUrl = `${window.location.origin}/payment/success?reference=${reference}`;
 
-    // Redirigir después de mostrar el éxito
-    setTimeout(() => {
-      router.push("/");
-    }, 3000);
+      // Crear enlace de pago en Wompi
+      const paymentData = await createPaymentLink({
+        amount: total,
+        currency: 'COP',
+        reference: reference,
+        description: description,
+        customerEmail: formData.email,
+        customerName: formData.name,
+        customerPhone: formData.phone,
+        redirectUrl: redirectUrl,
+      });
+
+      // Guardar información del pedido en localStorage para recuperarla después del pago
+      localStorage.setItem('pending-order', JSON.stringify({
+        reference,
+        cart,
+        formData,
+        total,
+        timestamp: Date.now(),
+      }));
+
+      // Redirigir a Wompi
+      if (paymentData.data && paymentData.data.id) {
+        window.location.href = `https://checkout.wompi.co/l/${paymentData.data.id}`;
+      } else {
+        throw new Error('No se recibió el ID del enlace de pago');
+      }
+    } catch (error: any) {
+      console.error('Error al procesar el pago:', error);
+      alert(`Error al procesar el pago: ${error.message || 'Error desconocido'}. Por favor, intenta nuevamente.`);
+      setIsProcessing(false);
+    }
   };
 
   if (cart.length === 0 && !showSuccess) {
