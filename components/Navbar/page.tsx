@@ -118,7 +118,112 @@ const Navbar = () => {
       className={`${styles.bordes} z-40 fixed w-full bg-transparent transition-colors duration-300 ease-in-out top-0 left-0`}
     >
       <div className="w-full backdrop-blur-[3px]">
-        <div className="flex justify-between items-center h-[65px] bg-gray-900/50 px-4 sm:px-6 lg:px-8">
+        {/* Navbar para pantallas grandes (lg+) */}
+        <div className="hidden lg:flex items-center justify-center h-[80px] bg-gray-900/50 px-8 relative">
+          {/* Enlaces izquierda */}
+          <div className="flex items-center space-x-6 absolute left-8">
+            <Link
+              href="#inicio"
+              onClick={(e) => handleSmoothScroll(e, "inicio")}
+              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm"
+            >
+              Inicio
+            </Link>
+            <Link
+              href="#especialidades"
+              onClick={(e) => handleSmoothScroll(e, "especialidades")}
+              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm"
+            >
+              Especialidades
+            </Link>
+            <Link
+              href="#destacadas"
+              onClick={(e) => handleSmoothScroll(e, "destacadas")}
+              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm"
+            >
+              Destacados
+            </Link>
+            <Link
+              href="/galeria"
+              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm"
+            >
+              📸 Galería
+            </Link>
+          </div>
+
+          {/* Logo centrado */}
+          <Link
+            href="/"
+            title="Ir a inicio"
+            className="transition-transform duration-700 ease-in-out hover:scale-110 p-2 rounded-full bg-white/10 backdrop-blur-sm shadow-lg hover:bg-white/20"
+          >
+            <Image
+              src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/munay/images/logo%20en%20blanco%20png.png"
+              alt="Logo Restaurante Munay"
+              title="Logo Restaurante Munay"
+              width={70}
+              height={70}
+              className="object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+              priority
+            />
+          </Link>
+
+          {/* Enlaces derecha */}
+          <div className="flex items-center space-x-6 absolute right-8">
+            <Link
+              href="#menu-comidas"
+              onClick={(e) => handleSmoothScroll(e, "menu-comidas")}
+              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm"
+            >
+              Menú
+            </Link>
+            <Link
+              href="/nosotros"
+              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm"
+            >
+              Sobre Nosotros
+            </Link>
+            <Link
+              href="/blog"
+              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm"
+            >
+              Blog
+            </Link>
+            <Link
+              href="#delivery"
+              onClick={(e) => handleSmoothScroll(e, "delivery")}
+              className="text-secondary-300 hover:text-primary-400 transition-all duration-300 font-semibold text-sm"
+            >
+              🏍️ Delivery
+            </Link>
+            <Link
+              href="#contacto"
+              onClick={(e) => handleSmoothScroll(e, "contacto")}
+              className="text-white hover:text-primary-400 transition-all duration-300 font-medium text-sm"
+            >
+              Contacto
+            </Link>
+
+            <PulseAnimation interval={5000} duration={1200}>
+              <ThemeSwitcher />
+            </PulseAnimation>
+
+            {isSignedIn && (
+              <div className="flex items-center">
+                <UserButton
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-9 h-9 ring-2 ring-white/20 hover:ring-white/40 transition-all"
+                    }
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Navbar para móviles y tablets (< lg) */}
+        <div className="flex lg:hidden justify-between items-center h-[65px] bg-gray-900/50 px-4 sm:px-6">
           {/* Logo a la izquierda */}
           <div className="flex items-center space-x-3">
             <Link
@@ -136,7 +241,6 @@ const Navbar = () => {
                 priority
               />
             </Link>
-            {/* <h1 className="text-xl font-bold text-white">Munay</h1> */}
           </div>
 
           {/* Theme Switcher, User Button y menú hamburguesa */}
@@ -145,7 +249,6 @@ const Navbar = () => {
               <ThemeSwitcher />
             </PulseAnimation>
 
-            {/* Botón de usuario de Clerk si está autenticado */}
             {isSignedIn && (
               <div className="flex items-center">
                 <UserButton
@@ -173,9 +276,9 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Menú desplegable con animación mejorada */}
+      {/* Menú desplegable con animación mejorada - Solo visible en móviles */}
       <div
-        className={`absolute top-full left-0 right-0 transition-all duration-500 ease-out overflow-hidden ${
+        className={`lg:hidden absolute top-full left-0 right-0 transition-all duration-500 ease-out overflow-hidden ${
           isMobileMenuOpen
             ? "opacity-100 translate-y-0 max-h-screen"
             : "opacity-0 -translate-y-8 max-h-0 pointer-events-none"
