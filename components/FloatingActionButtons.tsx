@@ -13,14 +13,14 @@ export default function FloatingActionButtons({
 }: FloatingActionButtonsProps) {
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex gap-3 items-center justify-center">
-      <PulseAnimation interval={5000} duration={1200}>
+      {/* <PulseAnimation interval={5000} duration={1200}>
         <button
           onClick={onReservaClick}
           className="relative group bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-6 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-105 transition-all duration-500 overflow-hidden btn-animated"
         >
           <span className="relative z-10">Reserva</span>
         </button>
-      </PulseAnimation>
+      </PulseAnimation> */}
 
       <PulseAnimation interval={5000} duration={1200}>
         <button
