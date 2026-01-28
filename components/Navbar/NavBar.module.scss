@@ -4,16 +4,16 @@
   // Los estilos de fondo y backdrop ahora se manejan con Tailwind
   // para mejor control del tema claro/oscuro
 
-  border-end-start-radius: 40px;
-  border-end-end-radius: 40px;
+  // border-end-start-radius: 40px;
+  // border-end-end-radius: 40px;
 
   @media (width >= 320px) and (width <= 768px) {
     .menuMobile {
       text-align: center;
       display: flex;
-      align-items: center;
+      flex-direction: column;
+      align-items: stretch;
       justify-content: center;
-      border-radius: 20px;
       margin: 0 auto;
     }
   }

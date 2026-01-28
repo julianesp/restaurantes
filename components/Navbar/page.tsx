@@ -391,7 +391,7 @@ const Navbar = () => {
         </div>
 
         {/* Navbar para móviles y tablets (< lg) */}
-        <div className="flex lg:hidden justify-between items-center h-[55px] backdrop-blur-md px-3 sm:px-4 border-b">
+        <div className="flex lg:hidden justify-between items-center h-[55px] backdrop-blur-md px-3 sm:px-4 border-b ">
           {/* Logo a la izquierda */}
           <div className="flex items-center space-x-2">
             <Link
@@ -413,9 +413,9 @@ const Navbar = () => {
 
           {/* Theme Switcher, User Button y menú hamburguesa */}
           <div className="flex items-center space-x-3">
-            <PulseAnimation interval={5000} duration={1200}>
+            {/* <PulseAnimation interval={5000} duration={1200}>
               <ThemeSwitcher />
-            </PulseAnimation>
+            </PulseAnimation> */}
 
             {isSignedIn && (
               <div className="flex items-center">
@@ -432,11 +432,11 @@ const Navbar = () => {
 
             <button
               onClick={toggleMobileMenu}
-              className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-white/10 transition-all duration-300"
+              className="p-2 rounded-full bg-white hover:bg-gray-200 dark:hover:bg-white/10 transition-all duration-300 shadow-lg"
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? (
-                <X className="h-6 w-6 text-gray-900 dark:text-white transition-transform duration-300 rotate-90" />
+                <X className="h-6 w-6 text-gray-900 dark:text-white transition-transform duration-300 rotate-90 " />
               ) : (
                 <Menu className="h-6 w-6 text-gray-900 dark:text-white transition-transform duration-300" />
               )}
@@ -447,31 +447,30 @@ const Navbar = () => {
 
       {/* Menú desplegable con animación mejorada - Solo visible en móviles */}
       <div
-        className={`lg:hidden absolute top-full left-0 right-0 transition-all duration-500 ease-out overflow-hidden ${
+        className={`lg:hidden absolute top-full left-0 right-0 transition-all duration-300 ease-out ${
           isMobileMenuOpen
-            ? "opacity-100 translate-y-0 max-h-screen"
+            ? "opacity-80 translate-y-0 max-h-screen"
             : "opacity-0 -translate-y-8 max-h-0 pointer-events-none"
         }`}
       >
-        <div className="w-full flex justify-center">
+        <div className="w-full flex justify-center py-2">
           <div
-            className={`max-w-md w-full mx-auto px-4 sm:px-6 py-4 sm:py-8 bg-white/98 dark:bg-gray-900/98 backdrop-blur-xl shadow-2xl border border-gray-200 dark:border-gray-700 ${styles.menuMobile}`}
+            className={`max-w-sm w-[50%] mx-auto px-3 sm:px-4 py-4 sm:py-6 bg-white/98 dark:bg-gray-900/98 backdrop-blur-xl shadow-2xl border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden `}
           >
             {/* Navigation Links */}
-            <div
-              className={`flex flex-col space-y-2 sm:space-y-3 transition-all duration-700 ${
-                isMobileMenuOpen
-                  ? "translate-x-0 opacity-100"
-                  : "-translate-x-8 opacity-0"
-              }`}
-            >
+            <div className="flex flex-col space-y-0 overflow-hidden ">
               <Link
                 href="#inicio"
                 onClick={(e) => {
                   handleSmoothScroll(e, "inicio");
                   setIsMobileMenuOpen(false);
                 }}
-                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-lg sm:text-2xl py-2.5 sm:py-3 px-4 sm:px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-lg sm:rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-sm sm:shadow-md"
+                className={` text-white hover:text-yellow-400 transition-all duration-300 font-bold text-lg sm:text-xl py-3 px-4 text-center border-b border-white/30 [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%),_-1px_-1px_2px_rgb(0_0_0_/_80%),_1px_-1px_2px_rgb(0_0_0_/_80%),_-1px_1px_2px_rgb(0_0_0_/_80%)] hover:scale-105 ${
+                  isMobileMenuOpen
+                    ? "opacity-100 translate-x-0"
+                    : "opacity-0 -translate-x-full"
+                }`}
+                style={{ transitionDelay: isMobileMenuOpen ? "50ms" : "0ms" }}
               >
                 Inicio
               </Link>
@@ -481,7 +480,12 @@ const Navbar = () => {
                   handleSmoothScroll(e, "especialidades");
                   setIsMobileMenuOpen(false);
                 }}
-                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-lg sm:text-2xl py-2.5 sm:py-3 px-4 sm:px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-lg sm:rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-sm sm:shadow-md"
+                className={`text-white hover:text-yellow-400 transition-all duration-300 font-bold text-lg sm:text-xl py-3 px-4 text-center border-b border-white/30 [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%),_-1px_-1px_2px_rgb(0_0_0_/_80%),_1px_-1px_2px_rgb(0_0_0_/_80%),_-1px_1px_2px_rgb(0_0_0_/_80%)] hover:scale-105 ${
+                  isMobileMenuOpen
+                    ? "opacity-100 translate-x-0"
+                    : "opacity-0 translate-x-full"
+                }`}
+                style={{ transitionDelay: isMobileMenuOpen ? "100ms" : "0ms" }}
               >
                 Especialidades
               </Link>
@@ -491,14 +495,24 @@ const Navbar = () => {
                   handleSmoothScroll(e, "destacadas");
                   setIsMobileMenuOpen(false);
                 }}
-                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-lg sm:text-2xl py-2.5 sm:py-3 px-4 sm:px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-lg sm:rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-sm sm:shadow-md"
+                className={`text-white hover:text-yellow-400 transition-all duration-300 font-bold text-lg sm:text-xl py-3 px-4 text-center border-b border-white/30 [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%),_-1px_-1px_2px_rgb(0_0_0_/_80%),_1px_-1px_2px_rgb(0_0_0_/_80%),_-1px_1px_2px_rgb(0_0_0_/_80%)] hover:scale-105 ${
+                  isMobileMenuOpen
+                    ? "opacity-100 translate-x-0"
+                    : "opacity-0 -translate-x-full"
+                }`}
+                style={{ transitionDelay: isMobileMenuOpen ? "150ms" : "0ms" }}
               >
                 Destacados
               </Link>
               <Link
                 href="/galeria"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-lg sm:text-2xl py-2.5 sm:py-3 px-4 sm:px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-lg sm:rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-sm sm:shadow-md"
+                className={`text-white hover:text-yellow-400 transition-all duration-300 font-bold text-lg sm:text-xl py-3 px-4 text-center border-b border-white/30 [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%),_-1px_-1px_2px_rgb(0_0_0_/_80%),_1px_-1px_2px_rgb(0_0_0_/_80%),_-1px_1px_2px_rgb(0_0_0_/_80%)] hover:scale-105 ${
+                  isMobileMenuOpen
+                    ? "opacity-100 translate-x-0"
+                    : "opacity-0 translate-x-full"
+                }`}
+                style={{ transitionDelay: isMobileMenuOpen ? "200ms" : "0ms" }}
               >
                 📸 Galería
               </Link>
@@ -508,21 +522,36 @@ const Navbar = () => {
                   handleSmoothScroll(e, "menu-comidas");
                   setIsMobileMenuOpen(false);
                 }}
-                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-lg sm:text-2xl py-2.5 sm:py-3 px-4 sm:px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-lg sm:rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-sm sm:shadow-md"
+                className={`text-white hover:text-yellow-400 transition-all duration-300 font-bold text-lg sm:text-xl py-3 px-4 text-center border-b border-white/30 [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%),_-1px_-1px_2px_rgb(0_0_0_/_80%),_1px_-1px_2px_rgb(0_0_0_/_80%),_-1px_1px_2px_rgb(0_0_0_/_80%)] hover:scale-105 ${
+                  isMobileMenuOpen
+                    ? "opacity-100 translate-x-0"
+                    : "opacity-0 -translate-x-full"
+                }`}
+                style={{ transitionDelay: isMobileMenuOpen ? "250ms" : "0ms" }}
               >
                 Menú
               </Link>
               <Link
                 href="/nosotros"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-lg sm:text-2xl py-2.5 sm:py-3 px-4 sm:px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-lg sm:rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-sm sm:shadow-md"
+                className={`text-white hover:text-yellow-400 transition-all duration-300 font-bold text-lg sm:text-xl py-3 px-4 text-center border-b border-white/30 [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%),_-1px_-1px_2px_rgb(0_0_0_/_80%),_1px_-1px_2px_rgb(0_0_0_/_80%),_-1px_1px_2px_rgb(0_0_0_/_80%)] hover:scale-105 ${
+                  isMobileMenuOpen
+                    ? "opacity-100 translate-x-0"
+                    : "opacity-0 translate-x-full"
+                }`}
+                style={{ transitionDelay: isMobileMenuOpen ? "300ms" : "0ms" }}
               >
                 Sobre Nosotros
               </Link>
               <Link
                 href="/blog"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-lg sm:text-2xl py-2.5 sm:py-3 px-4 sm:px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-lg sm:rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-sm sm:shadow-md"
+                className={`text-white hover:text-yellow-400 transition-all duration-300 font-bold text-lg sm:text-xl py-3 px-4 text-center border-b border-white/30 [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%),_-1px_-1px_2px_rgb(0_0_0_/_80%),_1px_-1px_2px_rgb(0_0_0_/_80%),_-1px_1px_2px_rgb(0_0_0_/_80%)] hover:scale-105 ${
+                  isMobileMenuOpen
+                    ? "opacity-100 translate-x-0"
+                    : "opacity-0 -translate-x-full"
+                }`}
+                style={{ transitionDelay: isMobileMenuOpen ? "350ms" : "0ms" }}
               >
                 Blog & Noticias
               </Link>
@@ -532,7 +561,12 @@ const Navbar = () => {
                   handleSmoothScroll(e, "delivery");
                   setIsMobileMenuOpen(false);
                 }}
-                className="text-primary-600 dark:text-secondary-300 hover:text-primary-700 dark:hover:text-primary-400 transition-all duration-300 font-semibold text-lg sm:text-2xl py-2.5 sm:py-3 px-4 sm:px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-lg sm:rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-secondary-300/30 backdrop-blur-sm text-center shadow-sm sm:shadow-md"
+                className={`text-white hover:text-yellow-400 transition-all duration-300 font-bold text-lg sm:text-xl py-3 px-4 text-center border-b border-white/30 [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%),_-1px_-1px_2px_rgb(0_0_0_/_80%),_1px_-1px_2px_rgb(0_0_0_/_80%),_-1px_1px_2px_rgb(0_0_0_/_80%)] hover:scale-105 ${
+                  isMobileMenuOpen
+                    ? "opacity-100 translate-x-0"
+                    : "opacity-0 translate-x-full"
+                }`}
+                style={{ transitionDelay: isMobileMenuOpen ? "400ms" : "0ms" }}
               >
                 🏍️ Delivery
               </Link>
@@ -542,7 +576,12 @@ const Navbar = () => {
                   handleSmoothScroll(e, "contacto");
                   setIsMobileMenuOpen(false);
                 }}
-                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-lg sm:text-2xl py-2.5 sm:py-3 px-4 sm:px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-lg sm:rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-sm sm:shadow-md"
+                className={`text-white hover:text-yellow-400 transition-all duration-300 font-bold text-lg sm:text-xl py-3 px-4 text-center [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%),_-1px_-1px_2px_rgb(0_0_0_/_80%),_1px_-1px_2px_rgb(0_0_0_/_80%),_-1px_1px_2px_rgb(0_0_0_/_80%)] hover:scale-105 ${
+                  isMobileMenuOpen
+                    ? "opacity-100 translate-x-0"
+                    : "opacity-0 -translate-x-full"
+                }`}
+                style={{ transitionDelay: isMobileMenuOpen ? "450ms" : "0ms" }}
               >
                 Contacto
               </Link>
