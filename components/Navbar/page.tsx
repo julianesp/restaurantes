@@ -19,8 +19,10 @@ const Navbar = () => {
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [showNavLinks, setShowNavLinks] = useState(false);
+  const [logoHovered, setLogoHovered] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const logoRotateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -280,10 +282,30 @@ const Navbar = () => {
           <Link
             href="/"
             title="Ir a inicio"
-            className="transition-transform duration-700 ease-in-out hover:scale-110 p-2 rounded-full bg-gray-100/80 dark:bg-white/10 backdrop-blur-sm shadow-lg hover:bg-gray-200/90 dark:hover:bg-white/20 z-10"
+            style={
+              logoHovered
+                ? {
+                    animation: "spin-180 0.6s ease-in-out 0.05s forwards",
+                    transform: "scale(1.1)",
+                  }
+                : undefined
+            }
+            className="transition-transform duration-500 ease-in-out hover:scale-110 p-2 rounded-full bg-gray-100/80  backdrop-blur-sm shadow-lg z-10"
+            onMouseEnter={() => {
+              setLogoHovered(true);
+              if (logoRotateTimeoutRef.current) {
+                clearTimeout(logoRotateTimeoutRef.current);
+              }
+            }}
+            onMouseLeave={() => {
+              setLogoHovered(false);
+              if (logoRotateTimeoutRef.current) {
+                clearTimeout(logoRotateTimeoutRef.current);
+              }
+            }}
           >
             <Image
-              src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/munay/images/logo%20en%20blanco%20png.png"
+              src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/munay/images/logo%20en%20negro%20png.png"
               alt="Logo Restaurante Munay"
               title="Logo Restaurante Munay"
               width={70}
@@ -369,20 +391,20 @@ const Navbar = () => {
         </div>
 
         {/* Navbar para móviles y tablets (< lg) */}
-        <div className="flex lg:hidden justify-between items-center h-[65px] bg-white/70 dark:bg-gray-900/50 px-4 sm:px-6 border-b border-gray-200/20 dark:border-gray-700/20">
+        <div className="flex lg:hidden justify-between items-center h-[55px] bg-white/70 dark:bg-gray-900/50 px-3 sm:px-4 border-b border-gray-200/20 dark:border-gray-700/20">
           {/* Logo a la izquierda */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2">
             <Link
               href="/"
               title="Ir a inicio"
-              className="transition-transform duration-700 ease-in-out hover:scale-110 p-2 rounded-full bg-gray-100/80 dark:bg-white/10 backdrop-blur-sm shadow-lg hover:bg-gray-200/90 dark:hover:bg-white/20"
+              className="transition-transform duration-700 ease-in-out hover:scale-110 p-1.5 rounded-full bg-gray-100/80 dark:bg-white/10 backdrop-blur-sm shadow-lg hover:bg-gray-200/90 dark:hover:bg-white/20"
             >
               <Image
                 src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/munay/images/logo%20en%20blanco%20png.png"
                 alt="Logo Restaurante Munay"
                 title="Logo Restaurante Munay"
-                width={70}
-                height={70}
+                width={50}
+                height={50}
                 className="object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
                 priority
               />
@@ -433,11 +455,11 @@ const Navbar = () => {
       >
         <div className="w-full flex justify-center">
           <div
-            className={`max-w-md w-full mx-auto px-6 py-8 bg-white/98 dark:bg-gray-900/98 backdrop-blur-xl shadow-2xl border border-gray-200 dark:border-gray-700 ${styles.menuMobile}`}
+            className={`max-w-md w-full mx-auto px-4 sm:px-6 py-4 sm:py-8 bg-white/98 dark:bg-gray-900/98 backdrop-blur-xl shadow-2xl border border-gray-200 dark:border-gray-700 ${styles.menuMobile}`}
           >
             {/* Navigation Links */}
             <div
-              className={`flex flex-col space-y-3 transition-all duration-700 ${
+              className={`flex flex-col space-y-2 sm:space-y-3 transition-all duration-700 ${
                 isMobileMenuOpen
                   ? "translate-x-0 opacity-100"
                   : "-translate-x-8 opacity-0"
@@ -449,7 +471,7 @@ const Navbar = () => {
                   handleSmoothScroll(e, "inicio");
                   setIsMobileMenuOpen(false);
                 }}
-                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-6xl py-4 px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-md"
+                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-lg sm:text-2xl py-2.5 sm:py-3 px-4 sm:px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-lg sm:rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-sm sm:shadow-md"
               >
                 Inicio
               </Link>
@@ -459,7 +481,7 @@ const Navbar = () => {
                   handleSmoothScroll(e, "especialidades");
                   setIsMobileMenuOpen(false);
                 }}
-                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-6xl py-4 px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-md"
+                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-lg sm:text-2xl py-2.5 sm:py-3 px-4 sm:px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-lg sm:rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-sm sm:shadow-md"
               >
                 Especialidades
               </Link>
@@ -469,14 +491,14 @@ const Navbar = () => {
                   handleSmoothScroll(e, "destacadas");
                   setIsMobileMenuOpen(false);
                 }}
-                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-6xl py-4 px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-md"
+                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-lg sm:text-2xl py-2.5 sm:py-3 px-4 sm:px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-lg sm:rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-sm sm:shadow-md"
               >
                 Destacados
               </Link>
               <Link
                 href="/galeria"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-6xl py-4 px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-md"
+                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-lg sm:text-2xl py-2.5 sm:py-3 px-4 sm:px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-lg sm:rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-sm sm:shadow-md"
               >
                 📸 Galería
               </Link>
@@ -486,21 +508,21 @@ const Navbar = () => {
                   handleSmoothScroll(e, "menu-comidas");
                   setIsMobileMenuOpen(false);
                 }}
-                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-6xl py-4 px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-md"
+                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-lg sm:text-2xl py-2.5 sm:py-3 px-4 sm:px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-lg sm:rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-sm sm:shadow-md"
               >
                 Menú
               </Link>
               <Link
                 href="/nosotros"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-6xl py-4 px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-md"
+                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-lg sm:text-2xl py-2.5 sm:py-3 px-4 sm:px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-lg sm:rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-sm sm:shadow-md"
               >
                 Sobre Nosotros
               </Link>
               <Link
                 href="/blog"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-6xl py-4 px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-md"
+                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-lg sm:text-2xl py-2.5 sm:py-3 px-4 sm:px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-lg sm:rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-sm sm:shadow-md"
               >
                 Blog & Noticias
               </Link>
@@ -510,7 +532,7 @@ const Navbar = () => {
                   handleSmoothScroll(e, "delivery");
                   setIsMobileMenuOpen(false);
                 }}
-                className="text-primary-600 dark:text-secondary-300 hover:text-primary-700 dark:hover:text-primary-400 transition-all duration-300 font-semibold text-6xl py-4 px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-secondary-300/30 backdrop-blur-sm text-center shadow-md"
+                className="text-primary-600 dark:text-secondary-300 hover:text-primary-700 dark:hover:text-primary-400 transition-all duration-300 font-semibold text-lg sm:text-2xl py-2.5 sm:py-3 px-4 sm:px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-lg sm:rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-secondary-300/30 backdrop-blur-sm text-center shadow-sm sm:shadow-md"
               >
                 🏍️ Delivery
               </Link>
@@ -520,7 +542,7 @@ const Navbar = () => {
                   handleSmoothScroll(e, "contacto");
                   setIsMobileMenuOpen(false);
                 }}
-                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-6xl py-4 px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-md"
+                className="text-gray-900 dark:text-white hover:text-primary-500 dark:hover:text-primary-400 transition-all duration-300 font-medium text-lg sm:text-2xl py-2.5 sm:py-3 px-4 sm:px-6 hover:bg-primary-50 dark:hover:bg-white/10 rounded-lg sm:rounded-xl border border-transparent hover:border-primary-200 dark:hover:border-white/20 backdrop-blur-sm text-center shadow-sm sm:shadow-md"
               >
                 Contacto
               </Link>
