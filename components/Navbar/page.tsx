@@ -449,13 +449,15 @@ const Navbar = () => {
       <div
         className={`lg:hidden absolute top-full left-0 right-0 transition-all duration-300 ease-out ${
           isMobileMenuOpen
-            ? "opacity-80 translate-y-0 max-h-screen"
+            ? "opacity-100 translate-y-0 max-h-screen"
             : "opacity-0 -translate-y-8 max-h-0 pointer-events-none"
         }`}
+        onClick={() => setIsMobileMenuOpen(false)}
       >
         <div className="w-full flex justify-center py-2">
           <div
-            className={`max-w-sm w-[50%] mx-auto px-3 sm:px-4 py-4 sm:py-6 bg-white/98 dark:bg-gray-900/98 backdrop-blur-xl shadow-2xl border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden `}
+            className={`max-w-sm w-[70%] mx-auto px-3 sm:px-4 py-4 sm:py-6 backdrop-blur-md bg-black/40 shadow-2xl border border-white/20 rounded-2xl overflow-hidden`}
+            onClick={(e) => e.stopPropagation()}
           >
             {/* Navigation Links */}
             <div className="flex flex-col space-y-0 overflow-hidden ">
