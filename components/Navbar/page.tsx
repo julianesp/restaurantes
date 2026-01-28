@@ -391,16 +391,16 @@ const Navbar = () => {
         </div>
 
         {/* Navbar para móviles y tablets (< lg) */}
-        <div className="flex lg:hidden justify-between items-center h-[55px] bg-white/70 dark:bg-gray-900/50 px-3 sm:px-4 border-b border-gray-200/20 dark:border-gray-700/20">
+        <div className="flex lg:hidden justify-between items-center h-[55px] backdrop-blur-md px-3 sm:px-4 border-b">
           {/* Logo a la izquierda */}
           <div className="flex items-center space-x-2">
             <Link
               href="/"
               title="Ir a inicio"
-              className="transition-transform duration-700 ease-in-out hover:scale-110 p-1.5 rounded-full bg-gray-100/80 dark:bg-white/10 backdrop-blur-sm shadow-lg hover:bg-gray-200/90 dark:hover:bg-white/20"
+              className="transition-transform duration-700 ease-in-out hover:scale-110 p-1.5 rounded-full bg-gray-100/80 backdrop-blur-sm shadow-lg"
             >
               <Image
-                src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/munay/images/logo%20en%20blanco%20png.png"
+                src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/munay/images/logo%20en%20negro%20png.png"
                 alt="Logo Restaurante Munay"
                 title="Logo Restaurante Munay"
                 width={50}
