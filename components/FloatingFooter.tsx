@@ -12,9 +12,9 @@ const FloatingFooter = () => {
   const flechaRef = useRef<HTMLButtonElement>(null);
   const pulseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const whatsappNumber = "3123946614";
-  const facebookUrl = "https://www.facebook.com/saboreospizza";
-  const instagramUrl = "https://www.instagram.com/saboreospizza/";
+  const whatsappNumber = "#";
+  const facebookUrl = "#";
+  const instagramUrl = "#";
 
   const switchOptions = () => {
     setMenuOptions(!menuOption);
@@ -87,7 +87,7 @@ const FloatingFooter = () => {
   const createWhatsAppMessage = () => {
     const message = "¡Hola! Me gustaría hacer un pedido de pizza.";
     return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-      message
+      message,
     )}`;
   };
 

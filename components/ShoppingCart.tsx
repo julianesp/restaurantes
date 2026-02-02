@@ -74,12 +74,25 @@ export default function ShoppingCart({ isOpen, onClose }: ShoppingCartProps) {
                   key={item.id}
                   className="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-xl"
                 >
+                  {/* Product Image */}
+                  <div className="w-24 h-24 flex-shrink-0 bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900/30 dark:to-secondary-900/30 rounded-lg flex items-center justify-center overflow-hidden">
+                    {item.image ? (
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="text-4xl">🍽️</div>
+                    )}
+                  </div>
+
                   {/* Item Info */}
-                  <div className="flex-1">
-                    <h4 className="font-bold text-gray-900 dark:text-white mb-1">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-gray-900 dark:text-white mb-1 truncate">
                       {item.name}
                     </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-2 line-clamp-2">
                       {item.description}
                     </p>
                     <p className="text-lg font-bold text-primary-500">
@@ -88,7 +101,7 @@ export default function ShoppingCart({ isOpen, onClose }: ShoppingCartProps) {
                   </div>
 
                   {/* Quantity Controls */}
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-shrink-0">
                     <button
                       onClick={() => updateQuantity(item.id, item.quantity - 1)}
                       className="p-1 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-all"
@@ -109,7 +122,7 @@ export default function ShoppingCart({ isOpen, onClose }: ShoppingCartProps) {
                   {/* Remove Button */}
                   <button
                     onClick={() => removeFromCart(item.id)}
-                    className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-all"
+                    className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-all flex-shrink-0"
                   >
                     <Trash2 className="w-5 h-5 text-red-500" />
                   </button>
@@ -142,34 +155,15 @@ export default function ShoppingCart({ isOpen, onClose }: ShoppingCartProps) {
               </span>
             </div>
 
-            {/* Checkout Buttons */}
-            <div className="grid grid-cols-2 gap-3">
-              <Link
-                href="/checkout"
-                onClick={onClose}
-                className="flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-lg font-bold transition-all"
-              >
-                <CreditCard className="w-5 h-5" />
-                Pagar Online
-              </Link>
-              <button
-                onClick={() => {
-                  // Crear mensaje de WhatsApp con el pedido
-                  const orderMessage = cart
-                    .map(
-                      (item) =>
-                        `${item.quantity}x ${item.name} - ${item.price}`
-                    )
-                    .join("%0A");
-                  const total = formatPrice(getCartTotal());
-                  const whatsappUrl = `https://wa.me/573174503604?text=Hola!%20Quiero%20hacer%20el%20siguiente%20pedido:%0A%0A${orderMessage}%0A%0ATotal:%20${total}`;
-                  window.open(whatsappUrl, "_blank");
-                }}
-                className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition-all"
-              >
-                💬 WhatsApp
-              </button>
-            </div>
+            {/* Checkout Button */}
+            <Link
+              href="/checkout"
+              onClick={onClose}
+              className="flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-6 py-4 rounded-lg font-bold transition-all w-full"
+            >
+              <CreditCard className="w-5 h-5" />
+              Pagar Online
+            </Link>
 
             <p className="text-xs text-center text-gray-500 dark:text-gray-400">
               Los costos de envío se calcularán según tu ubicación

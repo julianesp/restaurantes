@@ -32,51 +32,88 @@ import FoodSlider from "../components/FoodSlider";
 import LocationMap from "../components/LocationMap";
 import OrderCTAModal from "../components/OrderCTAModal";
 import TestimonialsSection from "../components/TestimonialsSection";
-import { createWhatsAppMessage } from "../utils/whatsapp";
-import { useCart } from "../context/CartContext";
+import DishDetailModal from "../components/DishDetailModal";
 import Link from "next/link";
 import styles from "../styles/Home.module.scss";
 import { useRevealOnScroll } from "../utils/useRevealOnScroll";
 
 const mostPopular = {
+  id: 9000,
   name: "Plato Estrella",
   description:
-    "El plato más solicitado por nuestros comensales. Sabor excepcional garantizado",
+    "El plato más solicitado por nuestros comensales. Una combinación perfecta de sabores tradicionales con un toque moderno. Preparado con ingredientes de primera calidad, este plato es una explosión de sabor que deleitará tu paladar. Ideal para quienes buscan una experiencia gastronómica memorable.",
   price: "$25.000",
   icon: Star,
   color: "text-yellow-500",
+  category: "Platos Destacados",
+  image: "https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/restaurants/1.jpg",
+  ingredients: ["Carne de res premium", "Vegetales frescos", "Especias secretas", "Arroz premium", "Ensalada fresca"],
+  nutritionalInfo: {
+    calories: "650 kcal",
+    protein: "45g",
+    carbs: "60g",
+    fat: "22g",
+  },
 };
 
 const dishOfTheDay = {
+  id: 9003,
   name: "Especial del Día",
   description:
-    "Una deliciosa propuesta gastronómica seleccionada especialmente para hoy. Ingredientes frescos y sabores únicos que harán de tu experiencia algo inolvidable.",
+    "Una deliciosa propuesta gastronómica seleccionada especialmente para hoy. Ingredientes frescos y sabores únicos que harán de tu experiencia algo inolvidable. Nuestro chef renueva esta opción diariamente para ofrecerte siempre lo mejor de la temporada. Una combinación equilibrada de proteínas, vegetales y carbohidratos que te dejará satisfecho.",
   price: "$23.990",
   icon: Flame,
   color: "text-accent",
   special: "¡Solo por hoy!",
+  category: "Platos Destacados",
+  image: "https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/restaurants/2.jpg",
+  ingredients: ["Proteína del día", "Vegetales de temporada", "Guarnición especial", "Salsa casera"],
+  nutritionalInfo: {
+    calories: "580 kcal",
+    protein: "38g",
+    carbs: "52g",
+    fat: "18g",
+  },
 };
 
 const specialOffer = {
   id: 9001,
   name: "Menú Familiar",
   description:
-    "Perfecto para compartir en familia o con amigos. Ingredientes frescos y preparación artesanal que te encantará.",
+    "Perfecto para compartir en familia o con amigos. Ingredientes frescos y preparación artesanal que te encantará. Incluye una variedad de platos principales, acompañamientos y bebidas para 4-5 personas. Una opción económica y deliciosa para disfrutar en grupo. Todos nuestros menús familiares están preparados con el mismo cuidado y dedicación que nuestros platos individuales.",
   price: "$55.000",
   icon: Utensils,
   color: "text-primary-500",
   discount: "18% OFF",
+  category: "Menús Especiales",
+  image: "https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/restaurants/3.jpg",
+  ingredients: ["Variedad de proteínas", "Acompañamientos múltiples", "Ensaladas frescas", "Bebidas incluidas", "Postre sorpresa"],
+  nutritionalInfo: {
+    calories: "2400 kcal",
+    protein: "180g",
+    carbs: "240g",
+    fat: "85g",
+  },
 };
 
 const chefRecommendation = {
   id: 9002,
   name: "Selección del Chef",
   description:
-    "Una exquisita combinación de ingredientes cuidadosamente seleccionados por nuestro chef. Preparado con técnicas tradicionales y productos frescos de temporada. Perfecta para quienes buscan sabor y calidad en cada bocado.",
+    "Una exquisita combinación de ingredientes cuidadosamente seleccionados por nuestro chef. Preparado con técnicas tradicionales y productos frescos de temporada. Perfecta para quienes buscan sabor y calidad en cada bocado. Este plato representa la máxima expresión de nuestra cocina, fusionando sabores tradicionales con técnicas modernas de preparación. Una experiencia culinaria única.",
   price: "$32.900",
   icon: ChefHat,
   color: "text-purple-600",
-  badge: "",
+  badge: "Chef's Choice",
+  category: "Especialidades del Chef",
+  image: "https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/restaurants/4.jpg",
+  ingredients: ["Proteína selecta", "Vegetales gourmet", "Reducción especial", "Guarnición premium", "Hierbas frescas"],
+  nutritionalInfo: {
+    calories: "720 kcal",
+    protein: "52g",
+    carbs: "55g",
+    fat: "28g",
+  },
 };
 
 // Menu categories with icons
@@ -150,12 +187,17 @@ export default function Home() {
   const infoReveal = useRevealOnScroll<HTMLDivElement>();
 
   const { theme } = useTheme();
-  const { addToCart } = useCart();
   const [themePulse, setThemePulse] = useState(false);
   const [waveAuto, setWaveAuto] = useState(false);
   const [showOrderModal, setShowOrderModal] = useState(false);
-  const [addedToCart, setAddedToCart] = useState<string | null>(null);
+  const [selectedDish, setSelectedDish] = useState<typeof mostPopular | null>(null);
+  const [isDishModalOpen, setIsDishModalOpen] = useState(false);
   const h2Ref = useRef<HTMLHeadingElement | null>(null);
+
+  const handleDishClick = (dish: typeof mostPopular) => {
+    setSelectedDish(dish);
+    setIsDishModalOpen(true);
+  };
 
   useEffect(() => {
     // Disparar animación de tema solo si el hero está visible
@@ -191,7 +233,7 @@ export default function Home() {
           }
         });
       },
-      { threshold: [0.5] }
+      { threshold: [0.5] },
     );
 
     observer.observe(el);
@@ -202,21 +244,6 @@ export default function Home() {
       if (stopTimeout) clearTimeout(stopTimeout);
     };
   }, [h2Ref]);
-
-  // Función para agregar productos especiales al carrito
-  const handleAddToCart = (product: { name: string; description: string; price: string; id: number }) => {
-    addToCart({
-      id: product.id,
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      category: "Ofertas Especiales"
-    });
-
-    // Mostrar feedback visual
-    setAddedToCart(product.name);
-    setTimeout(() => setAddedToCart(null), 3000);
-  };
 
   return (
     <div className="min-h-screen bg-transparent flex flex-col">
@@ -337,6 +364,7 @@ export default function Home() {
         </section>
 
         <section
+          
           className={`severalFoods ${styles.severalFoods} max-w-6xl mx-auto`}
         >
           {/* Plato Más Popular */}
@@ -345,6 +373,7 @@ export default function Home() {
           >
             <div
               ref={popularDishReveal.ref}
+              id="destacadas"
               className={`max-w-6xl mx-auto reveal-on-scroll reveal-from-bottom ${
                 popularDishReveal.isVisible ? "visible" : ""
               }`}
@@ -355,7 +384,7 @@ export default function Home() {
                 </h3>
               </div>
 
-              <div className="bg-gradient-to-r from-yellow-100 to-accent-100 dark:from-yellow-900/30 dark:to-accent-900/30 rounded-2xl p-8 max-w-4xl mx-auto hover-lift">
+              <div className="bg-gradient-to-r from-yellow-100 to-accent-100 dark:from-yellow-900/30 dark:to-accent-900/30 rounded-2xl p-8 max-w-4xl mx-auto hover-lift" id="">
                 <div className="flex flex-col items-center text-center">
                   <div className="w-48 h-48 mb-6 relative rounded-full bg-gradient-to-br from-yellow-400 to-accent-500 flex items-center justify-center shadow-lg">
                     <mostPopular.icon
@@ -378,17 +407,12 @@ export default function Home() {
                     >
                       {mostPopular.price}
                     </span>
-                    <Link
-                      href={createWhatsAppMessage(
-                        mostPopular.name,
-                        mostPopular.price
-                      )}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-primary-500 text-white px-8 py-4 text-lg rounded-lg hover:bg-primary-700 transition-colors inline-block shadow-lg"
+                    <button
+                      onClick={() => handleDishClick(mostPopular)}
+                      className="bg-primary-500 text-white px-8 py-4 text-lg rounded-lg hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 inline-flex items-center gap-2"
                     >
-                      Pedir por WhatsApp
-                    </Link>
+                      Ver Detalles y Agregar
+                    </button>
                   </div>
                 </div>
               </div>
@@ -435,17 +459,12 @@ export default function Home() {
                     >
                       {dishOfTheDay.price}
                     </span>
-                    <Link
-                      href={createWhatsAppMessage(
-                        dishOfTheDay.name,
-                        dishOfTheDay.price
-                      )}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-primary-500 text-white px-8 py-4 text-lg rounded-lg hover:bg-primary-700 transition-colors inline-block shadow-lg"
+                    <button
+                      onClick={() => handleDishClick(dishOfTheDay)}
+                      className="bg-primary-500 text-white px-8 py-4 text-lg rounded-lg hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 inline-flex items-center gap-2"
                     >
-                      Pedir por WhatsApp
-                    </Link>
+                      Ver Detalles y Agregar
+                    </button>
                   </div>
                 </div>
               </div>
@@ -499,18 +518,10 @@ export default function Home() {
                       </span>
                     </div>
                     <button
-                      onClick={() => handleAddToCart(specialOffer)}
-                      className="bg-primary-500 text-white px-8 py-4 text-lg rounded-lg hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2"
+                      onClick={() => handleDishClick(specialOffer)}
+                      className="bg-primary-500 text-white px-8 py-4 text-lg rounded-lg hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 inline-flex items-center gap-2"
                     >
-                      {addedToCart === specialOffer.name ? (
-                        <>
-                          ✓ Agregado al Carrito
-                        </>
-                      ) : (
-                        <>
-                          🛒 Agregar al Carrito
-                        </>
-                      )}
+                      Ver Detalles y Agregar
                     </button>
                   </div>
                 </div>
@@ -563,18 +574,10 @@ export default function Home() {
                       {chefRecommendation.price}
                     </span>
                     <button
-                      onClick={() => handleAddToCart(chefRecommendation)}
-                      className="bg-primary-500 text-white px-8 py-4 text-lg rounded-lg hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2"
+                      onClick={() => handleDishClick(chefRecommendation)}
+                      className="bg-primary-500 text-white px-8 py-4 text-lg rounded-lg hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 inline-flex items-center gap-2"
                     >
-                      {addedToCart === chefRecommendation.name ? (
-                        <>
-                          ✓ Agregado al Carrito
-                        </>
-                      ) : (
-                        <>
-                          🛒 Agregar al Carrito
-                        </>
-                      )}
+                      Ver Detalles y Agregar
                     </button>
                   </div>
                 </div>
@@ -859,6 +862,7 @@ export default function Home() {
           hours="Lunes-Domingo: 8:00 AM - 8:00 PM"
           latitude={1.1557}
           longitude={-76.8978}
+          
         />
 
         <Footer />
@@ -871,6 +875,13 @@ export default function Home() {
         <OrderCTAModal
           isOpen={showOrderModal}
           onClose={() => setShowOrderModal(false)}
+        />
+
+        {/* Modal de Detalles del Plato */}
+        <DishDetailModal
+          isOpen={isDishModalOpen}
+          onClose={() => setIsDishModalOpen(false)}
+          dish={selectedDish}
         />
       </div>
       {/* Cierre del contenedor dark-minimalist */}

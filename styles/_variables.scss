@@ -3,3 +3,9 @@ $color-primario-oscuro: #005599;
 $color-secundario: #0066aa;
 $color-fondo: #ffffff;
 $color-sombra: #1a5276;
+
+// Gradiente para footer
+$gradient-footer-start: #020024;
+$gradient-footer-mid: #090979;
+$gradient-footer-end: #00d4ff;
+$gradient-footer: linear-gradient(90deg, $gradient-footer-start 0%, $gradient-footer-mid 35%, $gradient-footer-end 100%);

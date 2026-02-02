@@ -96,52 +96,12 @@ const Navbar = () => {
   };
 
   const handleMouseLeave = () => {
-    // Delay de 300ms antes de cerrar
+    // Delay de 500ms antes de cerrar
     closeTimeoutRef.current = setTimeout(() => {
       setOpenDropdown(null);
-    }, 300);
+    }, 500);
   };
 
-  const handleSmoothScroll = (
-    e: React.MouseEvent<HTMLAnchorElement>,
-    targetId: string,
-  ) => {
-    e.preventDefault();
-    const element = document.getElementById(targetId);
-    if (element) {
-      const elementPosition = element.offsetTop;
-      const offsetPosition = elementPosition - 80; // Ajuste para el navbar fijo
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
-
-      // Agregar impulso de velocidad
-      const startTime = performance.now();
-      const startPosition = window.pageYOffset;
-      const distance = offsetPosition - startPosition;
-      const duration = Math.min(800, Math.abs(distance) * 0.8); // Duración más rápida
-
-      function easeInOutQuart(t: number): number {
-        return t < 0.5 ? 8 * t * t * t * t : 1 - 8 * --t * t * t * t;
-      }
-
-      function animateScroll(currentTime: number) {
-        const timeElapsed = currentTime - startTime;
-        const progress = Math.min(timeElapsed / duration, 1);
-        const easedProgress = easeInOutQuart(progress);
-
-        window.scrollTo(0, startPosition + distance * easedProgress);
-
-        if (progress < 1) {
-          requestAnimationFrame(animateScroll);
-        }
-      }
-
-      requestAnimationFrame(animateScroll);
-    }
-  };
   return (
     <nav
       ref={navRef}
@@ -164,8 +124,7 @@ const Navbar = () => {
               onMouseLeave={handleMouseLeave}
             >
               <Link
-                href="#inicio"
-                onClick={(e) => handleSmoothScroll(e, "inicio")}
+                href="/#inicio"
                 className="text-white hover:text-yellow-400 px-3 py-2 rounded-md text-lg font-bold transition-all duration-200 [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%),_-1px_-1px_2px_rgb(0_0_0_/_80%),_1px_-1px_2px_rgb(0_0_0_/_80%),_-1px_1px_2px_rgb(0_0_0_/_80%)] hover:scale-125 flex items-center gap-1"
               >
                 Inicio
@@ -195,21 +154,15 @@ const Navbar = () => {
                 onMouseLeave={handleMouseLeave}
               >
                 <Link
-                  href="#especialidades"
-                  onClick={(e) => {
-                    handleSmoothScroll(e, "especialidades");
-                    setOpenDropdown(null);
-                  }}
+                  href="/#especialidades"
+                  onClick={() => setOpenDropdown(null)}
                   className="block px-4 py-3 text-gray-900 dark:text-white hover:bg-gray-900 hover:text-white dark:hover:text-primary-400 transition-all duration-200 text-lg"
                 >
                   Especialidades
                 </Link>
                 <Link
-                  href="#destacadas"
-                  onClick={(e) => {
-                    handleSmoothScroll(e, "destacadas");
-                    setOpenDropdown(null);
-                  }}
+                  href="/#destacadas"
+                  onClick={() => setOpenDropdown(null)}
                   className="block px-4 py-3 text-gray-900 dark:text-white hover:bg-gray-900 hover:text-white dark:hover:text-primary-400 transition-all duration-200 text-lg border-t border-gray-200 dark:border-white/10"
                 >
                   Destacados
@@ -265,11 +218,8 @@ const Navbar = () => {
                   📸 Galería
                 </Link>
                 <Link
-                  href="#contacto"
-                  onClick={(e) => {
-                    handleSmoothScroll(e, "contacto");
-                    setOpenDropdown(null);
-                  }}
+                  href="/#contacto"
+                  onClick={() => setOpenDropdown(null)}
                   className="block px-4 py-3 text-gray-900 dark:text-white hover:bg-gray-900 hover:text-white dark:hover:text-primary-400 transition-all duration-200 text-lg border-t border-gray-200 dark:border-white/10"
                 >
                   Contacto
@@ -318,8 +268,7 @@ const Navbar = () => {
           {/* Enlaces derecha - cerca del logo */}
           <div className="flex items-center gap-4 absolute left-1/2 translate-x-[210px]">
             <Link
-              href="#menu-comidas"
-              onClick={(e) => handleSmoothScroll(e, "menu-comidas")}
+              href="/#menu-comidas"
               className={`text-white hover:text-yellow-400 px-3 py-2 rounded-md text-lg font-bold transition-all duration-200 [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%),_-1px_-1px_2px_rgb(0_0_0_/_80%),_1px_-1px_2px_rgb(0_0_0_/_80%),_-1px_1px_2px_rgb(0_0_0_/_80%)] hover:scale-105 ${
                 showNavLinks
                   ? "opacity-100 translate-x-0"
@@ -343,8 +292,7 @@ const Navbar = () => {
             </Link>
 
             <Link
-              href="#delivery"
-              onClick={(e) => handleSmoothScroll(e, "delivery")}
+              href="/#delivery"
               className={`text-white hover:text-yellow-400 px-3 py-2 rounded-md text-lg font-bold transition-all duration-200 [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%),_-1px_-1px_2px_rgb(0_0_0_/_80%),_1px_-1px_2px_rgb(0_0_0_/_80%),_-1px_1px_2px_rgb(0_0_0_/_80%)] hover:scale-105 ${
                 showNavLinks
                   ? "opacity-100 translate-x-0"
@@ -368,7 +316,7 @@ const Navbar = () => {
               </PulseAnimation> */}
             </div>
 
-            {isSignedIn && (
+            {isSignedIn ? (
               <div
                 className={`flex items-center transition-all duration-500 ${
                   showNavLinks
@@ -386,6 +334,31 @@ const Navbar = () => {
                   }}
                 />
               </div>
+            ) : (
+              <Link
+                href="/sign-in"
+                className={`flex items-center gap-2 text-white hover:text-yellow-400 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all duration-200 font-bold text-sm border border-white/20 hover:border-white/40 [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%)] hover:scale-105 ${
+                  showNavLinks
+                    ? "opacity-100 translate-x-0"
+                    : "opacity-0 translate-x-20"
+                }`}
+                style={{ transitionDelay: "400ms" }}
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                  />
+                </svg>
+                Iniciar sesión
+              </Link>
             )}
           </div>
         </div>
@@ -417,7 +390,7 @@ const Navbar = () => {
               <ThemeSwitcher />
             </PulseAnimation> */}
 
-            {isSignedIn && (
+            {isSignedIn ? (
               <div className="flex items-center">
                 <UserButton
                   appearance={{
@@ -428,6 +401,26 @@ const Navbar = () => {
                   }}
                 />
               </div>
+            ) : (
+              <Link
+                href="/sign-in"
+                className="flex items-center gap-1.5 text-white hover:text-yellow-400 px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all duration-200 font-bold text-xs border border-white/20 hover:border-white/40 [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%)]"
+              >
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                  />
+                </svg>
+                Iniciar
+              </Link>
             )}
 
             <button
@@ -462,11 +455,8 @@ const Navbar = () => {
             {/* Navigation Links */}
             <div className="flex flex-col space-y-0 overflow-hidden ">
               <Link
-                href="#inicio"
-                onClick={(e) => {
-                  handleSmoothScroll(e, "inicio");
-                  setIsMobileMenuOpen(false);
-                }}
+                href="/#inicio"
+                onClick={() => setIsMobileMenuOpen(false)}
                 className={` text-white hover:text-yellow-400 transition-all duration-300 font-bold text-lg sm:text-xl py-3 px-4 text-center border-b border-white/30 [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%),_-1px_-1px_2px_rgb(0_0_0_/_80%),_1px_-1px_2px_rgb(0_0_0_/_80%),_-1px_1px_2px_rgb(0_0_0_/_80%)] hover:scale-105 ${
                   isMobileMenuOpen
                     ? "opacity-100 translate-x-0"
@@ -477,11 +467,8 @@ const Navbar = () => {
                 Inicio
               </Link>
               <Link
-                href="#especialidades"
-                onClick={(e) => {
-                  handleSmoothScroll(e, "especialidades");
-                  setIsMobileMenuOpen(false);
-                }}
+                href="/#especialidades"
+                onClick={() => setIsMobileMenuOpen(false)}
                 className={`text-white hover:text-yellow-400 transition-all duration-300 font-bold text-lg sm:text-xl py-3 px-4 text-center border-b border-white/30 [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%),_-1px_-1px_2px_rgb(0_0_0_/_80%),_1px_-1px_2px_rgb(0_0_0_/_80%),_-1px_1px_2px_rgb(0_0_0_/_80%)] hover:scale-105 ${
                   isMobileMenuOpen
                     ? "opacity-100 translate-x-0"
@@ -492,11 +479,8 @@ const Navbar = () => {
                 Especialidades
               </Link>
               <Link
-                href="#destacadas"
-                onClick={(e) => {
-                  handleSmoothScroll(e, "destacadas");
-                  setIsMobileMenuOpen(false);
-                }}
+                href="/#destacadas"
+                onClick={() => setIsMobileMenuOpen(false)}
                 className={`text-white hover:text-yellow-400 transition-all duration-300 font-bold text-lg sm:text-xl py-3 px-4 text-center border-b border-white/30 [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%),_-1px_-1px_2px_rgb(0_0_0_/_80%),_1px_-1px_2px_rgb(0_0_0_/_80%),_-1px_1px_2px_rgb(0_0_0_/_80%)] hover:scale-105 ${
                   isMobileMenuOpen
                     ? "opacity-100 translate-x-0"
@@ -519,11 +503,8 @@ const Navbar = () => {
                 📸 Galería
               </Link>
               <Link
-                href="#menu-comidas"
-                onClick={(e) => {
-                  handleSmoothScroll(e, "menu-comidas");
-                  setIsMobileMenuOpen(false);
-                }}
+                href="/#menu-comidas"
+                onClick={() => setIsMobileMenuOpen(false)}
                 className={`text-white hover:text-yellow-400 transition-all duration-300 font-bold text-lg sm:text-xl py-3 px-4 text-center border-b border-white/30 [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%),_-1px_-1px_2px_rgb(0_0_0_/_80%),_1px_-1px_2px_rgb(0_0_0_/_80%),_-1px_1px_2px_rgb(0_0_0_/_80%)] hover:scale-105 ${
                   isMobileMenuOpen
                     ? "opacity-100 translate-x-0"
@@ -558,11 +539,8 @@ const Navbar = () => {
                 Blog & Noticias
               </Link>
               <Link
-                href="#delivery"
-                onClick={(e) => {
-                  handleSmoothScroll(e, "delivery");
-                  setIsMobileMenuOpen(false);
-                }}
+                href="/#delivery"
+                onClick={() => setIsMobileMenuOpen(false)}
                 className={`text-white hover:text-yellow-400 transition-all duration-300 font-bold text-lg sm:text-xl py-3 px-4 text-center border-b border-white/30 [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%),_-1px_-1px_2px_rgb(0_0_0_/_80%),_1px_-1px_2px_rgb(0_0_0_/_80%),_-1px_1px_2px_rgb(0_0_0_/_80%)] hover:scale-105 ${
                   isMobileMenuOpen
                     ? "opacity-100 translate-x-0"
@@ -573,11 +551,8 @@ const Navbar = () => {
                 🏍️ Delivery
               </Link>
               <Link
-                href="#contacto"
-                onClick={(e) => {
-                  handleSmoothScroll(e, "contacto");
-                  setIsMobileMenuOpen(false);
-                }}
+                href="/#contacto"
+                onClick={() => setIsMobileMenuOpen(false)}
                 className={`text-white hover:text-yellow-400 transition-all duration-300 font-bold text-lg sm:text-xl py-3 px-4 text-center [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%),_-1px_-1px_2px_rgb(0_0_0_/_80%),_1px_-1px_2px_rgb(0_0_0_/_80%),_-1px_1px_2px_rgb(0_0_0_/_80%)] hover:scale-105 ${
                   isMobileMenuOpen
                     ? "opacity-100 translate-x-0"

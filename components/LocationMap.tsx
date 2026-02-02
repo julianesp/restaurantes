@@ -49,7 +49,10 @@ export default function LocationMap({
               <MapPin className="w-10 h-10 text-white" />
             </div>
           </div>
-          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          <h2
+            className="text-4xl font-bold text-gray-900 dark:text-white mb-4"
+            id="contacto"
+          >
             📍 Encuéntranos Aquí
           </h2>
           <p className="text-xl text-black max-w-2xl mx-auto dark:text-white">
