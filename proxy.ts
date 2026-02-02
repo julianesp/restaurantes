@@ -12,11 +12,14 @@ const isPublicRoute = createRouteMatcher([
   "/checkout",
   "/payment/(.*)",
   "/invoice",
+  "/mesa/(.*)", // Páginas de pedidos por QR para mesas
   "/api/wompi/(.*)",
   "/api/menu/full",
   "/api/menu/download",
   "/api/menu/categories",
   "/api/menu/items",
+  "/api/orders/table(.*)", // API de pedidos de mesas (público)
+  "/api/test-supabase", // Ruta de prueba de Supabase
 ]);
 
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
@@ -26,6 +29,11 @@ const isApiAdminRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
+  // Permitir rutas públicas sin ninguna protección
+  if (isPublicRoute(req)) {
+    return NextResponse.next();
+  }
+
   const { userId } = await auth();
 
   // Proteger rutas de admin
@@ -50,10 +58,8 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.next();
   }
 
-  // Permitir rutas públicas
-  if (!isPublicRoute(req)) {
-    await auth.protect();
-  }
+  // Para todas las demás rutas, requerir autenticación
+  await auth.protect();
 });
 
 export const config = {

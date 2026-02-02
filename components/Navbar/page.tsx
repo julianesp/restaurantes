@@ -13,7 +13,7 @@ import { UserButton, useUser } from "@clerk/nextjs";
 import styles from "./NavBar.module.scss";
 
 const Navbar = () => {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
@@ -27,6 +27,11 @@ const Navbar = () => {
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  // Verificar si el usuario es administrador
+  const isAdmin = user?.emailAddresses?.some(
+    (email) => process.env.NEXT_PUBLIC_ADMIN_EMAILS?.includes(email.emailAddress)
+  );
 
   // Cerrar menú al hacer clic fuera
   // useEffect(() => {
@@ -109,9 +114,9 @@ const Navbar = () => {
     >
       <div className="w-full ">
         {/* Navbar para pantallas grandes (lg+) */}
-        <div className="hidden lg:flex items-center justify-center h-[60px] px-8 relative border-b backdrop-blur-md rounded-s-3xl rounded-e-3xl">
-          {/* Enlaces izquierda - cerca del logo */}
-          <div className="flex items-center gap-4 absolute left-1/2 -translate-x-[380px] ">
+        <div className="hidden lg:flex items-center justify-between h-[60px] px-8 border-b backdrop-blur-md rounded-s-3xl rounded-e-3xl max-w-[1400px] mx-auto relative">
+          {/* Enlaces izquierda */}
+          <div className="flex items-center gap-6 flex-1">
             {/* Menú Inicio con submenú */}
             <div
               className={`relative group transition-all duration-200 ${
@@ -228,7 +233,7 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Logo centrado */}
+          {/* Logo centrado - Posición absoluta */}
           <Link
             href="/"
             title="Ir a inicio"
@@ -240,7 +245,7 @@ const Navbar = () => {
                   }
                 : undefined
             }
-            className="transition-transform duration-500 ease-in-out hover:scale-110 p-2 rounded-full bg-gray-100/80  backdrop-blur-sm shadow-lg z-10"
+            className="absolute left-1/2 -translate-x-1/2 transition-transform duration-500 ease-in-out hover:scale-110 p-2 rounded-full bg-gray-100/80 backdrop-blur-sm shadow-lg z-10"
             onMouseEnter={() => {
               setLogoHovered(true);
               if (logoRotateTimeoutRef.current) {
@@ -265,8 +270,8 @@ const Navbar = () => {
             />
           </Link>
 
-          {/* Enlaces derecha - cerca del logo */}
-          <div className="flex items-center gap-4 absolute left-1/2 translate-x-[210px]">
+          {/* Enlaces derecha */}
+          <div className="flex items-center gap-6 flex-1 justify-end">
             <Link
               href="/#menu-comidas"
               className={`text-white hover:text-yellow-400 px-3 py-2 rounded-md text-lg font-bold transition-all duration-200 [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%),_-1px_-1px_2px_rgb(0_0_0_/_80%),_1px_-1px_2px_rgb(0_0_0_/_80%),_-1px_1px_2px_rgb(0_0_0_/_80%)] hover:scale-105 ${
@@ -318,13 +323,40 @@ const Navbar = () => {
 
             {isSignedIn ? (
               <div
-                className={`flex items-center transition-all duration-500 ${
+                className={`flex items-center gap-3 transition-all duration-500 ${
                   showNavLinks
                     ? "opacity-100 translate-x-0"
                     : "opacity-0 translate-x-20"
                 }`}
                 style={{ transitionDelay: "400ms" }}
               >
+                {isAdmin && (
+                  <Link
+                    href="/admin"
+                    className="flex items-center gap-2 text-white hover:text-yellow-400 px-4 py-2 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 backdrop-blur-sm transition-all duration-200 font-bold text-sm border border-primary-400/50 hover:border-primary-300 hover:scale-105 shadow-lg"
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                    </svg>
+                    Admin
+                  </Link>
+                )}
                 <UserButton
                   appearance={{
                     elements: {
@@ -562,6 +594,41 @@ const Navbar = () => {
               >
                 Contacto
               </Link>
+
+              {/* Botón Admin - Solo visible para administradores */}
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex items-center justify-center gap-2 text-white bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 transition-all duration-300 font-bold text-lg sm:text-xl py-4 px-4 text-center rounded-lg border-2 border-primary-400/50 shadow-lg hover:scale-105 mx-4 mt-4 ${
+                    isMobileMenuOpen
+                      ? "opacity-100 translate-x-0"
+                      : "opacity-0 -translate-x-full"
+                  }`}
+                  style={{ transitionDelay: isMobileMenuOpen ? "500ms" : "0ms" }}
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  Panel de Administración
+                </Link>
+              )}
             </div>
           </div>
         </div>

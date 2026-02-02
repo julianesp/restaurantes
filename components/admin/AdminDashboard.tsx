@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import {
   LayoutDashboard,
@@ -14,14 +14,6 @@ import {
   FileText,
   Users,
 } from "lucide-react";
-
-interface AdminDashboardProps {
-  user: {
-    firstName?: string | null;
-    lastName?: string | null;
-    emailAddresses: { emailAddress: string }[];
-  };
-}
 
 const menuItems = [
   {
@@ -68,12 +60,13 @@ const menuItems = [
   },
 ];
 
-export default function AdminDashboard({ user }: AdminDashboardProps) {
+export default function AdminDashboard() {
   const [selectedMenu, setSelectedMenu] = useState("overview");
+  const { user } = useUser();
 
-  const userName = user.firstName
+  const userName = user?.firstName
     ? `${user.firstName} ${user.lastName || ""}`
-    : user.emailAddresses[0]?.emailAddress || "Administrador";
+    : user?.emailAddresses[0]?.emailAddress || "Administrador";
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
