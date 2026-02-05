@@ -33,6 +33,7 @@ import LocationMap from "../components/LocationMap";
 import OrderCTAModal from "../components/OrderCTAModal";
 import TestimonialsSection from "../components/TestimonialsSection";
 import DishDetailModal from "../components/DishDetailModal";
+import PlatDeLaSemaine from "../components/PlatDeLaSemaine";
 import Link from "next/link";
 import styles from "../styles/Home.module.scss";
 import { useRevealOnScroll } from "../utils/useRevealOnScroll";
@@ -586,8 +587,8 @@ export default function Home() {
           </section>
         </section>
 
-        {/* Platos destacados */}
-        {/* </PlatosDestacados /> */}
+        {/* Plato de la Semana - French Luxury Style */}
+        <PlatDeLaSemaine />
 
         {/* Nuestro Menú */}
         <section

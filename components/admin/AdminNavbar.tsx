@@ -13,6 +13,7 @@ import {
   LogOut,
   Menu,
   X,
+  BarChart3,
 } from "lucide-react";
 import { useState } from "react";
 import { UserButton } from "@clerk/nextjs";
@@ -40,6 +41,11 @@ const navItems = [
     name: "Pedidos",
     href: "/admin/pedidos",
     icon: ShoppingBag,
+  },
+  {
+    name: "Estadísticas",
+    href: "/admin/estadisticas",
+    icon: BarChart3,
   },
   {
     name: "QR Mesas",

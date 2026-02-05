@@ -1,24 +1,28 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
+// Rutas completamente públicas (sin Clerk) - cron jobs
+const isCronRoute = createRouteMatcher([
+  '/api/cron/(.*)',
+]);
+
 const isPublicRoute = createRouteMatcher([
   "/",
   "/sign-in(.*)",
   "/sign-up(.*)",
-  "/menu",
-  "/nosotros",
-  "/blog",
-  "/galeria",
-  "/checkout",
+  "/menu(.*)",
+  "/nosotros(.*)",
+  "/blog(.*)",
+  "/galeria(.*)",
+  "/checkout(.*)",
   "/payment/(.*)",
-  "/invoice",
+  "/invoice(.*)",
   "/mesa/(.*)", // Páginas de pedidos por QR para mesas
   "/api/wompi/(.*)",
-  "/api/menu/full",
-  "/api/menu/download",
-  "/api/menu/categories",
-  "/api/menu/items",
-  "/api/orders/table(.*)", // API de pedidos de mesas (público)
+  "/api/menu/(.*)",
+  "/api/orders/(.*)",
+  "/api/statistics(.*)",
+  "/api/weekly-dishes(.*)",
   "/api/test-supabase", // Ruta de prueba de Supabase
 ]);
 
@@ -29,6 +33,11 @@ const isApiAdminRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
+  // Bypass Clerk completamente para rutas de cron
+  if (isCronRoute(req)) {
+    return NextResponse.next();
+  }
+
   // Permitir rutas públicas sin ninguna protección
   if (isPublicRoute(req)) {
     return NextResponse.next();
