@@ -29,6 +29,7 @@ export async function POST(request: Request) {
     // Datos del pago para ePayco Checkout v2
     const paymentData = {
       // ==================== REQUERIDOS ====================
+      public_key: process.env.NEXT_PUBLIC_EPAYCO_PUBLIC_KEY!,
       checkout_version: "2",
       name: "Restaurante Munay",
       currency: "COP",
@@ -80,7 +81,6 @@ export async function POST(request: Request) {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_EPAYCO_PUBLIC_KEY}`,
       },
       body: JSON.stringify(paymentData),
     });
