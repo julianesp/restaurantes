@@ -14,6 +14,7 @@ import {
   Menu,
   X,
   BarChart3,
+  Star,
 } from "lucide-react";
 import { useState } from "react";
 import { UserButton } from "@clerk/nextjs";
@@ -46,6 +47,11 @@ const navItems = [
     name: "Estadísticas",
     href: "/admin/estadisticas",
     icon: BarChart3,
+  },
+  {
+    name: "Platos Destacados",
+    href: "/admin/platos-destacados",
+    icon: Star,
   },
   {
     name: "QR Mesas",

@@ -10,7 +10,8 @@ import {
   BarChart3,
   RefreshCw,
   Star,
-  Send
+  Send,
+  Sparkles
 } from "lucide-react";
 import type {
   ItemStatistic,
@@ -18,6 +19,7 @@ import type {
   SalesSummary,
   TimeFilter
 } from "@/types/statistics";
+import PredictiveStatistics from "@/components/admin/PredictiveStatistics";
 
 export default function EstadisticasPage() {
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("month");
@@ -28,6 +30,7 @@ export default function EstadisticasPage() {
   const [error, setError] = useState<string | null>(null);
   const [publishing, setPublishing] = useState(false);
   const [publishSuccess, setPublishSuccess] = useState<string | null>(null);
+  const [showPredictive, setShowPredictive] = useState(true);
 
   // Cargar datos
   const fetchStatistics = async () => {
@@ -210,14 +213,27 @@ export default function EstadisticasPage() {
             </p>
           </div>
 
-          <button
-            onClick={fetchStatistics}
-            disabled={loading}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            Actualizar
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowPredictive(!showPredictive)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                showPredictive
+                  ? 'bg-purple-600 text-white hover:bg-purple-700'
+                  : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+              }`}
+            >
+              <Sparkles className="w-4 h-4" />
+              {showPredictive ? 'Ocultar' : 'Mostrar'} Predictivo
+            </button>
+            <button
+              onClick={fetchStatistics}
+              disabled={loading}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+              Actualizar
+            </button>
+          </div>
         </div>
 
         {/* Filtros de Tiempo */}
@@ -266,6 +282,11 @@ export default function EstadisticasPage() {
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           </div>
+        )}
+
+        {/* Estadísticas Predictivas */}
+        {showPredictive && (
+          <PredictiveStatistics daysToAnalyze={30} minFrequency={0.3} />
         )}
 
         {/* Content */}

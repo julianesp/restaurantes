@@ -28,6 +28,23 @@ export default function FoodSlider({
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const scrollY = useParallax();
 
+  // Array de colores para la barra de progreso
+  const progressColors = [
+    "bg-blue-500",      // Azul
+    "bg-purple-500",    // Morado
+    "bg-pink-500",      // Rosa
+    "bg-red-500",       // Rojo
+    "bg-orange-500",    // Naranja
+    "bg-yellow-500",    // Amarillo
+    "bg-green-500",     // Verde
+    "bg-teal-500",      // Turquesa
+    "bg-cyan-500",      // Cian
+    "bg-indigo-500",    // Índigo
+  ];
+
+  // Obtener el color actual basado en el índice
+  const currentProgressColor = progressColors[currentIndex % progressColors.length];
+
   // Detectar si es móvil
   useEffect(() => {
     const checkMobile = () => {
@@ -188,9 +205,10 @@ export default function FoodSlider({
 
         {/* Progress Bar */}
         {isAutoPlaying && (
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200 dark:bg-gray-700 z-20">
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200/50 dark:bg-gray-700/50 z-20">
             <div
-              className="h-full bg-primary-500 dark:bg-primary-600 transition-all"
+              key={currentIndex}
+              className={`h-full ${currentProgressColor} transition-colors duration-500`}
               style={{
                 animation: `progress ${autoplayInterval}ms linear`,
                 animationPlayState: isAutoPlaying ? "running" : "paused",

@@ -10,18 +10,47 @@ function PaymentSuccessContent() {
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("");
 
+  // ePayco envía parámetros diferentes
+  const refPayco = searchParams.get("ref_payco");
+  const transactionState = searchParams.get("x_transaction_state");
+  const invoice = searchParams.get("x_invoice"); // Nuestra referencia
+
+  // Parámetros legacy (para compatibilidad)
   const type = searchParams.get("type"); // 'reserva' o 'pedido'
-  const reference = searchParams.get("reference");
+  const reference = searchParams.get("reference") || invoice;
 
   useEffect(() => {
     const processPayment = async () => {
       try {
-        if (!reference || !type) {
-          throw new Error("Referencia o tipo de pago no encontrado");
+        // Verificar estado de la transacción de ePayco
+        if (transactionState && transactionState !== "Aceptada") {
+          setStatus("error");
+          if (transactionState === "Rechazada") {
+            setMessage("El pago fue rechazado. Por favor intenta nuevamente o usa otro método de pago.");
+          } else if (transactionState === "Pendiente") {
+            setMessage("El pago está pendiente de confirmación. Te notificaremos cuando se complete.");
+          } else {
+            setMessage("Hubo un problema con el pago. Por favor contacta al restaurante.");
+          }
+          return;
+        }
+
+        if (!reference) {
+          throw new Error("Referencia de pago no encontrada");
+        }
+
+        // Determinar tipo desde la referencia si no viene como parámetro
+        let paymentType = type;
+        if (!paymentType && reference) {
+          paymentType = reference.startsWith("RESERVA") ? "reserva" : "pedido";
+        }
+
+        if (!paymentType) {
+          throw new Error("Tipo de pago no encontrado");
         }
 
         // Obtener datos guardados en localStorage
-        const storageKey = `${type}_${reference}`;
+        const storageKey = `${paymentType}_${reference}`;
         const dataString = localStorage.getItem(storageKey);
 
         if (!dataString) {
@@ -30,8 +59,14 @@ function PaymentSuccessContent() {
 
         const data = JSON.parse(dataString);
 
+        // Guardar referencia de ePayco si viene
+        if (refPayco) {
+          data.refPayco = refPayco;
+          localStorage.setItem(storageKey, JSON.stringify(data));
+        }
+
         // Enviar confirmación por WhatsApp
-        if (type === "reserva") {
+        if (paymentType === "reserva") {
           const mensaje = `*✅ RESERVA CONFIRMADA - PAGO RECIBIDO*%0A%0A` +
             `📋 *Referencia:* ${reference}%0A` +
             `👤 *Nombre:* ${data.nombre}%0A` +
@@ -53,7 +88,7 @@ function PaymentSuccessContent() {
             // Limpiar localStorage
             localStorage.removeItem(storageKey);
           }, 2000);
-        } else if (type === "pedido") {
+        } else if (paymentType === "pedido") {
           let mensaje = `*✅ PEDIDO CONFIRMADO - PAGO RECIBIDO*%0A%0A` +
             `📋 *Referencia:* ${reference}%0A` +
             `👤 *Nombre:* ${data.nombre}%0A` +
@@ -84,7 +119,7 @@ function PaymentSuccessContent() {
 
         setStatus("success");
         setMessage(
-          type === "reserva"
+          paymentType === "reserva"
             ? "¡Tu reserva ha sido confirmada! En breve te redirigiremos a WhatsApp."
             : "¡Tu pedido ha sido confirmado! En breve te redirigiremos a WhatsApp."
         );
@@ -100,7 +135,7 @@ function PaymentSuccessContent() {
     };
 
     processPayment();
-  }, [reference, type]);
+  }, [reference, type, refPayco, transactionState, invoice]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-secondary-50 dark:from-gray-900 dark:to-gray-800 p-4">
@@ -124,9 +159,16 @@ function PaymentSuccessContent() {
               ¡Pago Exitoso!
             </h2>
             <p className="text-gray-600 dark:text-gray-300 mb-6">{message}</p>
+            {refPayco && (
+              <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                <p className="text-sm text-green-700 dark:text-green-300">
+                  <strong>Referencia ePayco:</strong> {refPayco}
+                </p>
+              </div>
+            )}
             <div className="space-y-3">
               <Link
-                href={`/invoice?type=${type}&reference=${reference}`}
+                href={`/invoice?type=${type || (reference?.startsWith("RESERVA") ? "reserva" : "pedido")}&reference=${reference}`}
                 className="flex items-center justify-center gap-2 w-full px-6 py-3 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg hover:shadow-lg transition-all duration-300 font-semibold"
               >
                 <FileText className="w-5 h-5" />

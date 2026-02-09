@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "../../components/Navbar/page";
 import Footer from "../../containers/Footer/page";
 import { useCart } from "../../context/CartContext";
-import { createPaymentLink, generatePaymentReference } from "../../utils/wompi";
+import { createPaymentLink, generatePaymentReference } from "../../utils/epayco";
 import {
   CreditCard,
   Building2,
@@ -108,11 +108,11 @@ export default function CheckoutPage() {
         timestamp: Date.now(),
       }));
 
-      // Redirigir a Wompi
-      if (paymentData.data && paymentData.data.id) {
-        window.location.href = `https://checkout.wompi.co/l/${paymentData.data.id}`;
+      // Redirigir a ePayco
+      if (paymentData.paymentUrl) {
+        window.location.href = paymentData.paymentUrl;
       } else {
-        throw new Error('No se recibió el ID del enlace de pago');
+        throw new Error('No se recibió el enlace de pago');
       }
     } catch (error: any) {
       console.error('Error al procesar el pago:', error);

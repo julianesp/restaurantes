@@ -23,7 +23,7 @@ import {
   createPaymentLink,
   generatePaymentReference,
   formatCOP,
-} from "../utils/wompi";
+} from "../utils/epayco";
 
 interface OrderModalProps {
   isOpen: boolean;

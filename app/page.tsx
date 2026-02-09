@@ -126,8 +126,9 @@ const menuCategories = [
   { icon: UtensilsCrossed, label: "Platos Fuertes", color: "text-red-700" },
 ];
 
-// Comidas especiales para el slider
-const specialFoods = [
+// Comidas especiales para el slider - SE CARGAN DESDE LA BASE DE DATOS
+// (Los datos hardcodeados se mantienen como fallback si falla la carga)
+const fallbackFoods = [
   {
     id: 1,
     name: "Buñuelos Artesanales",
@@ -193,12 +194,41 @@ export default function Home() {
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [selectedDish, setSelectedDish] = useState<typeof mostPopular | null>(null);
   const [isDishModalOpen, setIsDishModalOpen] = useState(false);
+  const [specialFoods, setSpecialFoods] = useState<any[]>(fallbackFoods);
   const h2Ref = useRef<HTMLHeadingElement | null>(null);
 
   const handleDishClick = (dish: typeof mostPopular) => {
     setSelectedDish(dish);
     setIsDishModalOpen(true);
   };
+
+  // Cargar platos destacados desde la base de datos
+  useEffect(() => {
+    const loadFeaturedDishes = async () => {
+      try {
+        const response = await fetch('/api/featured-dishes');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.data && data.data.length > 0) {
+            // Convertir formato de DB al formato esperado por el componente
+            const formattedDishes = data.data.map((dish: any) => ({
+              id: dish.id,
+              name: dish.name,
+              description: dish.description,
+              price: dish.price,
+              image: dish.image_url || fallbackFoods[0].image,
+            }));
+            setSpecialFoods(formattedDishes);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading featured dishes:', error);
+        // Mantener fallbackFoods si hay error
+      }
+    };
+
+    loadFeaturedDishes();
+  }, []);
 
   useEffect(() => {
     // Disparar animación de tema solo si el hero está visible

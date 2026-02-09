@@ -18,7 +18,7 @@ const isPublicRoute = createRouteMatcher([
   "/payment/(.*)",
   "/invoice(.*)",
   "/mesa/(.*)", // Páginas de pedidos por QR para mesas
-  "/api/wompi/(.*)",
+  "/api/epayco/(.*)",
   "/api/menu/(.*)",
   "/api/orders/(.*)",
   "/api/statistics(.*)",

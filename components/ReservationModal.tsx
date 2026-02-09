@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { X, Calendar, Users, Clock, User, Phone, CreditCard, Loader2 } from "lucide-react";
-import { createPaymentLink, generatePaymentReference, formatCOP } from "../utils/wompi";
+import { createPaymentLink, generatePaymentReference, formatCOP } from "../utils/epayco";
 
 interface ReservationModalProps {
   isOpen: boolean;
@@ -122,16 +122,14 @@ const ReservationModal = ({ isOpen, onClose }: ReservationModalProps) => {
       localStorage.setItem(`reserva_${reference}`, JSON.stringify({
         ...formData,
         reference,
-        paymentId: paymentInfo.id,
+        paymentId: paymentInfo.transactionId,
         createdAt: new Date().toISOString(),
       }));
 
-      // Redirigir al checkout de Wompi
-      if (paymentInfo && paymentInfo.id) {
-        // Construir el permalink si no viene en la respuesta
-        const checkoutUrl = paymentInfo.permalink || `https://checkout.wompi.co/l/${paymentInfo.id}`;
-        console.log('Redirecting to:', checkoutUrl);
-        window.location.href = checkoutUrl;
+      // Redirigir al checkout de ePayco
+      if (paymentInfo && paymentInfo.paymentUrl) {
+        console.log('Redirecting to ePayco:', paymentInfo.paymentUrl);
+        window.location.href = paymentInfo.paymentUrl;
       } else {
         throw new Error('No se pudo crear el enlace de pago');
       }

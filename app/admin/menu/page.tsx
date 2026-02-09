@@ -19,6 +19,7 @@ import {
   Cake,
 } from "lucide-react";
 import Link from "next/link";
+import Swal from "sweetalert2";
 
 interface MenuItem {
   id: string;
@@ -103,8 +104,41 @@ export default function AdminMenuPage() {
   };
 
   const handleCreateItem = async () => {
-    if (!formData.name || !formData.price || !selectedCategory) {
-      alert("Por favor completa todos los campos requeridos");
+    // Normalizar y validar campos
+    const nameTrim = formData.name?.trim() || "";
+    const priceRaw = formData.price || "";
+    // Eliminar símbolos y separadores, dejar sólo números y punto
+    const priceNormalized = priceRaw.toString().replace(/[^0-9.-]/g, "");
+    const categoryId =
+      selectedCategory || (categories[0] && categories[0].id) || "";
+
+    if (!nameTrim) {
+      Swal.fire({
+        icon: "warning",
+        title: "Campo requerido",
+        text: "Por favor ingresa el nombre del item",
+        confirmButtonColor: "#3b82f6",
+      });
+      return;
+    }
+
+    if (!priceNormalized || Number.isNaN(Number(priceNormalized))) {
+      Swal.fire({
+        icon: "warning",
+        title: "Precio inválido",
+        text: "Por favor ingresa un precio válido (ej. 13000)",
+        confirmButtonColor: "#3b82f6",
+      });
+      return;
+    }
+
+    if (!categoryId) {
+      Swal.fire({
+        icon: "warning",
+        title: "Categoría requerida",
+        text: "Por favor crea o selecciona una categoría antes de crear el item",
+        confirmButtonColor: "#3b82f6",
+      });
       return;
     }
 
@@ -113,8 +147,10 @@ export default function AdminMenuPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          category_id: selectedCategory,
+          category_id: categoryId,
           ...formData,
+          name: nameTrim,
+          price: priceNormalized,
         }),
       });
 
@@ -122,25 +158,81 @@ export default function AdminMenuPage() {
         await loadData();
         resetForm();
         setIsCreating(false);
+        Swal.fire({
+          icon: "success",
+          title: "¡Creado!",
+          text: "Item del menú creado correctamente",
+          timer: 2000,
+          showConfirmButton: false,
+        });
       } else {
-        alert("Error al crear el item");
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Error al crear el item",
+          confirmButtonColor: "#3b82f6",
+        });
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("Error al crear el item");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Error al crear el item",
+        confirmButtonColor: "#3b82f6",
+      });
     }
   };
 
   const handleUpdateItem = async () => {
     if (!editingItem) return;
 
+    // Normalizar precio y categoría al actualizar
+    const nameTrim = formData.name?.trim() || "";
+    const priceRaw = formData.price || "";
+    const priceNormalized = priceRaw.toString().replace(/[^0-9.-]/g, "");
+    const categoryId =
+      selectedCategory || (categories[0] && categories[0].id) || "";
+
+    if (!nameTrim) {
+      Swal.fire({
+        icon: "warning",
+        title: "Campo requerido",
+        text: "Por favor ingresa el nombre del item",
+        confirmButtonColor: "#3b82f6",
+      });
+      return;
+    }
+
+    if (!priceNormalized || Number.isNaN(Number(priceNormalized))) {
+      Swal.fire({
+        icon: "warning",
+        title: "Precio inválido",
+        text: "Por favor ingresa un precio válido (ej. 13000)",
+        confirmButtonColor: "#3b82f6",
+      });
+      return;
+    }
+
+    if (!categoryId) {
+      Swal.fire({
+        icon: "warning",
+        title: "Categoría requerida",
+        text: "Por favor selecciona una categoría",
+        confirmButtonColor: "#3b82f6",
+      });
+      return;
+    }
+
     try {
       const response = await fetch(`/api/menu/items/${editingItem.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          category_id: selectedCategory,
+          category_id: categoryId,
           ...formData,
+          name: nameTrim,
+          price: priceNormalized,
           is_available: editingItem.is_available,
         }),
       });
@@ -149,17 +241,45 @@ export default function AdminMenuPage() {
         await loadData();
         resetForm();
         setEditingItem(null);
+        Swal.fire({
+          icon: "success",
+          title: "¡Actualizado!",
+          text: "Item del menú actualizado correctamente",
+          timer: 2000,
+          showConfirmButton: false,
+        });
       } else {
-        alert("Error al actualizar el item");
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Error al actualizar el item",
+          confirmButtonColor: "#3b82f6",
+        });
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("Error al actualizar el item");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Error al actualizar el item",
+        confirmButtonColor: "#3b82f6",
+      });
     }
   };
 
   const handleDeleteItem = async (id: string) => {
-    if (!confirm("¿Estás seguro de eliminar este item?")) return;
+    const result = await Swal.fire({
+      icon: "warning",
+      title: "¿Estás seguro?",
+      text: "Esta acción eliminará el item del menú permanentemente",
+      showCancelButton: true,
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
       const response = await fetch(`/api/menu/items/${id}`, {
@@ -168,26 +288,65 @@ export default function AdminMenuPage() {
 
       if (response.ok) {
         await loadData();
+        Swal.fire({
+          icon: "success",
+          title: "¡Eliminado!",
+          text: "Item del menú eliminado correctamente",
+          timer: 2000,
+          showConfirmButton: false,
+        });
       } else {
-        alert("Error al eliminar el item");
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Error al eliminar el item",
+          confirmButtonColor: "#3b82f6",
+        });
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("Error al eliminar el item");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Error al eliminar el item",
+        confirmButtonColor: "#3b82f6",
+      });
     }
   };
 
   const handleEditItem = (item: MenuItem) => {
     setEditingItem(item);
+    // Asegurar que el precio tenga el formato correcto al editar
+    const formattedPrice = item.price.startsWith("$") ? item.price : formatPrice(item.price);
     setFormData({
       name: item.name,
       description: item.description,
-      price: item.price,
+      price: formattedPrice,
       is_vegetarian: item.is_vegetarian,
       is_spicy: item.is_spicy,
       display_order: item.display_order,
     });
     setIsCreating(false);
+  };
+
+  // Función para formatear el precio con $ y separadores de miles
+  const formatPrice = (value: string): string => {
+    // Eliminar todo excepto números
+    const numbers = value.replace(/\D/g, "");
+
+    if (!numbers) return "";
+
+    // Agregar separadores de miles
+    const formatted = numbers.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+    // Agregar símbolo de peso
+    return `$${formatted}`;
+  };
+
+  // Manejador para el cambio de precio
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPrice(e.target.value);
+    setFormData({ ...formData, price: formatted });
   };
 
   const resetForm = () => {
@@ -204,7 +363,7 @@ export default function AdminMenuPage() {
   };
 
   const filteredItems = items.filter(
-    (item) => item.category_id === selectedCategory
+    (item) => item.category_id === selectedCategory,
   );
 
   if (loading) {
@@ -392,12 +551,13 @@ export default function AdminMenuPage() {
                     <input
                       type="text"
                       value={formData.price}
-                      onChange={(e) =>
-                        setFormData({ ...formData, price: e.target.value })
-                      }
+                      onChange={handlePriceChange}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                      placeholder="Ej: $28.000"
+                      placeholder="Ej: $12.000"
                     />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Escribe solo números, el formato se aplicará automáticamente
+                    </p>
                   </div>
 
                   <div className="flex gap-4">
