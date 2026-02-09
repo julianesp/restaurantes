@@ -23,6 +23,7 @@ const isPublicRoute = createRouteMatcher([
   "/api/orders/(.*)",
   "/api/statistics(.*)",
   "/api/weekly-dishes(.*)",
+  "/api/suggestions(.*)", // Buzón de sugerencias
   "/api/test-supabase", // Ruta de prueba de Supabase
 ]);
 

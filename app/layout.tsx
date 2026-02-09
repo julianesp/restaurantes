@@ -8,6 +8,7 @@ import { esES } from "@clerk/localizations";
 import AOSInit from "@/components/AOSInit";
 import { CartProvider } from "@/context/CartContext";
 import CartButton from "@/components/CartButton";
+import SuggestionBox from "@/components/SuggestionBox";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -59,6 +60,7 @@ export default function RootLayout({
             <CartProvider>
               {children}
               <CartButton />
+              <SuggestionBox />
               <AOSInit />
               <Analytics />
             </CartProvider>

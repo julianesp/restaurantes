@@ -235,7 +235,7 @@ export default function PedidosAdminPage() {
                       </span>
                     </div>
                   </div>
-                  <div className="flex-1 bg-white dark:bg-gray-800 rounded-b-xl p-4 space-y-4 min-h-[400px]">
+                  <div className="flex-1 bg-white dark:bg-gray-800 rounded-b-xl p-4 space-y-4 overflow-y-auto max-h-[520px]">
                     {statusOrders.map((order) => (
                       <OrderCard
                         key={order.id}
@@ -318,9 +318,9 @@ function OrderCard({
     <div
       className={`${config.bgColor} border-2 ${config.color.split(" ")[2]} rounded-xl p-4 hover:shadow-lg transition-all`}
     >
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="text-2xl font-bold text-gray-900 dark:text-white">
               Mesa {order.table_id}
             </span>
@@ -334,8 +334,8 @@ function OrderCard({
           </p>
           <p className="text-xs text-gray-500 mt-1">{order.order_number}</p>
         </div>
-        <div className="text-right">
-          <p className="text-2xl font-bold text-primary-600 dark:text-primary-400">
+        <div className="text-right flex-shrink-0">
+          <p className="text-xl font-bold text-primary-600 dark:text-primary-400 whitespace-nowrap">
             ${order.total.toLocaleString("es-CO")}
           </p>
         </div>
