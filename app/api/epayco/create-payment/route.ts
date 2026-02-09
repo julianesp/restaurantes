@@ -1,12 +1,4 @@
 import { NextResponse } from 'next/server';
-import epayco from 'epayco-sdk-node';
-
-const epaycoClient = epayco({
-  apiKey: process.env.EPAYCO_P_KEY!,
-  privateKey: process.env.EPAYCO_PRIVATE_KEY!,
-  lang: 'ES',
-  test: process.env.NEXT_PUBLIC_EPAYCO_TEST_MODE === 'true',
-});
 
 export async function POST(request: Request) {
   try {
@@ -29,7 +21,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // Crear pago en ePayco usando el método de checkout
+    // Datos del pago para ePayco
     const paymentData = {
       // Información del comercio
       name: description,
@@ -42,7 +34,10 @@ export async function POST(request: Request) {
       country: 'co',
       lang: 'es',
 
-      // URLs
+      // Llaves de ePayco
+      public_key: process.env.NEXT_PUBLIC_EPAYCO_PUBLIC_KEY!,
+
+      // URLs de respuesta y confirmación
       external: 'false',
       response: redirectUrl || `${process.env.NEXT_PUBLIC_BASE_URL}/payment/success`,
       confirmation: `${process.env.NEXT_PUBLIC_BASE_URL}/api/epayco/webhook`,
@@ -52,22 +47,48 @@ export async function POST(request: Request) {
       email_billing: customerEmail || 'cliente@example.com',
       mobilephone_billing: customerPhone || '',
 
-      // Configuración adicional
-      methodsDisable: ['SP', 'CASH'], // Deshabilitar SafetyPay y efectivo
+      // Información adicional
+      type_person: '0', // 0 = Persona natural, 1 = Empresa
+
+      // Métodos de pago deshabilitados
+      methodsDisable: ['SP', 'CASH'].join(','),
     };
 
-    // Crear el pago
-    const payment = await epaycoClient.pagos.create(paymentData);
+    console.log('Creating ePayco payment with data:', {
+      ...paymentData,
+      public_key: '***',
+    });
 
-    if (!payment.success) {
-      throw new Error(payment.data?.description || 'Error al crear el pago');
+    // Crear el pago usando la API REST de ePayco
+    const response = await fetch('https://secure.epayco.co/checkout/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify(paymentData),
+    });
+
+    const result = await response.json();
+
+    console.log('ePayco API response:', result);
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.data?.description || result.data || 'Error al crear el pago en ePayco');
+    }
+
+    // ePayco retorna la URL en data.url_payment
+    const paymentUrl = result.data?.url_payment || result.data;
+
+    if (!paymentUrl) {
+      throw new Error('No se recibió URL de pago de ePayco');
     }
 
     return NextResponse.json({
       success: true,
-      paymentUrl: payment.data.url_payment,
+      paymentUrl: paymentUrl,
       reference: reference,
-      transactionId: payment.data.ref_payco,
+      transactionId: result.data?.ref_payco || reference,
     });
   } catch (error: any) {
     console.error('Error creating ePayco payment:', error);

@@ -16,7 +16,6 @@
     "@vercel/speed-insights": "^1.2.0",
     "aos": "^2.3.4",
     "clsx": "^2.1.1",
-    "epayco-sdk-node": "^1.4.4",
     "jspdf": "^4.0.0",
     "jspdf-autotable": "^5.0.7",
     "lucide-react": "^0.540.0",
