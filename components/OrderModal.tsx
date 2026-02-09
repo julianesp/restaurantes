@@ -24,6 +24,7 @@ import {
   generatePaymentReference,
   formatCOP,
 } from "../utils/epayco";
+import Swal from "sweetalert2";
 
 interface OrderModalProps {
   isOpen: boolean;
@@ -347,12 +348,13 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
       const redirectUrl = `${baseUrl}/payment/success?type=pedido&reference=${reference}`;
 
-      // Crear enlace de pago en Wompi
+      // Crear enlace de pago en ePayco
       const paymentData = await createPaymentLink({
         amount: totalAmount,
         currency: "COP",
         reference,
         description,
+        customerEmail: "cliente@restaurante.com",
         customerName: formData.nombre,
         customerPhone: formData.telefono,
         redirectUrl,
@@ -360,11 +362,9 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
 
       console.log("Payment data received:", paymentData);
 
-      // La respuesta de Wompi tiene estructura { data: { data: {...} } }
-      const paymentInfo =
-        paymentData.data?.data || paymentData.data || paymentData;
-
-      console.log("Payment info to use:", paymentInfo);
+      if (!paymentData.success || !paymentData.paymentUrl) {
+        throw new Error("No se recibió el enlace de pago de ePayco");
+      }
 
       // Guardar datos del pedido en localStorage para después del pago
       localStorage.setItem(
@@ -375,25 +375,25 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
           items: cart,
           total: totalAmount,
           reference,
-          paymentId: paymentInfo.id,
+          paymentId: paymentData.transactionId,
           createdAt: new Date().toISOString(),
         }),
       );
 
-      // Redirigir al checkout de Wompi
-      if (paymentInfo && paymentInfo.id) {
-        // Construir el permalink si no viene en la respuesta
-        const checkoutUrl =
-          paymentInfo.permalink ||
-          `https://checkout.wompi.co/l/${paymentInfo.id}`;
-        console.log("Redirecting to:", checkoutUrl);
-        window.location.href = checkoutUrl;
-      } else {
-        throw new Error("No se pudo crear el enlace de pago");
-      }
+      // Redirigir al checkout de ePayco
+      console.log("Redirecting to ePayco:", paymentData.paymentUrl);
+      window.location.href = paymentData.paymentUrl;
     } catch (error: unknown) {
       console.error("Error al procesar el pago:", error);
-      alert("Error al procesar el pago. Por favor intenta de nuevo.");
+      const errorMessage = error instanceof Error ? error.message : "Error desconocido";
+
+      await Swal.fire({
+        icon: "error",
+        title: "Error al procesar el pago",
+        text: `${errorMessage}. Por favor intenta de nuevo.`,
+        confirmButtonColor: "#3b82f6",
+      });
+
       setIsProcessingPayment(false);
     }
   };
@@ -800,8 +800,8 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
                   Información importante:
                 </p>
                 <ul className="space-y-1 list-disc list-inside">
-                  <li>Pago 100% seguro a través de Wompi</li>
-                  <li>Puedes pagar con Nequi, PSE, tarjetas débito/crédito</li>
+                  <li>Pago 100% seguro a través de ePayco</li>
+                  <li>Puedes pagar con PSE, tarjetas débito/crédito, efectivo</li>
                   <li>
                     Te confirmaremos tu pedido por WhatsApp después del pago
                   </li>
