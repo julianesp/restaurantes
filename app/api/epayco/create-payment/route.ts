@@ -21,66 +21,99 @@ export async function POST(request: Request) {
       );
     }
 
-    // Datos del pago para ePayco
+    // Calcular base e impuesto (19% IVA en Colombia)
+    const taxRate = 0.19;
+    const taxBase = Math.round(amount / (1 + taxRate));
+    const tax = amount - taxBase;
+
+    // Datos del pago para ePayco Checkout v2
     const paymentData = {
-      // Información del comercio
-      name: description,
+      // ==================== REQUERIDOS ====================
+      checkout_version: "2",
+      name: "Restaurante Munay",
+      currency: "COP",
+      amount: parseFloat(amount.toString()),
+
+      // ==================== OPCIONALES ====================
       description: description,
+      lang: "ES",
       invoice: reference,
-      currency: 'cop',
-      amount: amount.toString(),
-      tax_base: '0',
-      tax: '0',
-      country: 'co',
-      lang: 'es',
-
-      // Llaves de ePayco
-      public_key: process.env.NEXT_PUBLIC_EPAYCO_PUBLIC_KEY!,
-
-      // URLs de respuesta y confirmación
-      external: 'false',
+      country: "CO",
+      taxBase: parseFloat(taxBase.toString()),
+      tax: parseFloat(tax.toString()),
+      taxIco: 0,
       response: redirectUrl || `${process.env.NEXT_PUBLIC_BASE_URL}/payment/success`,
       confirmation: `${process.env.NEXT_PUBLIC_BASE_URL}/api/epayco/webhook`,
 
-      // Información del cliente
-      name_billing: customerName || 'Cliente',
-      email_billing: customerEmail || 'cliente@example.com',
-      mobilephone_billing: customerPhone || '',
+      // ==================== CONFIGURACIÓN ====================
+      methodsDisable: ["SP", "CASH"], // Deshabilitar SafetyPay y efectivo
+      method: "POST",
 
-      // Información adicional
-      type_person: '0', // 0 = Persona natural, 1 = Empresa
+      // ==================== BILLING (OPCIONAL) ====================
+      billing: {
+        email: customerEmail || "cliente@restaurante.com",
+        name: customerName || "Cliente",
+        address: "Restaurante",
+        typeDoc: "CC",
+        numberDoc: "0",
+        callingCode: "+57",
+        mobilePhone: customerPhone || "3000000000",
+      },
 
-      // Métodos de pago deshabilitados
-      methodsDisable: ['SP', 'CASH'].join(','),
+      // ==================== EXTRAS (OPCIONAL) ====================
+      extras: {
+        extra1: reference,
+        extra2: "pedido",
+      },
     };
 
-    console.log('Creating ePayco payment with data:', {
+    console.log('Creating ePayco payment v2 with data:', {
       ...paymentData,
-      public_key: '***',
+      billing: { ...paymentData.billing, numberDoc: '***' }
     });
 
-    // Crear el pago usando la API REST de ePayco
-    const response = await fetch('https://secure.epayco.co/checkout/create', {
+    // Crear el pago usando ePayco Checkout API v2
+    const epaycoUrl = 'https://apify.epayco.co/payment/process';
+
+    const response = await fetch(epaycoUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
+        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_EPAYCO_PUBLIC_KEY}`,
       },
       body: JSON.stringify(paymentData),
     });
 
     const result = await response.json();
 
-    console.log('ePayco API response:', result);
+    console.log('ePayco API v2 response:', result);
 
-    if (!response.ok || !result.success) {
-      throw new Error(result.data?.description || result.data || 'Error al crear el pago en ePayco');
+    // Verificar si la respuesta fue exitosa
+    if (!response.ok) {
+      throw new Error(result.message || result.error || 'Error al crear el pago en ePayco');
     }
 
-    // ePayco retorna la URL en data.url_payment
-    const paymentUrl = result.data?.url_payment || result.data;
+    // ePayco v2 retorna diferentes estructuras según el resultado
+    let paymentUrl = null;
+    let transactionId = null;
+
+    if (result.success) {
+      // Caso exitoso con URL
+      paymentUrl = result.data?.url || result.data?.urlPayment || result.url;
+      transactionId = result.data?.ref || result.data?.transactionId || reference;
+    } else if (result.data?.url) {
+      // A veces viene en data.url directamente
+      paymentUrl = result.data.url;
+      transactionId = result.data.ref || reference;
+    } else if (result.url) {
+      // O directamente en url
+      paymentUrl = result.url;
+      transactionId = result.ref || reference;
+    }
 
     if (!paymentUrl) {
+      console.error('No payment URL in response:', result);
       throw new Error('No se recibió URL de pago de ePayco');
     }
 
@@ -88,7 +121,7 @@ export async function POST(request: Request) {
       success: true,
       paymentUrl: paymentUrl,
       reference: reference,
-      transactionId: result.data?.ref_payco || reference,
+      transactionId: transactionId,
     });
   } catch (error: any) {
     console.error('Error creating ePayco payment:', error);
