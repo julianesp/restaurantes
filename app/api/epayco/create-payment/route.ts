@@ -31,7 +31,7 @@ export async function POST(request: Request) {
       // ==================== REQUERIDOS ====================
       public_key: process.env.NEXT_PUBLIC_EPAYCO_PUBLIC_KEY!,
       checkout_version: "2",
-      name: "Restaurante Munay",
+      name: "Restaurante",
       currency: "COP",
       amount: parseFloat(amount.toString()),
 
@@ -123,12 +123,13 @@ export async function POST(request: Request) {
       reference: reference,
       transactionId: transactionId,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error creating ePayco payment:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
     return NextResponse.json(
       {
         error: 'Error al crear el enlace de pago con ePayco',
-        details: error.message
+        details: errorMessage
       },
       { status: 500 }
     );

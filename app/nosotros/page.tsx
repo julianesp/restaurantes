@@ -48,7 +48,7 @@ export default function AboutPage() {
           </h1>
           <p className="text-xl text-white/90 max-w-3xl mx-auto">
             Conoce la historia, filosofía y valores que hacen de Restaurante
-            Munay un lugar especial en el Valle de Sibundoy
+            un lugar especial en el Valle de Sibundoy
           </p>
         </div>
       </section>
@@ -71,14 +71,14 @@ export default function AboutPage() {
               </div>
               <div className="space-y-4 text-gray-700 dark:text-gray-300">
                 <p className="text-lg leading-relaxed">
-                  Restaurante Munay nació del sueño de llevar los sabores
+                  Restaurante nació del sueño de llevar los sabores
                   auténticos y tradicionales del Valle de Sibundoy a cada mesa.
                   Fundado con la pasión por la gastronomía local y el compromiso
                   con la calidad, nos hemos convertido en un referente en la
                   región.
                 </p>
                 <p className="text-lg leading-relaxed">
-                  Nuestro nombre "Munay" refleja el amor y dedicación que
+                  Nuestro nombre "Restaurante" refleja el amor y dedicación que
                   ponemos en cada plato que servimos. Desde nuestros inicios,
                   hemos trabajado con ingredientes frescos y locales,
                   manteniendo vivas las recetas tradicionales mientras
@@ -117,7 +117,7 @@ export default function AboutPage() {
               Nuestra Filosofía
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              En Restaurante Munay creemos que la mejor comida nace de la
+              En Restaurante creemos que la mejor comida nace de la
               combinación perfecta entre tradición e innovación
             </p>
           </div>
@@ -305,7 +305,7 @@ export default function AboutPage() {
                   "Estamos trabajando en presentar a nuestro increíble equipo.
                   Próximamente podrás conocer a nuestros chefs, directivos y
                   todo el personal que hace posible la magia de Restaurante
-                  Munay."
+                 ."
                 </p>
               </div>
             </div>
@@ -323,7 +323,7 @@ export default function AboutPage() {
         >
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              ¿Por Qué Elegir Restaurante Munay?
+              ¿Por Qué Elegir Restaurante?
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               Somos más que un restaurante, somos una experiencia gastronómica
@@ -407,7 +407,7 @@ export default function AboutPage() {
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-accent-100 to-primary-100 dark:from-accent-900/30 dark:to-primary-900/30">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6">
-            ¿Listo para Vivir la Experiencia Munay?
+            ¿Listo para Vivir la Experiencia?
           </h2>
           <p className="text-xl text-gray-700 dark:text-gray-300 mb-8">
             Ven y descubre por qué somos el restaurante favorito del Valle de

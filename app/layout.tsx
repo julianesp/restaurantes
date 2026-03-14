@@ -8,7 +8,6 @@ import { esES } from "@clerk/localizations";
 import AOSInit from "@/components/AOSInit";
 import { CartProvider } from "@/context/CartContext";
 import CartButton from "@/components/CartButton";
-import SuggestionBox from "@/components/SuggestionBox";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -21,15 +20,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Restaurante Munay - Gastronomía del Valle de Sibundoy",
+  title: "Restaurante - Gastronomía del Valle de Sibundoy",
   description:
-    "Restaurante Munay en Valle de Sibundoy, Putumayo. Los mejores platos tradicionales con ingredientes frescos. Reservas y pedidos en línea. El único restaurante con presencia digital en el Alto Putumayo.",
+    "Restaurante en Valle de Sibundoy, Putumayo. Los mejores platos tradicionales con ingredientes frescos. Reservas y pedidos en línea. El único restaurante con presencia digital en el Alto Putumayo.",
   keywords:
     "restaurante sibundoy, restaurante putumayo, comida tradicional, gastronomía putumayo, munay, restaurante valle de sibundoy, delivery putumayo, pedidos en línea, reservas restaurante",
-  authors: [{ name: "Restaurante Munay" }],
+  authors: [{ name: "Restaurante" }],
   manifest: "/manifest.json",
   openGraph: {
-    title: "Restaurante Munay - Gastronomía del Valle de Sibundoy",
+    title: "Restaurante - Gastronomía del Valle de Sibundoy",
     description:
       "El primer restaurante con presencia digital en el Alto Putumayo. Descubre nuestros platos tradicionales y especialidades.",
     type: "website",
@@ -60,7 +59,6 @@ export default function RootLayout({
             <CartProvider>
               {children}
               <CartButton />
-              <SuggestionBox />
               <AOSInit />
               <Analytics />
             </CartProvider>

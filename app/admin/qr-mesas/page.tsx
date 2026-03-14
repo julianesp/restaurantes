@@ -114,7 +114,7 @@ export default function QRTablesPage() {
               <div className="text-center">
                 <div className="bg-primary-500 text-white rounded-t-lg py-3 -mx-6 -mt-6 mb-4">
                   <h3 className="text-2xl font-bold">Mesa {tableNumber}</h3>
-                  <p className="text-sm opacity-90">Restaurante Munay</p>
+                  <p className="text-sm opacity-90">Restaurante</p>
                 </div>
 
                 <div className="flex justify-center mb-4">

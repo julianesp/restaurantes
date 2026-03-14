@@ -347,9 +347,9 @@ export default function Home() {
                   className={`reveal-on-scroll reveal-from-right delay-200 inline-block text-purple-900 ${
                     heroReveal.isVisible ? "visible" : ""
                   } ${themePulse ? "theme-animate" : ""}`}
-                  aria-label="Restaurante Munay"
+                  aria-label="Restaurante"
                 >
-                  {"Restaurante Munay".split("").map((ch, i) => (
+                  {"Restaurante".split("").map((ch, i) => (
                     <span
                       key={i}
                       className="char inline-block"
@@ -887,7 +887,7 @@ export default function Home() {
 
         {/* Sección de Ubicación */}
         <LocationMap
-          businessName="Restaurante Munay"
+          businessName="Restaurante"
           address="Valle de Sibundoy, Putumayo, Colombia"
           phone="+57 300 000 0000"
           hours="Lunes-Domingo: 8:00 AM - 8:00 PM"

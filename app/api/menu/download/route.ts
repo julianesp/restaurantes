@@ -61,7 +61,7 @@ export async function GET() {
     // Título principal
     doc.setFontSize(24);
     doc.setFont('helvetica', 'bold');
-    doc.text('Restaurante Munay', pageWidth / 2, yPosition, { align: 'center' });
+    doc.text('Restaurante', pageWidth / 2, yPosition, { align: 'center' });
 
     yPosition += 10;
     doc.setFontSize(16);
@@ -140,7 +140,7 @@ export async function GET() {
       doc.setFontSize(8);
       doc.setTextColor(150);
       doc.text(
-        `Restaurante Munay - Página ${i} de ${pageCount}`,
+        `Restaurante - Página ${i} de ${pageCount}`,
         pageWidth / 2,
         doc.internal.pageSize.height - 10,
         { align: 'center' }

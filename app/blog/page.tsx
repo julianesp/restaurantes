@@ -88,7 +88,7 @@ const blogPosts: BlogPost[] = [
   },
   {
     id: 6,
-    title: "Nuevo Chef se Une al Equipo de Munay",
+    title: "Nuevo Chef se Une al Equipo de",
     excerpt:
       "Damos la bienvenida al Chef Miguel Ángel Torres, quien trae consigo 15 años de experiencia en cocina tradicional colombiana.",
     content: "",
@@ -168,7 +168,7 @@ export default function BlogPage() {
           </h1>
           <p className="text-xl text-white/90 max-w-3xl mx-auto">
             Descubre nuestros platos especiales, noticias, recetas y eventos
-            exclusivos del Restaurante Munay
+            exclusivos del Restaurante
           </p>
         </div>
       </section>

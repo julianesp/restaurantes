@@ -2,7 +2,8 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { Phone, MessageCircle, Facebook, Instagram } from "lucide-react";
+import { Phone } from "lucide-react";
+import Image from "next/image";
 
 const FloatingFooter = () => {
   const [menuOption, setMenuOptions] = useState(false);
@@ -15,6 +16,7 @@ const FloatingFooter = () => {
   const whatsappNumber = "#";
   const facebookUrl = "#";
   const instagramUrl = "#";
+  const tiktokUrl = "#";
 
   const switchOptions = () => {
     setMenuOptions(!menuOption);
@@ -140,10 +142,15 @@ const FloatingFooter = () => {
               href={createWhatsAppMessage()}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-12 h-12 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
+              className="w-12 h-12  text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
               title="WhatsApp"
             >
-              <MessageCircle className="h-6 w-6" />
+              <Image
+                src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/redes/social%20%281%29.png"
+                alt="WhatsApp"
+                width={44}
+                height={44}
+              />
             </Link>
 
             {/* Facebook */}
@@ -151,10 +158,15 @@ const FloatingFooter = () => {
               href={facebookUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
+              className="w-12 h-12  text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
               title="Facebook"
             >
-              <Facebook className="h-6 w-6" />
+              <Image
+                src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/redes/facebook.png"
+                alt="Facebook"
+                width={44}
+                height={44}
+              />
             </Link>
 
             {/* Instagram */}
@@ -162,20 +174,41 @@ const FloatingFooter = () => {
               href={instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-12 h-12 bg-gradient-to-br from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
+              className="w-12 h-12  text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
               title="Instagram"
             >
-              <Instagram className="h-6 w-6" />
+              <Image
+                src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/redes/instagram.png"
+                alt="Instagram"
+                width={44}
+                height={44}
+              />
+            </Link>
+
+            {/* TikTok */}
+            <Link
+              href={tiktokUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-12 h-12  text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
+              title="TikTok"
+            >
+              <Image
+                src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/redes/tiktok.png"
+                alt="TikTok"
+                width={44}
+                height={44}
+              />
             </Link>
 
             {/* Phone */}
-            <Link
+            {/* <Link
               href={`tel:+57${whatsappNumber}`}
               className="w-12 h-12 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
               title="Llamar"
             >
               <Phone className="h-6 w-6" />
-            </Link>
+            </Link> */}
           </div>
         </div>
       )}

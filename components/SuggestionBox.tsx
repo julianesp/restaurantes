@@ -11,8 +11,12 @@ interface SuggestionFormData {
   suggestion_type: string;
 }
 
-export default function SuggestionBox() {
-  const [isOpen, setIsOpen] = useState(false);
+interface SuggestionBoxProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function SuggestionBox({ isOpen, onClose }: SuggestionBoxProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -79,7 +83,7 @@ export default function SuggestionBox() {
         });
 
         setTimeout(() => {
-          setIsOpen(false);
+          onClose();
           setSubmitStatus('idle');
         }, 3000);
       } else {
@@ -107,27 +111,6 @@ export default function SuggestionBox() {
 
   return (
     <>
-      {/* Botón flotante */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 z-50 flex items-center gap-2 font-medium"
-        aria-label="Abrir buzón de sugerencias"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fillRule="evenodd"
-            d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
-            clipRule="evenodd"
-          />
-        </svg>
-        Sugerencias
-      </button>
-
       {/* Modal */}
       {isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
@@ -137,7 +120,7 @@ export default function SuggestionBox() {
               <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold">Buzón de Sugerencias</h2>
                 <button
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => onClose()}
                   className="text-white hover:text-gray-200 transition-colors"
                   aria-label="Cerrar"
                 >
@@ -291,7 +274,7 @@ export default function SuggestionBox() {
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => onClose()}
                   className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
                 >
                   Cancelar

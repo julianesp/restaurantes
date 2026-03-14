@@ -260,9 +260,9 @@ const Navbar = () => {
             }}
           >
             <Image
-              src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/munay/images/logo%20en%20negro%20png.png"
-              alt="Logo Restaurante Munay"
-              title="Logo Restaurante Munay"
+              src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/restaurants/logo_temporal.png"
+              alt="Logo Restaurante"
+              title="Logo Restaurante"
               width={70}
               height={70}
               className="object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
@@ -405,9 +405,9 @@ const Navbar = () => {
               className="transition-transform duration-700 ease-in-out hover:scale-110 p-1.5 rounded-full bg-gray-100/80 backdrop-blur-sm shadow-lg"
             >
               <Image
-                src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/munay/images/logo%20en%20negro%20png.png"
-                alt="Logo Restaurante Munay"
-                title="Logo Restaurante Munay"
+                src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/restaurants/logo_temporal.png"
+                alt="Logo Restaurante"
+                title="Logo Restaurante"
                 width={50}
                 height={50}
                 className="object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"

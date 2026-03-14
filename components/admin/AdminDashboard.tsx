@@ -83,7 +83,7 @@ export default function AdminDashboard() {
                   Panel de Administración
                 </h1>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Restaurante Munay
+                  Restaurante
                 </p>
               </div>
             </div>
@@ -108,7 +108,7 @@ export default function AdminDashboard() {
             ¡Bienvenido, {userName}! 👋
           </h2>
           <p className="text-primary-100">
-            Gestiona el contenido del sitio web de Restaurante Munay desde este
+            Gestiona el contenido del sitio web de Restaurante desde este
             panel
           </p>
         </div>

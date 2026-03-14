@@ -169,7 +169,7 @@ export default function TestimonialsSection() {
               <div className="h-full flex flex-col justify-center items-center text-center">
                 <User className="w-16 h-16 text-primary-500 mb-4" />
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                  ¿Has Visitado Munay?
+                  ¿Has Visitado?
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-6">
                   Comparte tu experiencia con otros comensales y ayúdanos a
@@ -327,7 +327,7 @@ export default function TestimonialsSection() {
               Aún no hay reseñas
             </h3>
             <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-6">
-              Sé el primero en compartir tu experiencia en Restaurante Munay. Tus comentarios ayudan a otros comensales y nos permiten mejorar nuestro servicio.
+              Sé el primero en compartir tu experiencia en Restaurante. Tus comentarios ayudan a otros comensales y nos permiten mejorar nuestro servicio.
             </p>
             {isSignedIn ? (
               <button

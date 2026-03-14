@@ -82,7 +82,7 @@ export default function CheckoutPage() {
 
       // Crear descripción del pedido
       const itemsDescription = cart.map(item => `${item.quantity}x ${item.name}`).join(', ');
-      const description = `Pedido Restaurante Munay - ${itemsDescription}`;
+      const description = `Pedido Restaurante - ${itemsDescription}`;
 
       // URL de retorno después del pago
       const redirectUrl = `${window.location.origin}/payment/success?reference=${reference}`;
