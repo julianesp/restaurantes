@@ -2,8 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
-import { ShoppingCart, Plus, Minus, Send, QrCode } from "lucide-react";
-import Link from "next/link";
+import { ShoppingCart, Plus, Minus, Send, Star } from "lucide-react";
 
 interface MenuItem {
   id: string;
@@ -18,26 +17,39 @@ interface OrderItem extends MenuItem {
   quantity: number;
 }
 
+interface DailySpecial {
+  id: string;
+  name: string;
+  description: string;
+  price: string;
+  category: string;
+  available: boolean;
+}
+
 export default function TableOrderPage() {
   const params = useParams();
   const tableId = params.tableId as string;
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [dailySpecials, setDailySpecials] = useState<DailySpecial[]>([]);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>("especiales");
   const [showCart, setShowCart] = useState(false);
   const [orderSent, setOrderSent] = useState(false);
 
-  // Cargar menú
   useEffect(() => {
-    loadMenu();
+    loadAll();
   }, []);
 
-  const loadMenu = async () => {
+  const loadAll = async () => {
     try {
-      const response = await fetch("/api/menu/full");
-      if (response.ok) {
-        const categories = await response.json();
+      const [menuRes, specialsRes] = await Promise.all([
+        fetch("/api/menu/full"),
+        fetch("/api/daily-specials"),
+      ]);
+
+      if (menuRes.ok) {
+        const categories = await menuRes.json();
         const allItems: MenuItem[] = [];
         categories.forEach((cat: any) => {
           cat.items?.forEach((item: any) => {
@@ -52,6 +64,11 @@ export default function TableOrderPage() {
           });
         });
         setMenuItems(allItems);
+      }
+
+      if (specialsRes.ok) {
+        const specials: DailySpecial[] = await specialsRes.json();
+        setDailySpecials(specials.filter((s) => s.available));
       }
     } catch (error) {
       console.error("Error loading menu:", error);
@@ -122,9 +139,17 @@ export default function TableOrderPage() {
     }
   };
 
-  const categories = ["all", ...new Set(menuItems.map((i) => i.category))];
-  const filteredItems =
-    selectedCategory === "all"
+  const menuCategories = [...new Set(menuItems.map((i) => i.category))];
+  const categories = [
+    ...(dailySpecials.length > 0 ? ["especiales"] : []),
+    "all",
+    ...menuCategories,
+  ];
+
+  const filteredItems: (MenuItem | DailySpecial)[] =
+    selectedCategory === "especiales"
+      ? dailySpecials
+      : selectedCategory === "all"
       ? menuItems
       : menuItems.filter((i) => i.category === selectedCategory);
 
@@ -176,13 +201,16 @@ export default function TableOrderPage() {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-full whitespace-nowrap font-medium transition-all ${
+                className={`px-4 py-2 rounded-full whitespace-nowrap font-medium transition-all flex items-center gap-1.5 ${
                   selectedCategory === cat
-                    ? "bg-primary-500 text-white"
+                    ? cat === "especiales"
+                      ? "bg-orange-500 text-white"
+                      : "bg-primary-500 text-white"
                     : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
                 }`}
               >
-                {cat === "all" ? "Todos" : cat}
+                {cat === "especiales" && <Star className="w-3.5 h-3.5" />}
+                {cat === "especiales" ? "Especiales del Día" : cat === "all" ? "Todos" : cat}
               </button>
             ))}
           </div>
@@ -192,42 +220,57 @@ export default function TableOrderPage() {
       {/* Menu Items */}
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredItems.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all"
-            >
-              {item.image && (
-                <div className="h-48 bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900/30 dark:to-secondary-900/30 flex items-center justify-center overflow-hidden">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
-              <div className="p-4">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
-                  {item.name}
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
-                  {item.description}
-                </p>
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-primary-500">
-                    {item.price}
-                  </span>
-                  <button
-                    onClick={() => addToOrder(item)}
-                    className="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Agregar
-                  </button>
+          {filteredItems.map((item) => {
+            const isSpecial = selectedCategory === "especiales";
+            return (
+              <div
+                key={item.id}
+                className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all ${
+                  isSpecial ? "border-2 border-orange-400 dark:border-orange-500" : ""
+                }`}
+              >
+                {isSpecial && (
+                  <div className="bg-orange-500 text-white text-xs font-bold px-3 py-1 flex items-center gap-1">
+                    <Star className="w-3 h-3" />
+                    Especial del Día · {"category" in item ? item.category : ""}
+                  </div>
+                )}
+                {"image" in item && item.image && (
+                  <div className="h-48 bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900/30 dark:to-secondary-900/30 flex items-center justify-center overflow-hidden">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <div className="p-4">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
+                    {item.name}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
+                    {item.description}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <span className={`text-2xl font-bold ${isSpecial ? "text-orange-500" : "text-primary-500"}`}>
+                      {item.price}
+                    </span>
+                    <button
+                      onClick={() => addToOrder(item as MenuItem)}
+                      className={`text-white px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                        isSpecial
+                          ? "bg-orange-500 hover:bg-orange-600"
+                          : "bg-primary-500 hover:bg-primary-600"
+                      }`}
+                    >
+                      <Plus className="w-4 h-4" />
+                      Agregar
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

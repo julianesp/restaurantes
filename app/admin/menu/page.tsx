@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Swal from "sweetalert2";
+import ImageUploader from "@/components/admin/ImageUploader";
 
 interface MenuItem {
   id: string;
@@ -67,9 +68,7 @@ export default function AdminMenuPage() {
     name: "",
     description: "",
     price: "",
-    is_vegetarian: false,
-    is_spicy: false,
-    display_order: 0,
+    image: "",
   });
 
   useEffect(() => {
@@ -316,15 +315,12 @@ export default function AdminMenuPage() {
 
   const handleEditItem = (item: MenuItem) => {
     setEditingItem(item);
-    // Asegurar que el precio tenga el formato correcto al editar
     const formattedPrice = item.price.startsWith("$") ? item.price : formatPrice(item.price);
     setFormData({
       name: item.name,
       description: item.description,
       price: formattedPrice,
-      is_vegetarian: item.is_vegetarian,
-      is_spicy: item.is_spicy,
-      display_order: item.display_order,
+      image: (item as any).image || "",
     });
     setIsCreating(false);
   };
@@ -354,9 +350,7 @@ export default function AdminMenuPage() {
       name: "",
       description: "",
       price: "",
-      is_vegetarian: false,
-      is_spicy: false,
-      display_order: 0,
+      image: "",
     });
     setEditingItem(null);
     setIsCreating(false);
@@ -560,56 +554,13 @@ export default function AdminMenuPage() {
                     </p>
                   </div>
 
-                  <div className="flex gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.is_vegetarian}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            is_vegetarian: e.target.checked,
-                          })
-                        }
-                        className="w-4 h-4 text-primary-500 rounded"
-                      />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">
-                        Vegetariano
-                      </span>
-                    </label>
-
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.is_spicy}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            is_spicy: e.target.checked,
-                          })
-                        }
-                        className="w-4 h-4 text-primary-500 rounded"
-                      />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">
-                        Picante
-                      </span>
-                    </label>
-                  </div>
-
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Orden
+                      Foto del plato
                     </label>
-                    <input
-                      type="number"
-                      value={formData.display_order}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          display_order: parseInt(e.target.value) || 0,
-                        })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    <ImageUploader
+                      value={formData.image}
+                      onChange={(url) => setFormData({ ...formData, image: url })}
                     />
                   </div>
 

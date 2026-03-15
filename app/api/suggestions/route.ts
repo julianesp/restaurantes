@@ -41,8 +41,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Insertar la sugerencia
-    const { data, error } = await supabase
+    // Insertar la sugerencia (usar supabaseAdmin para evitar RLS)
+    const client = supabaseAdmin || supabase;
+    const { data, error } = await client!
       .from('customer_suggestions')
       .insert({
         name: name?.trim() || null,

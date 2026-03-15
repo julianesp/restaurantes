@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { ShoppingCart as CartIcon } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import ShoppingCart from "./ShoppingCart";
@@ -9,6 +10,10 @@ export default function CartButton() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { getCartCount } = useCart();
   const cartCount = getCartCount();
+  const pathname = usePathname();
+
+  // No mostrar el carrito de clientes en el panel del mesero ni en admin
+  if (pathname.startsWith("/mesero") || pathname.startsWith("/admin")) return null;
 
   return (
     <>

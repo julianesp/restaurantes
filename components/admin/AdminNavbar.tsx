@@ -7,15 +7,14 @@ import {
   UtensilsCrossed,
   CalendarDays,
   BookOpen,
-  QrCode,
   ShoppingBag,
-  User,
-  LogOut,
   Menu,
   X,
   BarChart3,
   Star,
   MessageSquare,
+  ChefHat,
+  Ticket,
 } from "lucide-react";
 import { useState } from "react";
 import { UserButton } from "@clerk/nextjs";
@@ -33,6 +32,16 @@ const navItems = [
     name: "Dashboard",
     href: "/admin",
     icon: LayoutDashboard,
+  },
+  {
+    name: "Panel Chef",
+    href: "/admin/cocina",
+    icon: ChefHat,
+  },
+  {
+    name: "Tiqueteras",
+    href: "/admin/tiqueteras",
+    icon: Ticket,
   },
   {
     name: "Menú",
@@ -60,14 +69,24 @@ const navItems = [
     icon: Star,
   },
   {
-    name: "QR Mesas",
+    name: "Mesas",
     href: "/admin/qr-mesas",
-    icon: QrCode,
+    icon: UtensilsCrossed,
+  },
+  {
+    name: "Panel Mesero",
+    href: "/mesero",
+    icon: ShoppingBag,
   },
   {
     name: "Destacados",
     href: "/admin/daily-specials",
     icon: CalendarDays,
+  },
+  {
+    name: "Chat Cocina",
+    href: "/admin/chat",
+    icon: ChefHat,
   },
   {
     name: "Blog",
@@ -81,36 +100,17 @@ export default function AdminNavbar({ user }: AdminNavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 shadow-sm mb-12">
-      <div className="w-full px-4 fixed bg-white border-cyan-300 border ">
-        {/* Única fila: Navigation y Perfil */}
-        <div className="flex items-center justify-between h-14">
-          {/* Navigation - Desktop */}
-          <div className="hidden md:flex items-center gap-1 overflow-x-auto scrollbar-hide flex-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
-                    isActive
-                      ? "bg-primary-500 text-white"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  {item.name}
-                </Link>
-              );
-            })}
-          </div>
+    <nav className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 shadow-sm mb-24">
+      <div className="w-full px-4 fixed bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+
+        {/* Fila 1: Usuario (desktop) y botón menú (mobile) */}
+        <div className="flex items-center justify-between h-11 border-b border-gray-100 dark:border-gray-700">
+          <span className="text-xs font-semibold text-primary-500 tracking-wide hidden md:block">Admin</span>
 
           {/* User info - Desktop */}
-          <div className="hidden md:flex items-center gap-3 ml-4">
+          <div className="hidden md:flex items-center gap-3">
             <div className="text-right">
-              <p className="text-sm font-medium text-gray-900 dark:text-white">
+              <p className="text-sm font-medium text-gray-900 dark:text-white leading-none">
                 {user.firstName} {user.lastName}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -125,12 +125,30 @@ export default function AdminNavbar({ user }: AdminNavbarProps) {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
-            {mobileMenuOpen ? (
-              <X className="w-6 h-6" />
-            ) : (
-              <Menu className="w-6 h-6" />
-            )}
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
+        </div>
+
+        {/* Fila 2: Navigation - Desktop (wrap en dos líneas si hace falta) */}
+        <div className="hidden md:flex flex-wrap gap-1 py-1.5">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+                  isActive
+                    ? "bg-primary-500 text-white"
+                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                {item.name}
+              </Link>
+            );
+          })}
         </div>
 
         {/* Mobile menu */}
