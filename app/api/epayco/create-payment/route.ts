@@ -26,16 +26,34 @@ export async function POST(request: Request) {
     const taxBase = Math.round(amount / (1 + taxRate));
     const tax = amount - taxBase;
 
-    // Datos del pago para ePayco Checkout v2
-    const paymentData = {
-      // ==================== REQUERIDOS ====================
-      public_key: process.env.NEXT_PUBLIC_EPAYCO_PUBLIC_KEY!,
+    // Paso 1: Autenticarse con ePayco Apify
+    const publicKey = process.env.NEXT_PUBLIC_EPAYCO_PUBLIC_KEY!;
+    const privateKey = process.env.EPAYCO_PRIVATE_KEY!;
+    const basicAuth = Buffer.from(`${publicKey}:${privateKey}`).toString('base64');
+
+    const authResponse = await fetch('https://apify.epayco.co/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Basic ${basicAuth}`,
+      },
+      body: JSON.stringify({ public_key: publicKey }),
+    });
+
+    const authResult = await authResponse.json();
+
+    if (!authResult.token) {
+      throw new Error('No se pudo autenticar con ePayco');
+    }
+
+    const bearerToken = authResult.token;
+
+    // Paso 2: Crear sesión de pago
+    const sessionData = {
       checkout_version: "2",
       name: "Restaurante",
       currency: "COP",
       amount: parseFloat(amount.toString()),
-
-      // ==================== OPCIONALES ====================
       description: description,
       lang: "ES",
       invoice: reference,
@@ -45,12 +63,8 @@ export async function POST(request: Request) {
       taxIco: 0,
       response: redirectUrl || `${process.env.NEXT_PUBLIC_BASE_URL}/payment/success`,
       confirmation: `${process.env.NEXT_PUBLIC_BASE_URL}/api/epayco/webhook`,
-
-      // ==================== CONFIGURACIÓN ====================
-      methodsDisable: ["SP", "CASH"], // Deshabilitar SafetyPay y efectivo
+      methodsDisable: ["SP", "CASH"],
       method: "POST",
-
-      // ==================== BILLING (OPCIONAL) ====================
       billing: {
         email: customerEmail || "cliente@restaurante.com",
         name: customerName || "Cliente",
@@ -60,68 +74,33 @@ export async function POST(request: Request) {
         callingCode: "+57",
         mobilePhone: customerPhone || "3000000000",
       },
-
-      // ==================== EXTRAS (OPCIONAL) ====================
       extras: {
         extra1: reference,
         extra2: "pedido",
       },
     };
 
-    console.log('Creating ePayco payment v2 with data:', {
-      ...paymentData,
-      billing: { ...paymentData.billing, numberDoc: '***' }
-    });
-
-    // Crear el pago usando ePayco Checkout API v2
-    const epaycoUrl = 'https://apify.epayco.co/payment/process';
-
-    const response = await fetch(epaycoUrl, {
+    const sessionResponse = await fetch('https://apify.epayco.co/payment/session/create', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
+        'Authorization': `Bearer ${bearerToken}`,
       },
-      body: JSON.stringify(paymentData),
+      body: JSON.stringify(sessionData),
     });
 
-    const result = await response.json();
+    const sessionResult = await sessionResponse.json();
 
-    console.log('ePayco API v2 response:', result);
-
-    // Verificar si la respuesta fue exitosa
-    if (!response.ok) {
-      throw new Error(result.message || result.error || 'Error al crear el pago en ePayco');
-    }
-
-    // ePayco v2 retorna diferentes estructuras según el resultado
-    let paymentUrl = null;
-    let transactionId = null;
-
-    if (result.success) {
-      // Caso exitoso con URL
-      paymentUrl = result.data?.url || result.data?.urlPayment || result.url;
-      transactionId = result.data?.ref || result.data?.transactionId || reference;
-    } else if (result.data?.url) {
-      // A veces viene en data.url directamente
-      paymentUrl = result.data.url;
-      transactionId = result.data.ref || reference;
-    } else if (result.url) {
-      // O directamente en url
-      paymentUrl = result.url;
-      transactionId = result.ref || reference;
-    }
-
-    if (!paymentUrl) {
-      console.error('No payment URL in response:', result);
-      throw new Error('No se recibió URL de pago de ePayco');
+    if (!sessionResult.success || !sessionResult.data?.sessionId) {
+      console.error('ePayco session error:', sessionResult);
+      throw new Error(sessionResult.textResponse || 'Error al crear la sesión de pago en ePayco');
     }
 
     return NextResponse.json({
       success: true,
-      paymentUrl: paymentUrl,
+      sessionId: sessionResult.data.sessionId,
+      sessionToken: sessionResult.data.token,
       reference: reference,
-      transactionId: transactionId,
     });
   } catch (error: unknown) {
     console.error('Error creating ePayco payment:', error);

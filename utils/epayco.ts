@@ -43,7 +43,7 @@ export async function createPaymentLink(params: PaymentLinkParams) {
 
     const data = await response.json();
 
-    if (!response.ok) {
+    if (!response.ok || !data.success) {
       throw new Error(data.error || 'Error al crear el enlace de pago');
     }
 

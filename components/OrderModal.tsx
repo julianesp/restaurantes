@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   X,
   User,
@@ -224,6 +224,16 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.epayco.co/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
   // Funciones para manejar el carrito
   const addToCart = (item: MenuItem, categoryId: string) => {
     const existingItem = cart.find(
@@ -362,8 +372,8 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
 
       console.log("Payment data received:", paymentData);
 
-      if (!paymentData.success || !paymentData.paymentUrl) {
-        throw new Error("No se recibió el enlace de pago de ePayco");
+      if (!paymentData.success || !paymentData.sessionId) {
+        throw new Error("No se recibió la sesión de pago de ePayco");
       }
 
       // Guardar datos del pedido en localStorage para después del pago
@@ -375,14 +385,22 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
           items: cart,
           total: totalAmount,
           reference,
-          paymentId: paymentData.transactionId,
           createdAt: new Date().toISOString(),
         }),
       );
 
-      // Redirigir al checkout de ePayco
-      console.log("Redirecting to ePayco:", paymentData.paymentUrl);
-      window.location.href = paymentData.paymentUrl;
+      // Abrir checkout de ePayco con sessionId
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const handler = (window as any).ePayco?.checkout?.configure({
+        sessionId: paymentData.sessionId,
+        type: "standard",
+        test: process.env.NEXT_PUBLIC_EPAYCO_TEST_MODE === "true",
+      });
+      if (handler) {
+        handler.open();
+      } else {
+        throw new Error("No se pudo inicializar el checkout de ePayco");
+      }
     } catch (error: unknown) {
       console.error("Error al procesar el pago:", error);
       const errorMessage = error instanceof Error ? error.message : "Error desconocido";

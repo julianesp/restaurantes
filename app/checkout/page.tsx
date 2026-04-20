@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "../../components/Navbar/page";
 import Footer from "../../containers/Footer/page";
@@ -46,6 +46,16 @@ export default function CheckoutPage() {
   const [selectedPayment, setSelectedPayment] = useState<string>("credit-card");
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.epayco.co/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -108,11 +118,21 @@ export default function CheckoutPage() {
         timestamp: Date.now(),
       }));
 
-      // Redirigir a ePayco
-      if (paymentData.paymentUrl) {
-        window.location.href = paymentData.paymentUrl;
+      // Abrir checkout de ePayco con el sessionId
+      if (paymentData.sessionId) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const handler = (window as any).ePayco?.checkout?.configure({
+          sessionId: paymentData.sessionId,
+          type: "standard",
+          test: process.env.NEXT_PUBLIC_EPAYCO_TEST_MODE === "true",
+        });
+        if (handler) {
+          handler.open();
+        } else {
+          throw new Error('No se pudo inicializar el checkout de ePayco');
+        }
       } else {
-        throw new Error('No se recibió el enlace de pago');
+        throw new Error('No se recibió la sesión de pago');
       }
     } catch (error: any) {
       console.error('Error al procesar el pago:', error);

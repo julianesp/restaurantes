@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Calendar, Users, Clock, User, Phone, CreditCard, Loader2 } from "lucide-react";
 import { createPaymentLink, generatePaymentReference, formatCOP } from "../utils/epayco";
 
@@ -22,6 +22,16 @@ const ReservationModal = ({ isOpen, onClose }: ReservationModalProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const RESERVATION_FEE = 10000; // $10,000 COP
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.epayco.co/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -111,27 +121,28 @@ const ReservationModal = ({ isOpen, onClose }: ReservationModalProps) => {
         redirectUrl,
       });
 
-      console.log('Payment data received:', paymentData);
-
-      // La respuesta de Wompi tiene estructura { data: { data: {...} } }
-      const paymentInfo = paymentData.data?.data || paymentData.data || paymentData;
-
-      console.log('Payment info to use:', paymentInfo);
+      if (!paymentData.success || !paymentData.sessionId) {
+        throw new Error('No se recibió la sesión de pago de ePayco');
+      }
 
       // Guardar datos de la reserva en localStorage para después del pago
       localStorage.setItem(`reserva_${reference}`, JSON.stringify({
         ...formData,
         reference,
-        paymentId: paymentInfo.transactionId,
         createdAt: new Date().toISOString(),
       }));
 
-      // Redirigir al checkout de ePayco
-      if (paymentInfo && paymentInfo.paymentUrl) {
-        console.log('Redirecting to ePayco:', paymentInfo.paymentUrl);
-        window.location.href = paymentInfo.paymentUrl;
+      // Abrir checkout de ePayco con sessionId
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const handler = (window as any).ePayco?.checkout?.configure({
+        sessionId: paymentData.sessionId,
+        type: "standard",
+        test: process.env.NEXT_PUBLIC_EPAYCO_TEST_MODE === "true",
+      });
+      if (handler) {
+        handler.open();
       } else {
-        throw new Error('No se pudo crear el enlace de pago');
+        throw new Error('No se pudo inicializar el checkout de ePayco');
       }
 
     } catch (error: any) {
