@@ -1,25 +1,11 @@
 import { NextResponse } from 'next/server';
+import { notifyNewOrder, notifyNewReservation, notifyPaymentError } from '../../../../lib/notificationService';
 
-/**
- * Webhook de ePayco para recibir confirmaciones de pago
- * ePayco enviará una petición POST aquí cuando se complete un pago
- */
 export async function POST(request: Request) {
   try {
     const body = await request.json();
 
     console.log('ePayco webhook received:', body);
-
-    // Aquí puedes procesar la confirmación del pago
-    // body contiene información como:
-    // - x_ref_payco: Referencia de ePayco
-    // - x_transaction_id: ID de transacción
-    // - x_amount: Monto
-    // - x_currency_code: Código de moneda
-    // - x_transaction_state: Estado (Aceptada, Rechazada, Pendiente)
-    // - x_approval_code: Código de aprobación
-    // - x_response: Respuesta
-    // - x_invoice: Tu referencia
 
     const {
       x_ref_payco,
@@ -28,15 +14,48 @@ export async function POST(request: Request) {
       x_transaction_state,
       x_invoice,
       x_approval_code,
+      x_extra1,
+      x_extra2,
+      x_customer_name,
+      x_customer_phone,
+      x_customer_email,
     } = body;
 
-    // Aquí puedes actualizar el estado en tu base de datos
     if (x_transaction_state === 'Aceptada') {
       console.log(`✅ Pago exitoso - Referencia: ${x_invoice}, ePayco Ref: ${x_ref_payco}`);
-      // TODO: Actualizar estado del pedido/reserva en Supabase
+
+      const isReservation = x_invoice?.startsWith('RESERVA') || x_extra2 === 'reserva';
+
+      if (isReservation) {
+        // Recuperar datos de la reserva (guardados en localStorage por el frontend)
+        // El webhook no tiene acceso a localStorage, usamos los datos del webhook
+        await notifyNewReservation({
+          reference: x_invoice,
+          customerName: x_customer_name || 'Cliente',
+          customerPhone: x_customer_phone || 'No especificado',
+          date: 'Ver referencia',
+          time: 'Ver referencia',
+          people: 'Ver referencia',
+          transactionId: x_transaction_id,
+        }).catch(() => {}); // No bloquear si falla
+      } else {
+        // Pedido normal
+        const amountNumber = parseFloat(x_amount || '0');
+
+        await notifyNewOrder({
+          reference: x_invoice,
+          customerName: x_customer_name || 'Cliente',
+          customerPhone: x_customer_phone || 'No especificado',
+          customerEmail: x_customer_email,
+          items: [{ name: 'Ver detalles en referencia', quantity: 1 }],
+          total: amountNumber,
+          transactionId: x_transaction_id,
+        }).catch(() => {}); // No bloquear si falla
+      }
+
     } else if (x_transaction_state === 'Rechazada') {
       console.log(`❌ Pago rechazado - Referencia: ${x_invoice}`);
-      // TODO: Marcar como rechazado en Supabase
+      await notifyPaymentError(`Pago rechazado`, { reference: x_invoice, transactionId: x_transaction_id }).catch(() => {});
     } else {
       console.log(`⏳ Pago pendiente - Referencia: ${x_invoice}`);
     }
@@ -51,12 +70,9 @@ export async function POST(request: Request) {
   }
 }
 
-// También aceptar GET para confirmación
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const refPayco = searchParams.get('ref_payco');
-
+  const refPayco = await Promise.resolve(searchParams.get('ref_payco'));
   console.log('ePayco confirmation GET:', refPayco);
-
   return NextResponse.json({ success: true, ref_payco: refPayco });
 }

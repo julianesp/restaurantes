@@ -65,6 +65,47 @@ function PaymentSuccessContent() {
           localStorage.setItem(storageKey, JSON.stringify(data));
         }
 
+        // Enviar notificación al chef/admin vía Telegram
+        if (paymentType === "reserva") {
+          fetch('/api/notify-reservation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              reference,
+              customerName: data.nombre,
+              customerPhone: data.telefono,
+              date: data.fecha,
+              time: data.hora,
+              people: data.personas,
+              comments: data.comentarios,
+              transactionId: refPayco,
+            }),
+          }).catch(() => {});
+        } else if (paymentType === "pedido") {
+          // Reconstruir items desde el texto del pedido o desde items guardados
+          const items = data.items?.map((item: { name: string; quantity: number }) => ({
+            name: item.name,
+            quantity: item.quantity,
+          })) || [{ name: data.pedido || 'Ver detalles', quantity: 1 }];
+
+          fetch('/api/notify-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              reference,
+              customerName: data.nombre,
+              customerPhone: data.telefono,
+              address: data.direccion,
+              city: data.barrio,
+              items,
+              total: data.total,
+              serviceType: data.tipoServicio,
+              notes: data.notas,
+              transactionId: refPayco,
+            }),
+          }).catch(() => {});
+        }
+
         // Enviar confirmación por WhatsApp
         if (paymentType === "reserva") {
           const mensaje = `*✅ RESERVA CONFIRMADA - PAGO RECIBIDO*%0A%0A` +
