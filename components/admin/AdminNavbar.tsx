@@ -15,6 +15,7 @@ import {
   MessageSquare,
   ChefHat,
   Ticket,
+  Users,
 } from "lucide-react";
 import { useState } from "react";
 import { UserButton } from "@clerk/nextjs";
@@ -77,6 +78,11 @@ const navItems = [
     name: "Panel Mesero",
     href: "/mesero",
     icon: ShoppingBag,
+  },
+  {
+    name: "Meseros",
+    href: "/admin/meseros",
+    icon: Users,
   },
   {
     name: "Destacados",

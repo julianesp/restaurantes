@@ -27,6 +27,8 @@ const isPublicRoute = createRouteMatcher([
   "/api/daily-specials(.*)", // Platos del día (lectura pública para el modal)
   "/api/permanent-dishes(.*)", // Platos permanentes (lectura pública para el modal)
   "/api/test-supabase", // Ruta de prueba de Supabase
+  "/mesero(.*)", // Panel del mesero (protegido por PIN propio)
+  "/api/waiters/verify", // Verificación de PIN de mesero
 ]);
 
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
