@@ -305,7 +305,7 @@ const Navbar = () => {
               }`}
               style={{ transitionDelay: "200ms" }}
             >
-              🏍️ Delivery
+              🏍️ Entrega
             </Link>
 
             <div
@@ -369,7 +369,7 @@ const Navbar = () => {
             ) : (
               <Link
                 href="/sign-in"
-                className={`flex items-center gap-2 text-white hover:text-yellow-400 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all duration-200 font-bold text-sm border border-white/20 hover:border-white/40 [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%)] hover:scale-105 ${
+                className={`flex items-center gap-2 text-white hover:text-yellow-400 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-all duration-200 font-bold text-lg border border-white/20 hover:border-white/40 [text-shadow:_1px_1px_2px_rgb(0_0_0_/_80%)] hover:scale-105 ${
                   showNavLinks
                     ? "opacity-100 translate-x-0"
                     : "opacity-0 translate-x-20"

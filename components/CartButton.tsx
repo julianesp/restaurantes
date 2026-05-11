@@ -13,13 +13,14 @@ export default function CartButton() {
   const pathname = usePathname();
 
   // No mostrar el carrito de clientes en el panel del mesero ni en admin
-  if (pathname.startsWith("/mesero") || pathname.startsWith("/admin")) return null;
+  if (pathname.startsWith("/mesero") || pathname.startsWith("/admin"))
+    return null;
 
   return (
     <>
       <button
         onClick={() => setIsCartOpen(true)}
-        className="fixed bottom-24 right-4 md:right-8 z-40 bg-primary-500 hover:bg-primary-600 text-white p-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 group"
+        className="fixed top-16 right-2 z-40 bg-[#DE780D] hover:bg-[#B8620A] text-white p-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 group"
         aria-label="Abrir carrito"
       >
         <CartIcon className="w-6 h-6" />

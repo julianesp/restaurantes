@@ -1,315 +1,49 @@
-@use "../mixins.scss" as m;
-@use "../_variables.scss" as v;
+@use "./mixins.scss" as m;
 
 .footer {
   @include m.flex-center;
   position: relative;
   flex-direction: column;
-  padding-top: 10px;
-  padding-bottom: 20px;
-  padding-left: 10px;
-  padding-right: 10px;
-
-  text-align: center;
+  padding: 0;
   width: 100%;
   height: auto;
-  background-color: v.$color-primario-oscuro;
-  border-top-left-radius: 15px;
-  border-top-right-radius: 15px;
+  background-color: #1a0a00;
 
-  // Estilos para modo oscuro
   :global(.dark) & {
-    background: #1a1a1a; /* Fondo oscuro sólido para el footer */
+    background-color: #0f0600;
   }
+}
 
-  .flecha {
-    position: fixed;
-    padding: 10px;
-    bottom: 8px;
-    left: 5px;
-    background-color: v.$color-fondo;
-    background: linear-gradient(to bottom, v.$color-fondo, v.$color-fondo);
-    box-shadow:
-      0 6px 0 v.$color-primario,
-      /* Sombra base (profundidad) */ 0 8px 10px rgba(0, 0, 0, 0.3); /* Sombra exterior */
+.slideInLogo {
+  animation: slideIn 0.8s ease-out;
+}
 
-    /* Transiciones */
-    transition:
-      transform 0.1s ease,
-      box-shadow 0.1s ease;
+.fadeInText {
+  animation: fadeIn 1s ease-out 0.4s both;
+}
 
-    /* Efecto 3D con pseudo-elementos */
-    &::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 45%;
-      // background: linear-gradient(rgba(255, 255, 255, 0.3), transparent);
-      border-radius: 12px 12px 0 0;
-      pointer-events: none;
-    }
+.logoDescription {
+  text-align: center;
+}
 
-    /* Efecto hover */
-    &:hover {
-      background: linear-gradient(
-        to bottom,
-        v.$color-secundario,
-        v.$color-primario
-      );
-      box-shadow:
-        0 6px 0 v.$color-sombra,
-        0 10px 15px rgba(0, 0, 0, 0.4);
-    }
-
-    /* Efecto activo (presionado) */
-    &:active {
-      transform: translateY(6px); /* Mueve el botón hacia abajo */
-      box-shadow:
-        0 0px 0 #1a5276,
-        /* Elimina la sombra de profundidad */ 0 2px 5px rgba(0, 0, 0, 0.3); /* Reduce la sombra exterior */
-    }
-
-    //codigo anterior
-    cursor: pointer;
-    border-radius: 50%;
-    z-index: 100;
-
-    img {
-      border-color: 5px solid #000;
-
-      width: 30px;
-      height: 30px;
-    }
-
-    animation-name: pulsar;
+@keyframes slideIn {
+  from {
+    transform: translateX(-30px);
+    opacity: 0;
   }
-
-  .description {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    h3 {
-      text-align: center;
-      width: 100%;
-      background-color: #fff;
-      border-radius: 20px;
-      box-shadow: 5px 10px 10px #222121;
-      color: #000;
-      height: 50px;
-      font-size: 1.4rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    & img {
-      // position: absolute;
-      width: 80px;
-      height: 80px;
-      // margin-top: 150px;
-    }
+  to {
+    transform: translateX(0);
+    opacity: 1;
   }
+}
 
-  .information {
-    width: 100%;
-    margin-bottom: 20px;
-
-    h2 {
-      padding-top: 20px;
-      font-weight: bolder;
-      font-size: 1.5rem;
-      color: #fff;
-      text-decoration: underline;
-      margin-bottom: 10px;
-    }
-
-    h3 {
-      margin: 8px 0;
-      font-size: 1rem;
-    }
-
-    p {
-      color: #fff;
-      margin: 5px 0;
-      font-size: 0.95rem;
-    }
-
-    a {
-      color: #fff;
-      text-decoration: none;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-
-  .redes {
-    display: none;
-    transition: 0.3s ease-in;
-    border-radius: 30px;
-
-    ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-
-      li {
-        padding: 5px;
-        margin-top: 10px;
-        background-color: #fff;
-        border: 1px solid #000;
-        border-radius: 50%;
-
-        img {
-          width: 40px;
-          height: 40px;
-          display: block;
-        }
-      }
-    }
-
-    &.open {
-      display: flex;
-      position: fixed;
-      bottom: 60px;
-      left: 10px;
-      transition: 0.3s ease-in;
-      animation-name: showMenuBurger;
-      animation-duration: 0.3s;
-      z-index: 10;
-    }
-
-    &.closed {
-      display: none;
-    }
-  }
-
-  @keyframes showMenuBurger {
-    from {
-      transform: translateX(-250px);
-    }
-    to {
-      transform: translateX(0);
-    }
-  }
-
-  // RESPONSIVE: TABLET Y DESKTOP (768px+)
-  @media screen and (min-width: 768px) {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: auto auto;
-    grid-template-areas:
-      "logo logo logo logo logo"
-      "info ubicacion imagen contacto legal";
-    // gap: 20px;
-
-    text-align: left;
-    padding: 50px 0;
-
-    & .flecha {
-      left: 20px;
-    }
-
-    .description {
-      grid-area: imagen;
-      // width: 100%;
-      // height: 50px;
-      margin-bottom: 0px;
-      // justify-content: center;
-
-      & a {
-        img {
-          width: 150px;
-          height: 150px;
-        }
-      }
-    }
-
-    // Columna 1: Información
-    .informationLinks {
-      grid-area: info;
-    }
-
-    // Columna 2: Ubicación
-    .ubicacionInfo {
-      grid-area: ubicacion;
-    }
-
-    // Columna 3: Contacto
-    .contactoInfo {
-      grid-area: contacto;
-    }
-
-    // Columna 4: Legal
-    .legalInfo {
-      grid-area: legal;
-    }
-
-    .information {
-      width: 100%;
-      margin-bottom: 0;
-
-      h2 {
-        font-size: 1.3rem;
-        padding-top: 0;
-        margin-bottom: 15px;
-        text-align: center;
-      }
-
-      h3 {
-        font-size: 0.95rem;
-        margin: 8px 0;
-        text-align: center;
-      }
-
-      p {
-        font-size: 0.9rem;
-        margin: 6px 0;
-        text-align: center;
-      }
-    }
-  }
-
-  @media screen and (min-width: 1024px) {
-    .footer {
-      & .flecha {
-        &:hover {
-          transform: scale(0.8);
-        }
-      }
-    }
-  }
-
-  // RESPONSIVE: DESKTOP GRANDE (1200px+)
-  @media screen and (min-width: 1200px) {
-    // padding: 40px 60px;
-    gap: 30px;
-
-    .description {
-      h3 {
-        font-size: 2rem;
-        max-width: 500px;
-      }
-    }
-
-    .information {
-      h2 {
-        font-size: 1.4rem;
-        margin-bottom: 20px;
-      }
-
-      h3,
-      p {
-        font-size: 1rem;
-      }
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

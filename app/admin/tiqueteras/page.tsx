@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Swal from "sweetalert2";
 import {
   Plus, Search, RefreshCw, Ticket, UtensilsCrossed,
-  CheckCircle, XCircle, ChevronDown, ChevronUp, X,
+  CheckCircle, XCircle, ChevronDown, ChevronUp, X, Trash2,
 } from "lucide-react";
 
 interface Tiquetera {
@@ -114,13 +115,42 @@ export default function TiqueterasAdminPage() {
   };
 
   const recargar = async (id: string) => {
-    if (!confirm("¿Recargar esta tiquetera a 30 comidas?")) return;
+    const result = await Swal.fire({
+      title: "¿Recargar tiquetera?",
+      text: "Se reiniciará a 30 comidas disponibles.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, recargar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: "#DE780D",
+      cancelButtonColor: "#6b7280",
+      reverseButtons: true,
+    });
+    if (!result.isConfirmed) return;
     await fetch("/api/tiqueteras", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, accion: "recargar", registrado_por: "Admin" }),
     });
     setMovimientos((prev) => { const n = { ...prev }; delete n[id]; return n; });
+    await load();
+  };
+
+  const eliminar = async (t: Tiquetera) => {
+    const result = await Swal.fire({
+      title: "¿Eliminar tiquetera?",
+      html: `Se eliminará la tiquetera de <strong>${t.cliente_nombre}</strong>. Esta acción no se puede deshacer.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: "#DE780D",
+      cancelButtonColor: "#6b7280",
+      reverseButtons: true,
+    });
+    if (!result.isConfirmed) return;
+    await fetch(`/api/tiqueteras?id=${t.id}`, { method: "DELETE" });
+    Swal.fire({ title: "Eliminada", text: "La tiquetera fue eliminada.", icon: "success", confirmButtonColor: "#DE780D", timer: 2000, showConfirmButton: false });
     await load();
   };
 
@@ -336,18 +366,25 @@ export default function TiqueterasAdminPage() {
                       {/* Descontar */}
                       {t.activa && restantes > 0 && (
                         descuentoId === t.id ? (
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-3">
                             <span className="text-sm text-gray-600 dark:text-gray-300">¿Descontar</span>
-                            <input
-                              type="number"
-                              min={1}
-                              max={restantes}
-                              value={descuentoCantidad === 0 ? "" : descuentoCantidad}
-                              onChange={(e) => setDescuentoCantidad(e.target.value === "" ? 0 : parseInt(e.target.value))}
-                              onBlur={(e) => { if (!e.target.value || parseInt(e.target.value) < 1) setDescuentoCantidad(1); }}
-                              className="w-14 text-center px-2 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white font-bold focus:ring-2 focus:ring-primary-500 focus:outline-none"
-                              autoFocus
-                            />
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => setDescuentoCantidad(Math.max(1, descuentoCantidad - 1))}
+                                className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white text-xl font-bold transition-all"
+                              >
+                                −
+                              </button>
+                              <span className="w-10 text-center text-2xl font-bold text-gray-900 dark:text-white">
+                                {descuentoCantidad}
+                              </span>
+                              <button
+                                onClick={() => setDescuentoCantidad(Math.min(restantes, descuentoCantidad + 1))}
+                                className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white text-xl font-bold transition-all"
+                              >
+                                +
+                              </button>
+                            </div>
                             <span className="text-sm text-gray-600 dark:text-gray-300">
                               comida{descuentoCantidad !== 1 ? "s" : ""}?
                             </span>
@@ -391,6 +428,15 @@ export default function TiqueterasAdminPage() {
                       >
                         {t.activa ? <XCircle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
                         {t.activa ? "Desactivar" : "Activar"}
+                      </button>
+
+                      {/* Eliminar */}
+                      <button
+                        onClick={() => eliminar(t)}
+                        className="flex items-center gap-1.5 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/60 text-red-600 dark:text-red-400 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Eliminar
                       </button>
 
                       {/* Ver historial */}

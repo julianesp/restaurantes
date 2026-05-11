@@ -36,6 +36,7 @@ interface MenuItem {
   name: string;
   description: string;
   price: string;
+  image?: string | null;
   isVegetarian?: boolean;
   isSpicy?: boolean;
 }
@@ -53,162 +54,22 @@ interface CartItem extends MenuItem {
   categoryId: string;
 }
 
-// Datos del menú del día (selección de las categorías más comunes para pedidos)
-const menuDelDia: MenuCategory[] = [
-  {
-    id: "platos-fuertes",
-    name: "Platos Fuertes",
-    icon: UtensilsCrossed,
-    color: "text-red-700",
-    items: [
-      {
-        id: 1,
-        name: "Bandeja Paisa",
-        description:
-          "Frijoles, arroz, carne molida, chicharrón, chorizo, huevo, aguacate y arepa",
-        price: "$28.000",
-      },
-      {
-        id: 2,
-        name: "Pechuga a la Plancha",
-        description: "Pechuga de pollo con arroz y ensalada",
-        price: "$22.000",
-      },
-      {
-        id: 3,
-        name: "Lomo de Cerdo",
-        description: "Lomo de cerdo en salsa BBQ con papas",
-        price: "$26.000",
-      },
-      {
-        id: 4,
-        name: "Pescado Frito",
-        description: "Mojarra frita con arroz de coco y patacón",
-        price: "$30.000",
-      },
-      {
-        id: 5,
-        name: "Cazuela de Mariscos",
-        description: "Mariscos frescos en salsa criolla",
-        price: "$35.000",
-      },
-      {
-        id: 6,
-        name: "Churrasco",
-        description: "Carne de res con chimichurri y papas",
-        price: "$32.000",
-      },
-    ],
-  },
-  {
-    id: "sopas",
-    name: "Sopas",
-    icon: Soup,
-    color: "text-orange-600",
-    items: [
-      {
-        id: 1,
-        name: "Sopa de Pollo",
-        description: "Sopa casera con pollo y verduras frescas",
-        price: "$12.000",
-      },
-      {
-        id: 2,
-        name: "Sancocho Campesino",
-        description: "Tradicional sancocho con carne y plátano",
-        price: "$15.000",
-      },
-      {
-        id: 3,
-        name: "Ajiaco Bogotano",
-        description: "Sopa de papa con pollo, alcaparras y crema",
-        price: "$16.000",
-      },
-      {
-        id: 4,
-        name: "Crema de Tomate",
-        description: "Suave crema de tomate con albahaca",
-        price: "$10.000",
-        isVegetarian: true,
-      },
-    ],
-  },
-  {
-    id: "bebidas",
-    name: "Bebidas",
-    icon: Coffee,
-    color: "text-amber-600",
-    items: [
-      {
-        id: 1,
-        name: "Café Americano",
-        description: "Café recién molido con agua caliente",
-        price: "$3.000",
-      },
-      {
-        id: 2,
-        name: "Cappuccino",
-        description: "Espresso con leche vaporizada y espuma",
-        price: "$4.500",
-      },
-      {
-        id: 3,
-        name: "Chocolate Caliente",
-        description: "Chocolate artesanal con crema batida",
-        price: "$4.000",
-      },
-      {
-        id: 4,
-        name: "Jugo Natural",
-        description: "Jugos de frutas frescas de temporada",
-        price: "$5.000",
-      },
-      {
-        id: 5,
-        name: "Limonada de Coco",
-        description: "Refrescante limonada con toque de coco",
-        price: "$6.000",
-      },
-    ],
-  },
-  {
-    id: "postres",
-    name: "Postres",
-    icon: Cake,
-    color: "text-pink-600",
-    items: [
-      {
-        id: 1,
-        name: "Tiramisú",
-        description: "Clásico postre italiano con café y mascarpone",
-        price: "$12.000",
-      },
-      {
-        id: 2,
-        name: "Tres Leches",
-        description: "Pastel húmedo bañado en tres tipos de leche",
-        price: "$10.000",
-      },
-      {
-        id: 3,
-        name: "Brownie con Helado",
-        description: "Brownie de chocolate con helado de vainilla",
-        price: "$11.000",
-      },
-      {
-        id: 4,
-        name: "Flan de Caramelo",
-        description: "Suave flan casero con caramelo líquido",
-        price: "$9.000",
-      },
-    ],
-  },
-];
+// Mapa de categoría → icono y color
+const CATEGORY_META: Record<string, { icon: typeof Coffee; color: string }> = {
+  "Platos Fuertes": { icon: UtensilsCrossed, color: "text-red-700" },
+  Sopas: { icon: Soup, color: "text-orange-600" },
+  Bebidas: { icon: Coffee, color: "text-amber-600" },
+  Postres: { icon: Cake, color: "text-pink-600" },
+  Desayuno: { icon: Coffee, color: "text-yellow-600" },
+  Almuerzo: { icon: UtensilsCrossed, color: "text-green-700" },
+  Cena: { icon: Pizza, color: "text-purple-600" },
+};
 
 const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
-  const [step, setStep] = useState<"menu" | "form">("menu"); // Nuevo: paso del modal
-  const [selectedCategory, setSelectedCategory] =
-    useState<string>("platos-fuertes");
+  const [step, setStep] = useState<"menu" | "form">("menu");
+  const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
+  const [loadingMenu, setLoadingMenu] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [cart, setCart] = useState<CartItem[]>([]);
 
   const [formData, setFormData] = useState({
@@ -233,6 +94,63 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
       document.body.removeChild(script);
     };
   }, []);
+
+  // Cargar menú completo desde la BD
+  useEffect(() => {
+    if (!isOpen) return;
+    setLoadingMenu(true);
+
+    fetch("/api/menu/full")
+      .then((r) => (r.ok ? r.json() : []))
+      .then(
+        (
+          data: Array<{
+            id: string;
+            name: string;
+            icon: string;
+            color: string;
+            items: Array<{
+              id: string;
+              name: string;
+              description: string;
+              price: string;
+              image?: string | null;
+              isVegetarian?: boolean;
+              isSpicy?: boolean;
+            }>;
+          }>,
+        ) => {
+          // Filtrar categorías que tengan al menos un ítem
+          const cats: MenuCategory[] = data
+            .filter((cat) => cat.items && cat.items.length > 0)
+            .map((cat, catIdx) => {
+              const meta = CATEGORY_META[cat.name] || {
+                icon: UtensilsCrossed,
+                color: "text-gray-700",
+              };
+              return {
+                id: cat.id,
+                name: cat.name,
+                icon: meta.icon,
+                color: meta.color,
+                items: cat.items.map((item, itemIdx) => ({
+                  id: catIdx * 1000 + itemIdx + 1,
+                  name: item.name,
+                  description: item.description,
+                  price: item.price,
+                  image: item.image || null,
+                  isVegetarian: item.isVegetarian,
+                  isSpicy: item.isSpicy,
+                })),
+              };
+            });
+
+          setMenuCategories(cats);
+          if (cats.length > 0) setSelectedCategory(cats[0].id);
+        },
+      )
+      .finally(() => setLoadingMenu(false));
+  }, [isOpen]);
 
   // Funciones para manejar el carrito
   const addToCart = (item: MenuItem, categoryId: string) => {
@@ -354,8 +272,9 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
       // Crear descripción del pago
       const description = `Pedido - ${formData.nombre} - ${formData.tipoServicio}`;
 
-      // URL de redirección después del pago (usa la variable de entorno o el origin actual)
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+      // URL de redirección después del pago (siempre usa la URL pública, ePayco rechaza localhost)
+      const baseUrl =
+        process.env.NEXT_PUBLIC_BASE_URL || window.location.origin;
       const redirectUrl = `${baseUrl}/payment/success?type=pedido&reference=${reference}`;
 
       // Crear enlace de pago en ePayco
@@ -403,7 +322,8 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
       }
     } catch (error: unknown) {
       console.error("Error al procesar el pago:", error);
-      const errorMessage = error instanceof Error ? error.message : "Error desconocido";
+      const errorMessage =
+        error instanceof Error ? error.message : "Error desconocido";
 
       await Swal.fire({
         icon: "error",
@@ -418,7 +338,9 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
 
   if (!isOpen) return null;
 
-  const currentCategory = menuDelDia.find((cat) => cat.id === selectedCategory);
+  const currentCategory = menuCategories.find(
+    (cat) => cat.id === selectedCategory,
+  );
   const IconComponent = currentCategory?.icon || UtensilsCrossed;
 
   return (
@@ -448,167 +370,211 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
         {/* Vista de Menú */}
         {step === "menu" && (
           <div className="p-6">
-            {/* Categorías del menú */}
-            <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-              {menuDelDia.map((category) => {
-                const CategoryIcon = category.icon;
-                return (
-                  <button
-                    key={category.id}
-                    onClick={() => setSelectedCategory(category.id)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg whitespace-nowrap transition-all ${
-                      selectedCategory === category.id
-                        ? "bg-primary-500 text-white shadow-lg scale-105"
-                        : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-                    }`}
-                  >
-                    <CategoryIcon className="w-5 h-5" />
-                    <span className="font-medium text-sm">{category.name}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Items del menú */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              {currentCategory?.items.map((item) => {
-                const cartItem = cart.find(
-                  (c) => c.id === item.id && c.categoryId === selectedCategory,
-                );
-                const quantity = cartItem?.quantity || 0;
-
-                return (
-                  <div
-                    key={`${selectedCategory}-${item.id}`}
-                    className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 dark:text-white">
-                          {item.name}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                          {item.description}
-                        </p>
-                        {item.isVegetarian && (
-                          <span className="inline-block mt-2 px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs rounded-full">
-                            🌱 Vegetariano
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center mt-3">
-                      <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
-                        {item.price}
-                      </span>
-                      {quantity === 0 ? (
-                        <button
-                          onClick={() => addToCart(item, selectedCategory)}
-                          className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors text-sm font-medium flex items-center gap-1"
-                        >
-                          <Plus className="w-4 h-4" />
-                          Agregar
-                        </button>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() =>
-                              updateQuantity(
-                                item.id,
-                                selectedCategory,
-                                quantity - 1,
-                              )
-                            }
-                            className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors flex items-center justify-center"
-                          >
-                            <Minus className="w-4 h-4" />
-                          </button>
-                          <span className="w-8 text-center font-semibold text-gray-900 dark:text-white">
-                            {quantity}
-                          </span>
-                          <button
-                            onClick={() =>
-                              updateQuantity(
-                                item.id,
-                                selectedCategory,
-                                quantity + 1,
-                              )
-                            }
-                            className="w-8 h-8 bg-primary-500 text-white rounded-full hover:bg-primary-600 transition-colors flex items-center justify-center"
-                          >
-                            <Plus className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() =>
-                              removeFromCart(item.id, selectedCategory)
-                            }
-                            className="ml-2 w-8 h-8 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors flex items-center justify-center"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Resumen del carrito */}
-            {cart.length > 0 && (
-              <div className="sticky bottom-0 bg-white dark:bg-gray-800 border-t-2 border-primary-500 pt-4 pb-2">
-                <div className="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-4">
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                    <ShoppingBag className="w-5 h-5" />
-                    Tu Pedido ({cart.length}{" "}
-                    {cart.length === 1 ? "item" : "items"})
-                  </h3>
-                  <div className="space-y-2 mb-4 max-h-32 overflow-y-auto">
-                    {cart.map((item) => (
-                      <div
-                        key={`cart-${item.categoryId}-${item.id}`}
-                        className="flex justify-between text-sm"
-                      >
-                        <span className="text-gray-700 dark:text-gray-300">
-                          {item.quantity}x {item.name}
-                        </span>
-                        <span className="font-medium text-gray-900 dark:text-white">
-                          $
-                          {(
-                            parseFloat(item.price.replace(/[$.,]/g, "")) *
-                            item.quantity
-                          ).toLocaleString()}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="border-t border-primary-200 dark:border-primary-700 pt-3 mb-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-lg font-bold text-gray-900 dark:text-white">
-                        Total:
-                      </span>
-                      <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-                        {formatCOP(getCartTotal())}
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setStep("form")}
-                    className="w-full py-3 bg-gradient-to-r from-secondary-500 to-primary-500 text-white rounded-lg hover:shadow-lg transition-all duration-300 font-semibold"
-                  >
-                    Continuar con el Pedido
-                  </button>
-                </div>
+            {/* Cargando */}
+            {loadingMenu && (
+              <div className="flex flex-col items-center justify-center py-16 gap-4">
+                <div
+                  className="animate-spin rounded-full h-12 w-12 border-b-2"
+                  style={{ borderColor: "#DE780D" }}
+                />
+                <p className="text-gray-500 dark:text-gray-400">
+                  Cargando el menú de hoy...
+                </p>
               </div>
             )}
 
-            {cart.length === 0 && (
-              <div className="text-center py-12">
-                <IconComponent className="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-                <p className="text-gray-500 dark:text-gray-400 text-lg">
-                  Selecciona los platos que deseas ordenar
+            {/* Sin platos configurados */}
+            {!loadingMenu && menuCategories.length === 0 && (
+              <div className="text-center py-16">
+                <UtensilsCrossed className="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
+                <p className="text-gray-500 dark:text-gray-400 text-lg font-medium">
+                  No hay platos disponibles hoy
+                </p>
+                <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">
+                  El administrador aún no ha configurado los platos del día.
                 </p>
               </div>
+            )}
+
+            {!loadingMenu && menuCategories.length > 0 && (
+              <>
+                {/* Categorías del menú */}
+                <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+                  {menuCategories.map((category) => {
+                    const CategoryIcon = category.icon;
+                    return (
+                      <button
+                        key={category.id}
+                        onClick={() => setSelectedCategory(category.id)}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg whitespace-nowrap transition-all ${
+                          selectedCategory === category.id
+                            ? "bg-primary-500 text-white shadow-lg scale-105"
+                            : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                        }`}
+                      >
+                        <CategoryIcon className="w-5 h-5" />
+                        <span className="font-medium text-sm">
+                          {category.name}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Items del menú */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  {currentCategory?.items.map((item) => {
+                    const cartItem = cart.find(
+                      (c) =>
+                        c.id === item.id && c.categoryId === selectedCategory,
+                    );
+                    const quantity = cartItem?.quantity || 0;
+
+                    return (
+                      <div
+                        key={`${selectedCategory}-${item.id}`}
+                        className="bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 hover:shadow-md transition-shadow overflow-hidden"
+                      >
+                        {item.image && (
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-full h-36 object-cover"
+                          />
+                        )}
+                        <div className="p-4">
+                          <div className="flex justify-between items-start mb-2">
+                            <div className="flex-1">
+                              <h3 className="font-semibold text-gray-900 dark:text-white">
+                                {item.name}
+                              </h3>
+                              <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                                {item.description}
+                              </p>
+                              {item.isVegetarian && (
+                                <span className="inline-block mt-2 px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs rounded-full">
+                                  🌱 Vegetariano
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center mt-3">
+                            <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
+                              {item.price}
+                            </span>
+                            {quantity === 0 ? (
+                              <button
+                                onClick={() =>
+                                  addToCart(item, selectedCategory)
+                                }
+                                className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors text-sm font-medium flex items-center gap-1"
+                              >
+                                <Plus className="w-4 h-4" />
+                                Agregar
+                              </button>
+                            ) : (
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() =>
+                                    updateQuantity(
+                                      item.id,
+                                      selectedCategory,
+                                      quantity - 1,
+                                    )
+                                  }
+                                  className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors flex items-center justify-center"
+                                >
+                                  <Minus className="w-4 h-4" />
+                                </button>
+                                <span className="w-8 text-center font-semibold text-gray-900 dark:text-white">
+                                  {quantity}
+                                </span>
+                                <button
+                                  onClick={() =>
+                                    updateQuantity(
+                                      item.id,
+                                      selectedCategory,
+                                      quantity + 1,
+                                    )
+                                  }
+                                  className="w-8 h-8 bg-primary-500 text-white rounded-full hover:bg-primary-600 transition-colors flex items-center justify-center"
+                                >
+                                  <Plus className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    removeFromCart(item.id, selectedCategory)
+                                  }
+                                  className="ml-2 w-8 h-8 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors flex items-center justify-center"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Resumen del carrito */}
+                {cart.length > 0 && (
+                  <div className="sticky bottom-0 bg-white dark:bg-gray-800 border-t-2 border-primary-500 pt-4 pb-2">
+                    <div className="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-4">
+                      <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                        <ShoppingBag className="w-5 h-5" />
+                        Tu Pedido ({cart.length}{" "}
+                        {cart.length === 1 ? "item" : "items"})
+                      </h3>
+                      <div className="space-y-2 mb-4 max-h-32 overflow-y-auto">
+                        {cart.map((item) => (
+                          <div
+                            key={`cart-${item.categoryId}-${item.id}`}
+                            className="flex justify-between text-sm"
+                          >
+                            <span className="text-gray-700 dark:text-gray-300">
+                              {item.quantity}x {item.name}
+                            </span>
+                            <span className="font-medium text-gray-900 dark:text-white">
+                              $
+                              {(
+                                parseFloat(item.price.replace(/[$.,]/g, "")) *
+                                item.quantity
+                              ).toLocaleString()}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="border-t border-primary-200 dark:border-primary-700 pt-3 mb-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-lg font-bold text-gray-900 dark:text-white">
+                            Total:
+                          </span>
+                          <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                            {formatCOP(getCartTotal())}
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setStep("form")}
+                        className="w-full py-3 bg-gradient-to-r from-secondary-500 to-primary-500 text-white rounded-lg hover:shadow-lg transition-all duration-300 font-semibold"
+                      >
+                        Continuar con el Pedido
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {cart.length === 0 && (
+                  <div className="text-center py-12">
+                    <IconComponent className="w-16 h-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
+                    <p className="text-gray-500 dark:text-gray-400 text-lg">
+                      Selecciona los platos que deseas ordenar
+                    </p>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}
@@ -819,7 +785,9 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
                 </p>
                 <ul className="space-y-1 list-disc list-inside">
                   <li>Pago 100% seguro a través de ePayco</li>
-                  <li>Puedes pagar con PSE, tarjetas débito/crédito, efectivo</li>
+                  <li>
+                    Puedes pagar con PSE, tarjetas débito/crédito, efectivo
+                  </li>
                   <li>
                     Te confirmaremos tu pedido por WhatsApp después del pago
                   </li>

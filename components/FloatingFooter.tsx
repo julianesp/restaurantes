@@ -99,7 +99,7 @@ const FloatingFooter = () => {
       <button
         ref={flechaRef}
         onClick={switchOptions}
-        className="fixed bottom-4 left-4 w-14 h-14 bg-[#0077f7] dark:bg-primary-600 hover:bg-[#0077f7] dark:hover:bg-primary-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-50 flex items-center justify-center group cursor-pointer"
+        className="fixed bottom-4 left-4 w-14 h-14 bg-[#DE780D] hover:bg-[#B8620A] text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-50 flex items-center justify-center group cursor-pointer"
         aria-label="Abrir redes sociales"
         title="Abrir redes sociales"
       >

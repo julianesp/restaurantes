@@ -48,8 +48,24 @@ export async function POST(request: Request) {
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error("[tiqueteras POST] Supabase error:", JSON.stringify(error));
+    return NextResponse.json({ error: error.message, details: error.details, hint: error.hint, code: error.code }, { status: 500 });
+  }
   return NextResponse.json(data, { status: 201 });
+}
+
+// DELETE: eliminar tiquetera
+export async function DELETE(request: Request) {
+  if (!supabaseAdmin) return NextResponse.json({ error: "Error de configuración" }, { status: 500 });
+
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get("id");
+  if (!id) return NextResponse.json({ error: "id es requerido" }, { status: 400 });
+
+  const { error } = await supabaseAdmin.from("tiqueteras").delete().eq("id", id);
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ ok: true });
 }
 
 // PATCH: descontar comida, recargar o desactivar

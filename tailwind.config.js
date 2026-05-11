@@ -9,31 +9,30 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Paleta principal de 3 azules
         primary: {
-          DEFAULT: '#00A2F7',  // Azul principal brillante
-          50: '#E6F7FF',
-          100: '#BAE7FF',
-          200: '#91D5FF',
-          300: '#69C0FF',
-          400: '#4DC4FF',
-          500: '#00A2F7',      // Color base
-          600: '#0077CC',      // Azul intermedio
-          700: '#0066AA',
-          800: '#005599',
-          900: '#003D77',
+          DEFAULT: '#DE780D',
+          50: '#FEF3E2',
+          100: '#FDE0B5',
+          200: '#FBCC85',
+          300: '#F9B754',
+          400: '#F7A32A',
+          500: '#DE780D',
+          600: '#B8620A',
+          700: '#924D08',
+          800: '#6C3806',
+          900: '#462304',
         },
         secondary: {
-          DEFAULT: '#0077CC',  // Azul intermedio
-          500: '#0077CC',
-          600: '#005599',
-          700: '#004477',
+          DEFAULT: '#B8620A',
+          500: '#B8620A',
+          600: '#924D08',
+          700: '#6C3806',
         },
         accent: {
-          DEFAULT: '#33B5FF',  // Azul claro/acento
-          400: '#4DC4FF',
-          500: '#33B5FF',
-          600: '#1AA3F0',
+          DEFAULT: '#F7A32A',
+          400: '#F9B754',
+          500: '#F7A32A',
+          600: '#DE780D',
         }
       }
     },

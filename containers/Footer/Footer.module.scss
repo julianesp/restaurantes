@@ -1,16 +1,11 @@
-@use "@/styles/variables.scss" as v;
-
 .footer {
   border-top-left-radius: 40px;
   border-top-right-radius: 40px;
-  background: v.$gradient-footer-start;
-  background: v.$gradient-footer;
+  background: #1a0a00;
   position: relative;
   overflow: hidden;
-
   padding-bottom: 100px;
 
-  // Efecto de brillo adicional
   &::before {
     content: "";
     position: absolute;
@@ -31,51 +26,24 @@
   @media screen and (min-width: 768px) {
     display: grid;
     grid-template-columns: 300px 1fr;
-
     align-items: center;
     justify-content: center;
   }
 }
 
-// Animación tipo "bomba de agua" - squeeze/bulge effect
-@keyframes bulge {
-  0% {
-    transform: scale(1);
-  }
-  25% {
-    transform: scale(1.02) translateY(-2px);
-  }
-  50% {
-    transform: scale(1.04) translateY(-4px);
-  }
-  75% {
-    transform: scale(1.02) translateY(-2px);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-/* ========================================
-   HEADER: slide-in logo and delayed paragraph (desktop >=768px)
-   ======================================== */
-
 .logoBlock {
-  /* helper container (if needed) */
+  /* helper container */
 }
 
 .slideInLogo {
   display: flex;
   justify-content: center;
   align-items: center;
-  /* visible by default on small screens */
   opacity: 1;
   width: 100px;
-  
 }
 
 .fadeInText {
-  /* visible by default on small screens */
   opacity: 1;
 }
 
@@ -101,7 +69,6 @@
   }
 }
 
-/* Only apply entrance animations on medium screens and up */
 @media (min-width: 768px) {
   .slideInLogo {
     opacity: 0;
@@ -112,11 +79,10 @@
   .fadeInText {
     opacity: 0;
     animation: fadeInUp 520ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
-    animation-delay: 0.5s; /* small delay so paragraph appears after logo */
+    animation-delay: 0.5s;
   }
 }
 
-/* Respect users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .slideInLogo,
   .fadeInText {

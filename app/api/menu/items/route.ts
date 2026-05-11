@@ -75,6 +75,7 @@ export async function POST(request: NextRequest) {
       name,
       description,
       price,
+      image,
       is_vegetarian,
       is_spicy,
       display_order
@@ -103,6 +104,7 @@ export async function POST(request: NextRequest) {
         name,
         description: description || '',
         price,
+        image: image || null,
         is_vegetarian: is_vegetarian || false,
         is_spicy: is_spicy || false,
         is_available: true,

@@ -54,6 +54,7 @@ export async function GET() {
           name: item.name,
           description: item.description,
           price: item.price,
+          image: item.image || null,
           isVegetarian: item.is_vegetarian,
           isSpicy: item.is_spicy
         }))

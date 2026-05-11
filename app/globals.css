@@ -10,18 +10,18 @@
   --loc-from: #f8fafc; /* claro */
   --loc-to: #ffffff; /* claro */
 
-  /* Paleta de 3 colores azules */
-  --color-primary: #0077f7; /* Azul principal brillante */
-  --color-secondary: #0a0b0c; /* Azul intermedio */
-  --color-accent: #33b5ff; /* Azul claro/acento */
+  /* Color primario */
+  --color-primary: #DE780D;
+  --color-secondary: #B8620A;
+  --color-accent: #F7A32A;
 
   /* Variantes oscuras */
-  --color-primary-dark: #0066aa;
-  --color-secondary-dark: #005599;
+  --color-primary-dark: #B8620A;
+  --color-secondary-dark: #924D08;
 
   /* Variantes claras */
-  --color-primary-light: #4dc4ff;
-  --color-accent-light: #80d4ff;
+  --color-primary-light: #F9B754;
+  --color-accent-light: #FDE0B5;
 }
 
 @theme inline {

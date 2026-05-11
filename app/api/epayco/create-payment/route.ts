@@ -21,10 +21,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Calcular base e impuesto (19% IVA en Colombia)
-    const taxRate = 0.19;
-    const taxBase = Math.round(amount / (1 + taxRate));
-    const tax = amount - taxBase;
+    // ePayco requiere taxBase + tax == amount exactamente
+    // Para evitar problemas de redondeo, enviamos sin IVA desglosado
+    const amountNum = Math.round(Number(amount));
 
     // Paso 1: Autenticarse con ePayco Apify
     const publicKey = process.env.NEXT_PUBLIC_EPAYCO_PUBLIC_KEY!;
@@ -47,22 +46,25 @@ export async function POST(request: Request) {
     }
 
     const bearerToken = authResult.token;
+    const isTest = process.env.NEXT_PUBLIC_EPAYCO_TEST_MODE === 'true';
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
     // Paso 2: Crear sesión de pago
     const sessionData = {
       checkout_version: "2",
       name: "Restaurante",
       currency: "COP",
-      amount: parseFloat(amount.toString()),
+      amount: amountNum,
       description: description,
       lang: "ES",
       invoice: reference,
       country: "CO",
-      taxBase: parseFloat(taxBase.toString()),
-      tax: parseFloat(tax.toString()),
+      taxBase: amountNum,
+      tax: 0,
       taxIco: 0,
-      response: redirectUrl || `${process.env.NEXT_PUBLIC_BASE_URL}/payment/success`,
-      confirmation: `${process.env.NEXT_PUBLIC_BASE_URL}/api/epayco/webhook`,
+      test: isTest,
+      response: redirectUrl || `${baseUrl}/payment/success`,
+      confirmation: `${baseUrl}/api/epayco/webhook`,
       methodsDisable: ["SP", "CASH"],
       method: "POST",
       billing: {
@@ -92,8 +94,8 @@ export async function POST(request: Request) {
     const sessionResult = await sessionResponse.json();
 
     if (!sessionResult.success || !sessionResult.data?.sessionId) {
-      console.error('ePayco session error:', sessionResult);
-      throw new Error(sessionResult.textResponse || 'Error al crear la sesión de pago en ePayco');
+      console.error('ePayco session error:', JSON.stringify(sessionResult));
+      throw new Error(sessionResult.textResponse || sessionResult.message || JSON.stringify(sessionResult));
     }
 
     return NextResponse.json({

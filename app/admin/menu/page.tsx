@@ -28,6 +28,7 @@ interface MenuItem {
   name: string;
   description: string;
   price: string;
+  image?: string | null;
   is_vegetarian: boolean;
   is_spicy: boolean;
   is_available: boolean;
@@ -400,9 +401,9 @@ export default function AdminMenuPage() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className={`grid gap-8 ${(isCreating || editingItem) ? "lg:grid-cols-4" : ""}`}>
           {/* Lista de items */}
-          <div className="lg:col-span-2">
+          <div className={(isCreating || editingItem) ? "lg:col-span-3" : ""}>
             {/* Categorías */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 mb-6">
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
@@ -430,9 +431,9 @@ export default function AdminMenuPage() {
             </div>
 
             {/* Items del menú */}
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
               {filteredItems.length === 0 ? (
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center">
+                <div className="col-span-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center">
                   <p className="text-gray-500 dark:text-gray-400">
                     No hay items en esta categoría
                   </p>
@@ -441,8 +442,16 @@ export default function AdminMenuPage() {
                 filteredItems.map((item) => (
                   <div
                     key={item.id}
-                    className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6"
+                    className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
                   >
+                    {item.image && (
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-32 object-cover"
+                      />
+                    )}
+                    <div className="p-6">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
                         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
@@ -481,6 +490,7 @@ export default function AdminMenuPage() {
                           <Trash2 className="w-5 h-5" />
                         </button>
                       </div>
+                    </div>
                     </div>
                   </div>
                 ))
