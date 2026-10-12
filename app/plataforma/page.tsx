@@ -14,10 +14,9 @@ import {
   Share2,
   Check,
 } from "lucide-react";
-import BrasayaLogo from "@/components/BrasayaLogo";
-import ThemeToggle from "@/components/ThemeToggle";
 import GuidedTour from "@/components/platform/GuidedTour";
 import EmberEdge from "@/components/EmberEdge";
+import PlatformHeader from "@/components/platform/PlatformHeader";
 import FoodSlider from "@/components/FoodSlider";
 
 export const metadata = {
@@ -71,39 +70,16 @@ const start = [
   { icon: Share2, title: "Comparte tu enlace", text: "Pon los QR en las mesas y el enlace en tus redes. Listo para vender." },
 ];
 
-const navLink = "rounded-full px-3.5 py-2 hover:bg-gray-900/[0.05] dark:hover:bg-white/[0.07]";
-
 export default function PlataformaPage() {
   return (
     // isolate: el humo del borde final (z-index -1) queda sobre este fondo y detrás del contenido
     <div data-platform-landing className="isolate min-h-[100dvh] bg-[rgb(var(--background))]">
-      {/* Cabecera */}
-      <header className="sticky top-0 z-40 border-b border-gray-900/[0.06] bg-[rgb(var(--background)/0.8)] backdrop-blur-xl dark:border-white/10">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-          <Link href="/" aria-label="Brasaya, inicio" className="group">
-            <BrasayaLogo size={32} />
-          </Link>
-          <nav className="hidden items-center gap-1 text-[15px] font-medium text-gray-700 dark:text-gray-300 md:flex">
-            <a href="#servicios" className={navLink}>Servicios</a>
-            <a href="#recorrido" className={navLink}>Recorrido</a>
-            <a href="#empezar" className={navLink}>Cómo empezar</a>
-            <a href="#precio" className={navLink}>Precio</a>
-          </nav>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <Link href="/sign-in" className={`hidden text-sm font-semibold text-gray-800 dark:text-gray-200 sm:inline-flex ${navLink}`}>
-              Iniciar sesión
-            </Link>
-            <Link href="/registro" className="btn-press rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">
-              Probar gratis
-            </Link>
-          </div>
-        </div>
-      </header>
+      {/* Cabecera fija y transparente */}
+      <PlatformHeader />
 
       <main>
         {/* Presentación: beneficios de Brasaya */}
-        <section className="relative h-[calc(100dvh-4rem)] min-h-[520px] w-full overflow-hidden">
+        <section data-nav-dark className="relative h-[100dvh] min-h-[560px] w-full overflow-hidden">
           <FoodSlider foods={benefits} autoplayInterval={5000} />
           <div className="absolute inset-x-0 bottom-20 z-30 flex justify-center px-4 md:bottom-16 md:justify-start md:px-6 lg:px-10">
             <div className="flex flex-wrap items-center justify-center gap-3">
@@ -253,7 +229,7 @@ export default function PlataformaPage() {
       </main>
 
       {/* Cierre con el carbón encendido */}
-      <footer className="relative mt-10 bg-primary-700 text-white dark:bg-primary-900">
+      <footer data-nav-dark className="relative mt-10 bg-primary-700 text-white dark:bg-primary-900">
         <EmberEdge />
         <div className="mx-auto max-w-6xl px-4 pb-10 pt-20 sm:px-6">
           <div className="mb-16 flex flex-col items-start justify-between gap-8 md:flex-row md:items-end">

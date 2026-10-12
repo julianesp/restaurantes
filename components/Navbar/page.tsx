@@ -10,6 +10,7 @@ import FloatingActionButtons from "../FloatingActionButtons";
 import ThemeToggle from "../ThemeToggle";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { useBranding } from "@/context/TenantContext";
+import { useNavOverDark } from "../useNavOverDark";
 
 type NavLink = { href: string; label: string };
 type NavGroup = { label: string; href: string; children: NavLink[] };
@@ -52,12 +53,17 @@ const MOBILE_LINKS: NavLink[] = [
   { href: "/#contacto", label: "Contacto" },
 ];
 
-const linkClass =
-  "rounded-full px-3.5 py-2 text-[15px] font-medium text-gray-700 hover:text-gray-950 hover:bg-gray-900/[0.05] dark:text-gray-300 dark:hover:text-white dark:hover:bg-white/[0.07] transition-colors duration-150";
+// Texto oscuro sobre fondo claro; blanco cuando detrás hay una foto o zona oscura (navbar transparente)
+const linkBase = "rounded-full px-3.5 py-2 text-[15px] font-medium transition-colors duration-200";
+const linkOnLight =
+  "text-gray-800 hover:text-gray-950 hover:bg-gray-900/[0.06] dark:text-gray-200 dark:hover:text-white dark:hover:bg-white/[0.08]";
+const linkOnDark = "text-white/90 hover:text-white hover:bg-white/[0.12] [text-shadow:0_1px_2px_rgb(0_0_0_/_0.35)]";
 
 const Navbar = () => {
   const { isSignedIn } = useUser();
   const { name } = useBranding();
+  const overDark = useNavOverDark();
+  const linkClass = `${linkBase} ${overDark ? linkOnDark : linkOnLight}`;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
@@ -109,14 +115,19 @@ const Navbar = () => {
   };
 
   return (
-    <nav ref={navRef} className="fixed inset-x-0 top-0 z-40 px-3 pt-3 sm:px-4">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 rounded-full border border-gray-900/[0.08] bg-white/70 pl-2.5 pr-2.5 shadow-[0_8px_30px_-12px_rgb(28_25_23_/_0.25)] backdrop-blur-xl dark:border-white/10 dark:bg-gray-950/65 dark:shadow-[0_8px_30px_-12px_rgb(0_0_0_/_0.6)]">
+    <nav ref={navRef} className="fixed inset-x-0 top-0 z-40">
+      <div className="rounded-b-3xl border-b-2 border-primary-500 bg-transparent shadow-[0_10px_24px_-12px_rgb(var(--primary-600)/0.55)] backdrop-blur-xl backdrop-saturate-150">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-3 sm:px-6">
         {/* Marca */}
         <Link href="/" className="flex min-w-0 items-center gap-2.5 rounded-full pr-2" title="Ir a inicio">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-[10px]">
             <BrandLogo size={36} className="h-9 w-9 object-contain" />
           </span>
-          <span className="truncate font-display text-lg font-semibold tracking-tight text-gray-950 dark:text-white">
+          <span
+            className={`truncate font-display text-lg font-semibold tracking-tight transition-colors duration-200 ${
+              overDark ? "text-white [text-shadow:0_1px_2px_rgb(0_0_0_/_0.35)]" : "text-gray-950 dark:text-white"
+            }`}
+          >
             {name}
           </span>
         </Link>
@@ -208,11 +219,12 @@ const Navbar = () => {
             {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
+        </div>
       </div>
 
       {/* Menú móvil */}
       <div
-        className={`mx-auto mt-2 max-w-6xl origin-top transition-[opacity,transform] duration-200 ease-out lg:hidden ${
+        className={`mx-auto mt-2 max-w-6xl px-3 origin-top transition-[opacity,transform] duration-200 ease-out lg:hidden ${
           isMobileMenuOpen ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-2 opacity-0"
         }`}
       >

@@ -194,7 +194,7 @@ export default function GalleryPage() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-gray-800 dark:to-gray-900">
+      <section data-nav-dark className="relative pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-gray-800 dark:to-gray-900">
         <div
           ref={heroReveal.ref}
           className={`max-w-7xl mx-auto text-center reveal-on-scroll reveal-scale-up ${

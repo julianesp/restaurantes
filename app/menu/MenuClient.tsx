@@ -110,7 +110,7 @@ export default function MenuClient({ initialMenuData }: MenuClientProps) {
   return (
     <>
       {/* Header */}
-      <div className="pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-gray-800 dark:to-gray-900">
+      <div data-nav-dark className="pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-primary-500 to-secondary-500 dark:from-gray-800 dark:to-gray-900">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <Link

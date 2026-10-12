@@ -227,7 +227,7 @@ export default function LegacyHome() {
       <Navbar />
 
       {/* Slider de especialidades */}
-      <div id="especialidades" className="relative h-[100dvh] w-full">
+      <div id="especialidades" data-nav-dark className="relative h-[100dvh] w-full">
         <FoodSlider foods={specialFoods} autoplayInterval={5000} />
       </div>
 

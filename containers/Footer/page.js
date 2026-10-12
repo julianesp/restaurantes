@@ -95,7 +95,7 @@ const Footer = () => {
   const [isSuggestionOpen, setIsSuggestionOpen] = useState(false);
 
   return (
-    <footer id="contacto" className={styles.footer}>
+    <footer id="contacto" data-nav-dark className={styles.footer}>
       {/* Borde de carbón encendido con humo */}
       <EmberEdge />
 
