@@ -1,0 +1,146 @@
+// Botón "Pedir Ahora": rebota al tocar el footer, se quema de abajo hacia arriba y reaparece al
+// volver a subir. El estado lo pone FloatingActionButtons.tsx en data-state.
+
+.btnWrap {
+  position: relative;
+}
+
+.btn {
+  position: relative;
+}
+
+// Línea de brasa que sube por el botón mientras se quema
+.front {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  bottom: -3px;
+  height: 6px;
+  border-radius: 999px;
+  background: radial-gradient(ellipse at center, #ffe08a 0%, #ff8a2a 45%, rgb(255 70 0 / 0) 75%);
+  box-shadow: 0 0 10px 2px rgb(255 120 30 / 0.6);
+  opacity: 0;
+  pointer-events: none;
+}
+
+// Voluta de humo que suelta al consumirse
+.puff {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 46px;
+  height: 46px;
+  margin-left: -23px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(120 113 108 / 0.45) 0%, rgb(120 113 108 / 0) 70%);
+  opacity: 0;
+  pointer-events: none;
+
+  :global(.dark) & {
+    background: radial-gradient(circle, rgb(214 211 209 / 0.3) 0%, rgb(214 211 209 / 0) 70%);
+  }
+}
+
+// Al quemarse: rebote (con aplastamiento al caer), se carboniza y se consume desde abajo
+[data-state="burn"] {
+  .btn {
+    animation:
+      bf-bounce 560ms cubic-bezier(0.3, 0.7, 0.4, 1) both,
+      bf-char 320ms 560ms ease-out forwards,
+      bf-consume 900ms 680ms cubic-bezier(0.45, 0, 0.55, 1) forwards;
+  }
+  .front {
+    animation: bf-front 900ms 680ms cubic-bezier(0.45, 0, 0.55, 1) forwards;
+  }
+  .puff {
+    animation: bf-puff 1000ms 1150ms ease-out forwards;
+  }
+}
+
+// Consumido: no se ve ni se puede pulsar
+[data-state="burned"] {
+  pointer-events: none;
+
+  .btn {
+    clip-path: inset(0 0 100% 0 round 999px);
+    opacity: 0;
+  }
+}
+
+// De vuelta: aparece con un fundido corto
+[data-state="back"] .btn {
+  animation: bf-appear 260ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+// Mientras se quema o está consumido no se muestran los anillos de pulso
+[data-state="burn"],
+[data-state="burned"] {
+  :global(.animate-ping) {
+    display: none;
+  }
+}
+
+@keyframes bf-bounce {
+  0% { transform: translateY(0) scale(1, 1); }
+  18% { transform: translateY(0) scale(1.08, 0.88); }
+  42% { transform: translateY(-16px) scale(0.97, 1.04); }
+  68% { transform: translateY(0) scale(1.05, 0.93); }
+  84% { transform: translateY(-4px) scale(1, 1); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+@keyframes bf-char {
+  to {
+    background-color: #2b211c;
+    color: #ffb070;
+    box-shadow: 0 0 18px rgb(255 110 30 / 0.45);
+  }
+}
+
+@keyframes bf-consume {
+  from { clip-path: inset(0 0 0 0 round 999px); }
+  to { clip-path: inset(0 0 100% 0 round 999px); }
+}
+
+@keyframes bf-front {
+  0% { opacity: 0; transform: translateY(0); }
+  8% { opacity: 1; }
+  92% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(calc(var(--btn-h, 48px) * -1)); }
+}
+
+@keyframes bf-puff {
+  0% { opacity: 0; transform: translateY(0) scale(0.6); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-60px) scale(2.2); }
+}
+
+@keyframes bf-appear {
+  from { opacity: 0; transform: scale(0.92); filter: blur(4px); }
+  to { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+
+// Reducir movimiento: sin rebote ni fuego, solo se desvanece
+@media (prefers-reduced-motion: reduce) {
+  [data-state="burn"] {
+    .btn {
+      animation: bf-fade 200ms ease-out forwards;
+    }
+    .front,
+    .puff {
+      animation: none;
+    }
+  }
+  [data-state="back"] .btn {
+    animation: bf-appear-fade 200ms ease-out both;
+  }
+}
+
+@keyframes bf-fade {
+  to { opacity: 0; }
+}
+
+@keyframes bf-appear-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
