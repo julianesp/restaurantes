@@ -111,7 +111,7 @@ export default function ConfiguracionPage() {
           <div>
             <label htmlFor="color" className="block text-sm font-medium mb-1 text-gray-800 dark:text-gray-200">Color principal</label>
             <div className="flex items-center gap-3">
-              <input id="color" type="color" value={/^#[0-9a-f]{6}$/i.test(settings.primary_color || "") ? settings.primary_color : "#1f8150"}
+              <input id="color" type="color" value={/^#[0-9a-f]{6}$/i.test(settings.primary_color || "") ? settings.primary_color : "#eb810f"}
                 onChange={(e) => set("primary_color", e.target.value)} className="h-10 w-14 rounded border border-gray-300 dark:border-gray-600" />
               <span className="text-sm text-gray-600 dark:text-gray-300">{settings.primary_color || "Color por defecto"}</span>
               {settings.primary_color && (

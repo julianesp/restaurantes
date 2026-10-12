@@ -57,7 +57,7 @@ export default function FloatingActionButtons({ onPedirClick }: FloatingActionBu
           <button
             ref={btnRef}
             onClick={onPedirClick}
-            className={`${styles.btn} w-max rounded-full bg-primary-600 px-6 py-3 font-semibold text-white shadow-lg shadow-primary-900/25 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600`}
+            className={`${styles.btn} w-max rounded-full bg-primary-600 px-6 py-3 font-semibold text-white shadow-lg shadow-primary-900/25 hover:bg-primary-700`}
           >
             Pedir Ahora
           </button>
