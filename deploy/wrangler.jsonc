@@ -22,6 +22,16 @@
   "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "restaurantes-media" }],
   // Lunes 05:00 UTC: plato ganador de la semana anterior (ver worker/index.ts)
   "triggers": { "crons": ["0 5 * * 1"] },
+  // Dominio de la plataforma: brasaya.com (landing) y <slug>.brasaya.com (un restaurante por subdominio).
+  // Mantener en sincronía con NEXT_PUBLIC_ROOT_DOMAIN del script "deploy" (package.json) y cloudflare.config.ts.
+  // Los subdominios necesitan en la zona un registro DNS comodín "*" proxied (p. ej. AAAA 100::).
+  // Mantener también la dirección *.workers.dev (al declarar rutas, wrangler la desactiva si no se indica)
+  "workers_dev": true,
+  "preview_urls": true,
+  "routes": [
+    { "pattern": "brasaya.com/*", "zone_name": "brasaya.com" },
+    { "pattern": "*.brasaya.com/*", "zone_name": "brasaya.com" }
+  ],
   "vars": {
     "ADMIN_EMAILS": "julii1295@gmail.com",
     "DEFAULT_TENANT_SLUG": "restaurante"

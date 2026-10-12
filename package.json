@@ -6,7 +6,7 @@
     "dev": "vite dev --port 3000",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "vite build && wrangler deploy -c deploy/wrangler.jsonc",
+    "deploy": "NEXT_PUBLIC_ROOT_DOMAIN=brasaya.com vite build && wrangler deploy -c deploy/wrangler.jsonc",
     "db:migrate": "wrangler d1 migrations apply restaurantes --remote -c deploy/wrangler.jsonc",
     "db:migrate:local": "wrangler d1 migrations apply restaurantes --local -c deploy/wrangler.jsonc",
     "lint": "next lint",
