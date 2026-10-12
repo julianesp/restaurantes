@@ -86,6 +86,18 @@ export default defineConfig({
   ],
   optimizeDeps: {
     exclude: ["@clerk/nextjs"],
+    // @clerk/nextjs está excluido, así que Vite descubre sus imports de next/* en mitad de la primera
+    // carga, re-optimiza y el navegador acaba con dos copias de React ("Invalid hook call").
+    // Se pre-empaquetan desde el arranque para que eso no ocurra.
+    include: ["next/compat/router", "next/dynamic", "next/router", "next/script"],
+  },
+  environments: {
+    // Igual en el servidor: evita el "optimized dependencies changed. reloading" del primer request
+    rsc: {
+      optimizeDeps: {
+        include: ["@clerk/backend", "@clerk/backend/internal", "@clerk/backend/jwt"],
+      },
+    },
   },
   css: {
     modules: {
