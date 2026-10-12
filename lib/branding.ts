@@ -17,6 +17,8 @@ export interface Branding {
   instagramUrl: string;
   facebookUrl: string;
   tiktokUrl: string;
+  /** Restaurante de demostración de la plataforma (settings.demo): muestra un aviso y un enlace para crear uno. */
+  isDemo: boolean;
 }
 
 /** Claves de `restaurants.settings` que el restaurante puede editar. */
@@ -60,6 +62,7 @@ export function brandingFor(tenant: Tenant): Branding {
     instagramUrl: pick("instagram_url"),
     facebookUrl: pick("facebook_url"),
     tiktokUrl: pick("tiktok_url"),
+    isDemo: s.demo === true,
   };
 }
 

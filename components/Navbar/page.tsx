@@ -11,6 +11,7 @@ import ThemeToggle from "../ThemeToggle";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { useBranding } from "@/context/TenantContext";
 import { useNavOverDark } from "../useNavOverDark";
+import { ROOT_DOMAIN } from "@/lib/tenant-host";
 
 type NavLink = { href: string; label: string };
 type NavGroup = { label: string; href: string; children: NavLink[] };
@@ -61,7 +62,9 @@ const linkOnDark = "text-white/90 hover:text-white hover:bg-white/[0.12] [text-s
 
 const Navbar = () => {
   const { isSignedIn } = useUser();
-  const { name } = useBranding();
+  const { name, isDemo } = useBranding();
+  // Restaurante de demostración: enlace para crear el propio en la plataforma
+  const signupUrl = ROOT_DOMAIN ? `https://${ROOT_DOMAIN}/registro` : "/registro";
   const overDark = useNavOverDark();
   const linkClass = `${linkBase} ${overDark ? linkOnDark : linkOnLight}`;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -116,6 +119,14 @@ const Navbar = () => {
 
   return (
     <nav ref={navRef} className="fixed inset-x-0 top-0 z-40">
+      {isDemo && (
+        <div className="bg-gray-950 px-4 py-1.5 text-center text-[13px] text-white/85">
+          Este es un restaurante de ejemplo de Brasaya: así se vería el tuyo.{" "}
+          <a href={signupUrl} className="font-semibold text-primary-300 underline-offset-2 hover:underline">
+            Crea el tuyo gratis
+          </a>
+        </div>
+      )}
       <div className="rounded-b-3xl border-b-2 border-primary-500 bg-transparent shadow-[0_10px_24px_-12px_rgb(var(--primary-600)/0.55)] backdrop-blur-xl backdrop-saturate-150">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-3 sm:px-6">
         {/* Marca */}
