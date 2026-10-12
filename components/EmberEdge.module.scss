@@ -18,9 +18,10 @@
   --smoke: 120 113 108;
   --smoke-alpha: 0.24;
 
+  // En oscuro el humo es casi blanco y algo más denso para que se distinga del fondo
   :global(.dark) & {
-    --smoke: 214 211 209;
-    --smoke-alpha: 0.2;
+    --smoke: 245 245 244;
+    --smoke-alpha: 0.55;
   }
 
   // Fuera de pantalla: todo en pausa
