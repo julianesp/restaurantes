@@ -116,7 +116,7 @@ export default function SuggestionBox({ isOpen, onClose }: SuggestionBoxProps) {
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-t-2xl">
+            <div className="bg-primary-700 text-white p-6 rounded-t-2xl">
               <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold">Buzón de Sugerencias</h2>
                 <button
@@ -282,7 +282,7 @@ export default function SuggestionBox({ isOpen, onClose }: SuggestionBoxProps) {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-6 py-3 bg-primary-600 text-white rounded-full hover:bg-primary-700 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? 'Enviando...' : 'Enviar Sugerencia'}
                 </button>

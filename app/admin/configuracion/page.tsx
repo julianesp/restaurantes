@@ -111,7 +111,7 @@ export default function ConfiguracionPage() {
           <div>
             <label htmlFor="color" className="block text-sm font-medium mb-1 text-gray-800 dark:text-gray-200">Color principal</label>
             <div className="flex items-center gap-3">
-              <input id="color" type="color" value={/^#[0-9a-f]{6}$/i.test(settings.primary_color || "") ? settings.primary_color : "#de780d"}
+              <input id="color" type="color" value={/^#[0-9a-f]{6}$/i.test(settings.primary_color || "") ? settings.primary_color : "#1f8150"}
                 onChange={(e) => set("primary_color", e.target.value)} className="h-10 w-14 rounded border border-gray-300 dark:border-gray-600" />
               <span className="text-sm text-gray-600 dark:text-gray-300">{settings.primary_color || "Color por defecto"}</span>
               {settings.primary_color && (
@@ -143,7 +143,7 @@ export default function ConfiguracionPage() {
             y pega aquí el ID del chat.
           </p>
           {!data.telegram_bot_available && (
-            <p className="text-sm text-amber-700">El bot de Telegram de la plataforma aún no está activado.</p>
+            <p className="text-sm text-yellow-700 dark:text-yellow-400">El bot de Telegram de la plataforma aún no está activado.</p>
           )}
           <input value={settings.telegram_chat_id || ""} placeholder="ID del chat, p. ej. -1001234567890"
             onChange={(e) => set("telegram_chat_id", e.target.value)} className={input} aria-label="ID del chat de Telegram" />

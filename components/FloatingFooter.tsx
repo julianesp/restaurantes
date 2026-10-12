@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Phone } from "lucide-react";
 import Image from "next/image";
+import { useBranding } from "@/context/TenantContext";
 
 const FloatingFooter = () => {
   const [menuOption, setMenuOptions] = useState(false);
@@ -13,10 +14,11 @@ const FloatingFooter = () => {
   const flechaRef = useRef<HTMLButtonElement>(null);
   const pulseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const whatsappNumber = "#";
-  const facebookUrl = "#";
-  const instagramUrl = "#";
-  const tiktokUrl = "#";
+  const branding = useBranding();
+  const whatsappNumber = branding.whatsapp;
+  const facebookUrl = branding.facebookUrl;
+  const instagramUrl = branding.instagramUrl;
+  const tiktokUrl = branding.tiktokUrl;
 
   const switchOptions = () => {
     setMenuOptions(!menuOption);
@@ -87,7 +89,7 @@ const FloatingFooter = () => {
   }, []);
 
   const createWhatsAppMessage = () => {
-    const message = "¡Hola! Me gustaría hacer un pedido de pizza.";
+    const message = `¡Hola! Me gustaría hacer un pedido en ${branding.name}.`;
     return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
       message,
     )}`;
@@ -99,7 +101,7 @@ const FloatingFooter = () => {
       <button
         ref={flechaRef}
         onClick={switchOptions}
-        className="fixed bottom-4 left-4 w-14 h-14 bg-[#DE780D] hover:bg-[#B8620A] text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-50 flex items-center justify-center group cursor-pointer"
+        className="fixed bottom-4 left-4 w-14 h-14 bg-primary-500 hover:bg-primary-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-50 flex items-center justify-center group cursor-pointer"
         aria-label="Abrir redes sociales"
         title="Abrir redes sociales"
       >
@@ -138,72 +140,80 @@ const FloatingFooter = () => {
         >
           <div className="flex flex-col gap-3">
             {/* WhatsApp */}
-            <Link
-              href={createWhatsAppMessage()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12  text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
-              title="WhatsApp"
-            >
-              <Image
-                src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/redes/social%20%281%29.png"
-                alt="WhatsApp"
-                width={44}
-                height={44}
-              />
-            </Link>
+            {whatsappNumber && (
+              <Link
+                href={createWhatsAppMessage()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-12 h-12  text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
+                title="WhatsApp"
+              >
+                <Image
+                  src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/redes/social%20%281%29.png"
+                  alt="WhatsApp"
+                  width={44}
+                  height={44}
+                />
+              </Link>
+            )}
 
             {/* Facebook */}
-            <Link
-              href={facebookUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12  text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
-              title="Facebook"
-            >
-              <Image
-                src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/redes/facebook.png"
-                alt="Facebook"
-                width={44}
-                height={44}
-              />
-            </Link>
+            {facebookUrl && (
+              <Link
+                href={facebookUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-12 h-12  text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
+                title="Facebook"
+              >
+                <Image
+                  src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/redes/facebook.png"
+                  alt="Facebook"
+                  width={44}
+                  height={44}
+                />
+              </Link>
+            )}
 
             {/* Instagram */}
-            <Link
-              href={instagramUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12  text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
-              title="Instagram"
-            >
-              <Image
-                src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/redes/instagram.png"
-                alt="Instagram"
-                width={44}
-                height={44}
-              />
-            </Link>
+            {instagramUrl && (
+              <Link
+                href={instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-12 h-12  text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
+                title="Instagram"
+              >
+                <Image
+                  src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/redes/instagram.png"
+                  alt="Instagram"
+                  width={44}
+                  height={44}
+                />
+              </Link>
+            )}
 
             {/* TikTok */}
-            <Link
-              href={tiktokUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12  text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
-              title="TikTok"
-            >
-              <Image
-                src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/redes/tiktok.png"
-                alt="TikTok"
-                width={44}
-                height={44}
-              />
-            </Link>
+            {tiktokUrl && (
+              <Link
+                href={tiktokUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-12 h-12  text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
+                title="TikTok"
+              >
+                <Image
+                  src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/redes/tiktok.png"
+                  alt="TikTok"
+                  width={44}
+                  height={44}
+                />
+              </Link>
+            )}
 
             {/* Phone */}
             {/* <Link
-              href={`tel:+57${whatsappNumber}`}
+              href={`tel:+${whatsappNumber}`}
               className="w-12 h-12 bg-red-600 hover:bg-red-700 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group"
               title="Llamar"
             >

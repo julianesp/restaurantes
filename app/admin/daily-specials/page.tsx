@@ -1,17 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { UserButton } from "@clerk/nextjs";
-import Link from "next/link";
 import {
-  ArrowLeft,
   Plus,
   Edit,
   Trash2,
   Save,
   X,
   ChefHat,
-  Home,
   RefreshCw,
   Star,
 } from "lucide-react";
@@ -259,7 +255,7 @@ export default function DailySpecialsPage() {
             type="submit"
             disabled={saving}
             className="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white px-6 py-2 rounded-lg font-bold transition-all disabled:opacity-60"
-            style={{ backgroundColor: "#DE780D" }}
+            style={{ backgroundColor: "rgb(var(--primary-500))" }}
           >
             <Save className="w-4 h-4" />
             {saving ? "Guardando..." : editingId ? "Guardar Cambios" : "Agregar Plato"}
@@ -305,7 +301,7 @@ export default function DailySpecialsPage() {
             </span>
           </div>
           <span className="inline-block text-xs px-2 py-1 rounded-full font-medium mb-2"
-            style={{ backgroundColor: "#DE780D22", color: "#DE780D" }}>
+            style={{ backgroundColor: "rgb(var(--primary-500) / 0.13)", color: "rgb(var(--primary-500))" }}>
             {dish.category}
           </span>
         </div>
@@ -326,7 +322,7 @@ export default function DailySpecialsPage() {
       <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm">{dish.description}</p>
 
       <div className="flex items-center justify-between">
-        <p className="text-2xl font-bold" style={{ color: "#DE780D" }}>{dish.price}</p>
+        <p className="text-2xl font-bold" style={{ color: "rgb(var(--primary-500))" }}>{dish.price}</p>
         <button
           onClick={onToggle}
           className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${
@@ -334,7 +330,7 @@ export default function DailySpecialsPage() {
               ? "bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300"
               : "text-white"
           }`}
-          style={!dish.available ? { backgroundColor: "#DE780D" } : {}}
+          style={!dish.available ? { backgroundColor: "rgb(var(--primary-500))" } : {}}
         >
           {dish.available ? "Marcar No Disponible" : "Activar"}
         </button>
@@ -348,41 +344,22 @@ export default function DailySpecialsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href="/admin" className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                <ArrowLeft className="w-6 h-6 text-gray-600 dark:text-gray-300" />
-              </Link>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: "#DE780D" }}>
-                  <ChefHat className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Platos</h1>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">Platos del día y platos permanentes</p>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => { loadSpecials(); loadPermanent(); }}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                title="Actualizar"
-              >
-                <RefreshCw className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-              </button>
-              <Link href="/" className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 transition-colors">
-                <Home className="w-5 h-5" />
-                <span className="hidden sm:inline">Ver Sitio</span>
-              </Link>
-              <UserButton afterSignOutUrl="/" />
-            </div>
+      {/* Título de la página (la navegación y el usuario están en AdminNavbar) */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Platos</h1>
+            <p className="text-sm text-gray-600 dark:text-gray-300">Platos del día y platos permanentes</p>
           </div>
+          <button
+            onClick={() => { loadSpecials(); loadPermanent(); }}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            title="Actualizar"
+          >
+            <RefreshCw className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+          </button>
         </div>
-      </header>
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
@@ -395,7 +372,7 @@ export default function DailySpecialsPage() {
                 ? "border-b-2 text-white"
                 : "border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
             }`}
-            style={activeTab === "daily" ? { backgroundColor: "#DE780D", borderColor: "#DE780D" } : {}}
+            style={activeTab === "daily" ? { backgroundColor: "rgb(var(--primary-500))", borderColor: "rgb(var(--primary-500))" } : {}}
           >
             <ChefHat className="w-4 h-4" />
             Platos del Día
@@ -411,7 +388,7 @@ export default function DailySpecialsPage() {
                 ? "text-white"
                 : "border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
             }`}
-            style={activeTab === "permanent" ? { backgroundColor: "#B8620A", borderColor: "#B8620A" } : {}}
+            style={activeTab === "permanent" ? { backgroundColor: "rgb(var(--primary-600))", borderColor: "rgb(var(--primary-600))" } : {}}
           >
             <Star className="w-4 h-4" />
             Platos Permanentes
@@ -436,7 +413,7 @@ export default function DailySpecialsPage() {
               <button
                 onClick={() => { setShowDailyForm(!showDailyForm); setDailyForm(emptyDailyForm); setEditingDailyId(null); }}
                 className="flex items-center gap-2 text-white px-5 py-2.5 rounded-lg font-bold transition-all shadow-lg shrink-0 ml-4"
-                style={{ backgroundColor: "#DE780D" }}
+                style={{ backgroundColor: "rgb(var(--primary-500))" }}
               >
                 <Plus className="w-5 h-5" />
                 Agregar Plato del Día
@@ -457,7 +434,7 @@ export default function DailySpecialsPage() {
 
             {loadingDaily ? (
               <div className="text-center py-16">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: "#DE780D" }} />
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: "rgb(var(--primary-500))" }} />
                 <p className="text-gray-500 dark:text-gray-400">Cargando platos del día...</p>
               </div>
             ) : specials.length === 0 ? (
@@ -492,7 +469,7 @@ export default function DailySpecialsPage() {
               <button
                 onClick={() => { setShowPermForm(!showPermForm); setPermForm(emptyPermForm); setEditingPermId(null); }}
                 className="flex items-center gap-2 text-white px-5 py-2.5 rounded-lg font-bold transition-all shadow-lg shrink-0 ml-4"
-                style={{ backgroundColor: "#B8620A" }}
+                style={{ backgroundColor: "rgb(var(--primary-600))" }}
               >
                 <Plus className="w-5 h-5" />
                 Agregar Plato Permanente
@@ -512,7 +489,7 @@ export default function DailySpecialsPage() {
 
             {loadingPerm ? (
               <div className="text-center py-16">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: "#B8620A" }} />
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: "rgb(var(--primary-600))" }} />
                 <p className="text-gray-500 dark:text-gray-400">Cargando platos permanentes...</p>
               </div>
             ) : permanent.length === 0 ? (

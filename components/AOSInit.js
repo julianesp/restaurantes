@@ -13,25 +13,25 @@ export default function AOSInit() {
   useEffect(() => {
     AOS.init({
       // Duración de las animaciones en milisegundos
-      duration: 1000,
+      duration: 600,
 
       // Retraso antes de que comience la animación
-      delay: 100,
+      delay: 0,
 
       // Si las animaciones deben ocurrir solo una vez
       once: true,
 
       // Offset desde el punto de activación original
-      offset: 100,
+      offset: 60,
 
       // Función de aceleración
-      easing: "ease-in-out",
+      easing: "ease-out-cubic",
 
       // Si se debe animar elementos cuando se hace scroll hacia arriba
       mirror: false,
 
       // Si se deben deshabilitar animaciones en dispositivos móviles
-      disable: false,
+      disable: () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
     });
 
     // Refrescar AOS cuando cambie el contenido

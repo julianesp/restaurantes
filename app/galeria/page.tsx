@@ -17,6 +17,7 @@ import {
 import { useRevealOnScroll } from "../../utils/useRevealOnScroll";
 import Link from "next/link";
 import { createWhatsAppMessage } from "../../utils/whatsapp";
+import { useBranding } from "@/context/TenantContext";
 
 interface FoodItem {
   id: number;
@@ -158,15 +159,16 @@ const foodGallery: FoodItem[] = [
 
 const categories = [
   { id: "todos", name: "Todos", icon: UtensilsCrossed, color: "text-primary-500" },
-  { id: "desayunos", name: "Desayunos", icon: Coffee, color: "text-yellow-600" },
+  { id: "desayunos", name: "Desayunos", icon: Coffee, color: "text-primary-600" },
   { id: "almuerzos", name: "Almuerzos", icon: Soup, color: "text-accent-600" },
-  { id: "cenas", name: "Cenas", icon: Pizza, color: "text-indigo-600" },
-  { id: "postres", name: "Postres", icon: Cake, color: "text-pink-600" },
-  { id: "bebidas", name: "Bebidas", icon: Coffee, color: "text-amber-600" },
-  { id: "helados", name: "Helados", icon: IceCream, color: "text-cyan-600" },
+  { id: "cenas", name: "Cenas", icon: Pizza, color: "text-primary-600" },
+  { id: "postres", name: "Postres", icon: Cake, color: "text-primary-600" },
+  { id: "bebidas", name: "Bebidas", icon: Coffee, color: "text-primary-600" },
+  { id: "helados", name: "Helados", icon: IceCream, color: "text-primary-600" },
 ];
 
 export default function GalleryPage() {
+  const { whatsapp } = useBranding();
   const [selectedCategory, setSelectedCategory] = useState<string>("todos");
   const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
   const heroReveal = useRevealOnScroll<HTMLDivElement>();
@@ -293,7 +295,7 @@ export default function GalleryPage() {
                         onClick={(e) => {
                           e.stopPropagation();
                           window.open(
-                            createWhatsAppMessage(item.name, item.price),
+                            createWhatsAppMessage(item.name, item.price, whatsapp),
                             "_blank"
                           );
                         }}
@@ -379,7 +381,8 @@ export default function GalleryPage() {
                 <Link
                   href={createWhatsAppMessage(
                     selectedItem.name,
-                    selectedItem.price
+                    selectedItem.price,
+                    whatsapp
                   )}
                   target="_blank"
                   rel="noopener noreferrer"

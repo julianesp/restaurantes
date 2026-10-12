@@ -56,13 +56,13 @@ interface CartItem extends MenuItem {
 
 // Mapa de categoría → icono y color
 const CATEGORY_META: Record<string, { icon: typeof Coffee; color: string }> = {
-  "Platos Fuertes": { icon: UtensilsCrossed, color: "text-red-700" },
-  Sopas: { icon: Soup, color: "text-orange-600" },
-  Bebidas: { icon: Coffee, color: "text-amber-600" },
-  Postres: { icon: Cake, color: "text-pink-600" },
-  Desayuno: { icon: Coffee, color: "text-yellow-600" },
-  Almuerzo: { icon: UtensilsCrossed, color: "text-green-700" },
-  Cena: { icon: Pizza, color: "text-purple-600" },
+  "Platos Fuertes": { icon: UtensilsCrossed, color: "text-primary-600" },
+  Sopas: { icon: Soup, color: "text-primary-600" },
+  Bebidas: { icon: Coffee, color: "text-primary-600" },
+  Postres: { icon: Cake, color: "text-primary-600" },
+  Desayuno: { icon: Coffee, color: "text-primary-600" },
+  Almuerzo: { icon: UtensilsCrossed, color: "text-primary-600" },
+  Cena: { icon: Pizza, color: "text-primary-600" },
 };
 
 const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
@@ -273,8 +273,11 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
       const description = `Pedido - ${formData.nombre} - ${formData.tipoServicio}`;
 
       // URL de redirección después del pago (siempre usa la URL pública, ePayco rechaza localhost)
+      // Cada restaurante vive en su propio subdominio: se usa el origen actual,
+      // salvo en desarrollo local donde se recurre a NEXT_PUBLIC_BASE_URL.
+      const isLocal = window.location.hostname.endsWith("localhost");
       const baseUrl =
-        process.env.NEXT_PUBLIC_BASE_URL || window.location.origin;
+        (isLocal && process.env.NEXT_PUBLIC_BASE_URL) || window.location.origin;
       const redirectUrl = `${baseUrl}/payment/success?type=pedido&reference=${reference}`;
 
       // Crear enlace de pago en ePayco
@@ -375,7 +378,7 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
               <div className="flex flex-col items-center justify-center py-16 gap-4">
                 <div
                   className="animate-spin rounded-full h-12 w-12 border-b-2"
-                  style={{ borderColor: "#DE780D" }}
+                  style={{ borderColor: "rgb(var(--primary-500))" }}
                 />
                 <p className="text-gray-500 dark:text-gray-400">
                   Cargando el menú de hoy...

@@ -122,7 +122,7 @@ export default function TiqueterasAdminPage() {
       showCancelButton: true,
       confirmButtonText: "Sí, recargar",
       cancelButtonText: "Cancelar",
-      confirmButtonColor: "#DE780D",
+      confirmButtonColor: "rgb(var(--primary-500))",
       cancelButtonColor: "#6b7280",
       reverseButtons: true,
     });
@@ -144,13 +144,13 @@ export default function TiqueterasAdminPage() {
       showCancelButton: true,
       confirmButtonText: "Sí, eliminar",
       cancelButtonText: "Cancelar",
-      confirmButtonColor: "#DE780D",
+      confirmButtonColor: "rgb(var(--primary-500))",
       cancelButtonColor: "#6b7280",
       reverseButtons: true,
     });
     if (!result.isConfirmed) return;
     await fetch(`/api/tiqueteras?id=${t.id}`, { method: "DELETE" });
-    Swal.fire({ title: "Eliminada", text: "La tiquetera fue eliminada.", icon: "success", confirmButtonColor: "#DE780D", timer: 2000, showConfirmButton: false });
+    Swal.fire({ title: "Eliminada", text: "La tiquetera fue eliminada.", icon: "success", confirmButtonColor: "rgb(var(--primary-500))", timer: 2000, showConfirmButton: false });
     await load();
   };
 
@@ -339,7 +339,7 @@ export default function TiqueterasAdminPage() {
                       {/* Saldo */}
                       <div className="text-center flex-shrink-0">
                         <p className={`text-4xl font-extrabold ${
-                          restantes === 0 ? "text-red-500" : restantes <= 5 ? "text-orange-500" : "text-primary-500"
+                          restantes === 0 ? "text-red-500" : restantes <= 5 ? "text-yellow-600" : "text-primary-500"
                         }`}>
                           {restantes}
                         </p>
@@ -353,7 +353,7 @@ export default function TiqueterasAdminPage() {
                       <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                         <div
                           className={`h-full rounded-full transition-all ${
-                            pct > 50 ? "bg-green-500" : pct > 20 ? "bg-orange-400" : "bg-red-500"
+                            pct > 50 ? "bg-green-500" : pct > 20 ? "bg-yellow-400" : "bg-red-500"
                           }`}
                           style={{ width: `${pct}%` }}
                         />

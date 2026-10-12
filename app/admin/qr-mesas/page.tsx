@@ -23,7 +23,9 @@ interface Order {
   items: OrderItem[];
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+// El QR apunta al subdominio del restaurante desde el que se está administrando
+const getBaseUrl = () =>
+  typeof window !== "undefined" ? window.location.origin : process.env.NEXT_PUBLIC_BASE_URL || "";
 const TABLES_KEY = "qr_tables";
 
 const statusConfig = {
@@ -160,7 +162,7 @@ export default function MesasPedidosPage() {
   const printQR = (tableId: number) => {
     const win = window.open("", "_blank");
     if (!win) return;
-    const url = `${BASE_URL}/mesa/${tableId}`;
+    const url = `${getBaseUrl()}/mesa/${tableId}`;
     win.document.write(`
       <html><head><title>QR Mesa ${tableId}</title>
       <style>body{font-family:sans-serif;text-align:center;padding:40px}h2{margin-bottom:8px}p{color:#666;margin-bottom:20px}img{width:220px;height:220px}</style>
@@ -262,7 +264,7 @@ export default function MesasPedidosPage() {
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                 {tables.map((tableId) => {
-                  const url = `${BASE_URL}/mesa/${tableId}`;
+                  const url = `${getBaseUrl()}/mesa/${tableId}`;
                   return (
                     <div key={tableId} className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 flex flex-col items-center gap-3 relative group">
                       <button
@@ -371,7 +373,7 @@ export default function MesasPedidosPage() {
 
                         {/* Nota del cliente */}
                         {order.customer_notes && (
-                          <p className="text-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 rounded px-2 py-1 mb-3">
+                          <p className="text-xs text-yellow-800 dark:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 rounded px-2 py-1 mb-3">
                             Nota: {order.customer_notes}
                           </p>
                         )}

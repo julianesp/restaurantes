@@ -1,10 +1,10 @@
 "use client";
 
-import { useRevealOnScroll } from "../../utils/useRevealOnScroll";
-import Navbar from "../../components/Navbar/page";
-import Footer from "../../containers/Footer/page";
-import FloatingFooter from "../../components/FloatingFooter";
-import ScrollToTopButton from "../../components/ScrollToTopButton";
+import { useRevealOnScroll } from "@/utils/useRevealOnScroll";
+import Navbar from "@/components/Navbar/page";
+import Footer from "@/containers/Footer/page";
+import FloatingFooter from "@/components/FloatingFooter";
+import ScrollToTopButton from "@/components/ScrollToTopButton";
 import {
   Heart,
   Users,
@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-export default function AboutPage() {
+export default function LegacyAbout() {
   const heroReveal = useRevealOnScroll<HTMLDivElement>();
   const storyReveal = useRevealOnScroll<HTMLDivElement>();
   const philosophyReveal = useRevealOnScroll<HTMLDivElement>();
@@ -48,7 +48,7 @@ export default function AboutPage() {
           </h1>
           <p className="text-xl text-white/90 max-w-3xl mx-auto">
             Conoce la historia, filosofía y valores que hacen de Restaurante
-            un lugar especial en el Valle de Sibundoy
+            un lugar especial para disfrutar en familia
           </p>
         </div>
       </section>
@@ -72,7 +72,7 @@ export default function AboutPage() {
               <div className="space-y-4 text-gray-700 dark:text-gray-300">
                 <p className="text-lg leading-relaxed">
                   Restaurante nació del sueño de llevar los sabores
-                  auténticos y tradicionales del Valle de Sibundoy a cada mesa.
+                  auténticos y tradicionales de nuestra tierra a cada mesa.
                   Fundado con la pasión por la gastronomía local y el compromiso
                   con la calidad, nos hemos convertido en un referente en la
                   región.
@@ -85,8 +85,8 @@ export default function AboutPage() {
                   innovamos constantemente.
                 </p>
                 <p className="text-lg leading-relaxed">
-                  Hoy nos enorgullece ser el primer restaurante del Alto
-                  Putumayo con presencia digital completa, facilitando a
+                  Hoy nos enorgullece ofrecer una presencia digital completa,
+                  facilitando a
                   nuestros clientes el acceso a nuestros servicios de reservas y
                   pedidos en línea.
                 </p>
@@ -152,7 +152,7 @@ export default function AboutPage() {
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover-lift text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-primary-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Star className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
@@ -263,8 +263,7 @@ export default function AboutPage() {
                   Innovación Digital
                 </h3>
                 <p className="text-gray-700 dark:text-gray-300">
-                  Somos pioneros en el Alto Putumayo, ofreciendo servicios
-                  digitales modernos que facilitan la experiencia de nuestros
+                  Ofrecemos servicios digitales modernos que facilitan la experiencia de nuestros
                   clientes.
                 </p>
               </div>
@@ -274,7 +273,7 @@ export default function AboutPage() {
       </section>
 
       {/* Equipo (Placeholder para fotos futuras) */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-950">
         <div
           ref={teamReveal.ref}
           className={`max-w-6xl mx-auto reveal-on-scroll reveal-scale-up ${
@@ -327,7 +326,7 @@ export default function AboutPage() {
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               Somos más que un restaurante, somos una experiencia gastronómica
-              única en el Valle de Sibundoy
+              única en cada visita
             </p>
           </div>
 
@@ -337,11 +336,11 @@ export default function AboutPage() {
                 <Star className="w-6 h-6 text-white" />
               </div>
               <h3 className="text-xl font-bold mb-3">
-                Primer Restaurante Digital
+                Restaurante Digital
               </h3>
               <p className="text-gray-300">
-                Somos el único restaurante en el Alto Putumayo con presencia
-                digital completa, reservas y pedidos en línea.
+                Contamos con presencia digital completa, reservas y pedidos
+                en línea.
               </p>
             </div>
 
@@ -357,7 +356,7 @@ export default function AboutPage() {
             </div>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center mb-4">
                 <Heart className="w-6 h-6 text-white" />
               </div>
               <h3 className="text-xl font-bold mb-3">Atención Personalizada</h3>
@@ -410,8 +409,7 @@ export default function AboutPage() {
             ¿Listo para Vivir la Experiencia?
           </h2>
           <p className="text-xl text-gray-700 dark:text-gray-300 mb-8">
-            Ven y descubre por qué somos el restaurante favorito del Valle de
-            Sibundoy
+            Ven y descubre por qué somos el restaurante favorito de nuestros clientes
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

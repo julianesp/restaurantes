@@ -20,7 +20,7 @@ export default function CartButton() {
     <>
       <button
         onClick={() => setIsCartOpen(true)}
-        className="fixed top-16 right-2 z-40 bg-[#DE780D] hover:bg-[#B8620A] text-white p-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 group"
+        className="fixed bottom-20 right-4 z-30 bg-primary-600 hover:bg-primary-700 text-white p-3.5 rounded-full shadow-lg shadow-primary-900/20 group"
         aria-label="Abrir carrito"
       >
         <CartIcon className="w-6 h-6" />

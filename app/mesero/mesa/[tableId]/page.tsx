@@ -230,7 +230,7 @@ export default function MeseroTablePage() {
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full whitespace-nowrap text-sm font-medium transition-all ${
                 selectedCategory === cat
                   ? cat === "especiales"
-                    ? "bg-orange-500 text-white"
+                    ? "bg-yellow-400 text-gray-950"
                     : "bg-primary-500 text-white"
                   : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
               }`}
@@ -253,7 +253,7 @@ export default function MeseroTablePage() {
                 key={item.id}
                 className={`bg-white dark:bg-gray-800 rounded-xl flex items-center gap-3 shadow-sm border overflow-hidden ${
                   isSpecial
-                    ? "border-orange-300 dark:border-orange-600"
+                    ? "border-yellow-300 dark:border-yellow-600"
                     : "border-gray-100 dark:border-gray-700"
                 }`}
               >
@@ -266,7 +266,7 @@ export default function MeseroTablePage() {
                   />
                 ) : (
                   <div className={`w-20 h-20 flex-shrink-0 flex items-center justify-center text-2xl ${
-                    isSpecial ? "bg-orange-50 dark:bg-orange-900/20" : "bg-gray-50 dark:bg-gray-700"
+                    isSpecial ? "bg-yellow-50 dark:bg-yellow-900/20" : "bg-gray-50 dark:bg-gray-700"
                   }`}>
                     🍽️
                   </div>
@@ -275,7 +275,7 @@ export default function MeseroTablePage() {
                 {/* Info */}
                 <div className="flex-1 min-w-0 py-3 pr-1">
                   <div className="flex items-center gap-2">
-                    {isSpecial && <Star className="w-3.5 h-3.5 text-orange-500 flex-shrink-0" />}
+                    {isSpecial && <Star className="w-3.5 h-3.5 text-yellow-500 flex-shrink-0" />}
                     <h3 className="font-semibold text-gray-900 dark:text-white truncate">
                       {item.name}
                     </h3>
@@ -283,7 +283,7 @@ export default function MeseroTablePage() {
                   <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 mt-0.5">
                     {item.description}
                   </p>
-                  <p className={`text-sm font-bold mt-1 ${isSpecial ? "text-orange-500" : "text-primary-500"}`}>
+                  <p className={`text-sm font-bold mt-1 ${isSpecial ? "text-yellow-600 dark:text-yellow-400" : "text-primary-500"}`}>
                     {item.price}
                   </p>
                 </div>
@@ -294,7 +294,7 @@ export default function MeseroTablePage() {
                   <button
                     onClick={() => addItem(item)}
                     className={`flex items-center gap-1 px-4 py-2 rounded-lg text-white font-semibold text-sm transition-all ${
-                      isSpecial ? "bg-orange-500 hover:bg-orange-600" : "bg-primary-500 hover:bg-primary-600"
+                      isSpecial ? "bg-yellow-400 hover:bg-yellow-500 !text-gray-950" : "bg-primary-500 hover:bg-primary-600"
                     }`}
                   >
                     <Plus className="w-4 h-4" />
@@ -314,7 +314,7 @@ export default function MeseroTablePage() {
                     <button
                       onClick={() => changeQty(item.id, 1)}
                       className={`w-8 h-8 rounded-full text-white flex items-center justify-center transition-colors ${
-                        isSpecial ? "bg-orange-500 hover:bg-orange-600" : "bg-primary-500 hover:bg-primary-600"
+                        isSpecial ? "bg-yellow-400 hover:bg-yellow-500 !text-gray-950" : "bg-primary-500 hover:bg-primary-600"
                       }`}
                     >
                       <Plus className="w-4 h-4" />

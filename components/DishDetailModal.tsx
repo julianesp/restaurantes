@@ -80,8 +80,8 @@ export default function DishDetailModal({
                   : dish.color === "text-accent"
                   ? "from-accent-400 to-primary-500"
                   : dish.color === "text-primary-500"
-                  ? "from-primary-400 to-pink-500"
-                  : "from-purple-400 to-indigo-500"
+                  ? "from-primary-500 to-primary-700"
+                  : "from-primary-600 to-primary-900"
               } flex items-center justify-center shadow-xl`}
             >
               <IconComponent className={`w-16 h-16 ${dish.color}`} />

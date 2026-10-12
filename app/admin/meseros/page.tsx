@@ -37,7 +37,7 @@ export default function MeserosAdminPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (form.pin.length < 4) {
-      Swal.fire({ icon: "warning", title: "PIN muy corto", text: "El PIN debe tener al menos 4 dígitos.", confirmButtonColor: "#DE780D" });
+      Swal.fire({ icon: "warning", title: "PIN muy corto", text: "El PIN debe tener al menos 4 dígitos.", confirmButtonColor: "rgb(var(--primary-500))" });
       return;
     }
     setSaving(true);
@@ -54,7 +54,7 @@ export default function MeserosAdminPage() {
       setShowForm(false);
       Swal.fire({ icon: "success", title: "Mesero creado", timer: 2000, showConfirmButton: false });
     } catch (err: any) {
-      Swal.fire({ icon: "error", title: "Error", text: err.message, confirmButtonColor: "#DE780D" });
+      Swal.fire({ icon: "error", title: "Error", text: err.message, confirmButtonColor: "rgb(var(--primary-500))" });
     } finally {
       setSaving(false);
     }
@@ -76,7 +76,7 @@ export default function MeserosAdminPage() {
       inputLabel: "Nuevo PIN (mínimo 4 dígitos)",
       inputAttributes: { maxlength: "8", pattern: "[0-9]*", inputmode: "numeric" },
       showCancelButton: true,
-      confirmButtonColor: "#DE780D",
+      confirmButtonColor: "rgb(var(--primary-500))",
       cancelButtonText: "Cancelar",
       confirmButtonText: "Guardar",
       inputValidator: (v) => (!v || v.length < 4 ? "El PIN debe tener al menos 4 dígitos" : null),
@@ -99,7 +99,7 @@ export default function MeserosAdminPage() {
       showCancelButton: true,
       confirmButtonText: "Sí, eliminar",
       cancelButtonText: "Cancelar",
-      confirmButtonColor: "#DE780D",
+      confirmButtonColor: "rgb(var(--primary-500))",
       cancelButtonColor: "#6b7280",
       reverseButtons: true,
     });

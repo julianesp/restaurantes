@@ -184,7 +184,7 @@ export default function MiTiqueteraPage() {
                 <div className="text-center mb-6">
                   <p className={`text-8xl font-black leading-none ${
                     restantes === 0 ? "text-red-500" :
-                    restantes <= 5 ? "text-orange-500" : "text-primary-500"
+                    restantes <= 5 ? "text-yellow-600" : "text-primary-500"
                   }`}>
                     {restantes}
                   </p>
@@ -201,7 +201,7 @@ export default function MiTiqueteraPage() {
                   <div className="h-4 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
-                        pct > 50 ? "bg-green-500" : pct > 20 ? "bg-orange-400" : "bg-red-500"
+                        pct > 50 ? "bg-green-500" : pct > 20 ? "bg-yellow-400" : "bg-red-500"
                       }`}
                       style={{ width: `${pct}%` }}
                     />
