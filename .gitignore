@@ -45,3 +45,9 @@ next-env.d.ts
 
 # Ocultar archivos de ayuda de Claude
 *.sql
+/dist/
+.vinext/
+.cloudflare/
+
+# Generado por las herramientas de Cloudflare (tipos completos de Workers; rompen el type-check de la app)
+worker-configuration.d.ts

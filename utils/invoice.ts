@@ -2,6 +2,8 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 interface InvoiceData {
+  /** Datos del restaurante que emite el recibo */
+  restaurant: { name: string; whatsapp?: string; website?: string };
   reference: string;
   type: 'reserva' | 'pedido';
   customerName: string;
@@ -34,7 +36,7 @@ export function generateInvoicePDF(data: InvoiceData) {
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(24);
   doc.setFont('helvetica', 'bold');
-  doc.text('Tu Restaurante', 105, 20, { align: 'center' });
+  doc.text(data.restaurant.name, 105, 20, { align: 'center' });
 
   doc.setFontSize(12);
   doc.setFont('helvetica', 'normal');
@@ -186,8 +188,12 @@ export function generateInvoicePDF(data: InvoiceData) {
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(9);
   doc.text('Gracias por tu preferencia', 105, pageHeight - 18, { align: 'center' });
-  doc.text('WhatsApp: +57 317 450 3604', 105, pageHeight - 12, { align: 'center' });
-  doc.text('https://restaurantes-phi.vercel.app', 105, pageHeight - 6, { align: 'center' });
+  if (data.restaurant.whatsapp) {
+    doc.text(`WhatsApp: +${data.restaurant.whatsapp}`, 105, pageHeight - 12, { align: 'center' });
+  }
+  if (data.restaurant.website) {
+    doc.text(data.restaurant.website, 105, pageHeight - 6, { align: 'center' });
+  }
 
   return doc;
 }

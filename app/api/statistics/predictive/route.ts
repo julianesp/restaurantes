@@ -1,60 +1,41 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+import { adminCtx } from '@/lib/tenant';
+import { predictiveDishes, hourlyPatterns, type TimeFilter } from '@/lib/stats';
 
 /**
- * GET /api/statistics/predictive
- *
- * Obtiene estadísticas predictivas para preparar platos con anticipación
+ * GET /api/statistics/predictive (solo admin)
  *
  * Query params:
  * - type: 'dishes' | 'hourly' | 'customer-favorites' (default: 'dishes')
  * - daysToAnalyze: number (default: 30)
  * - minFrequency: number (0-1, default: 0.3)
+ * - timeFilter: 'today' | 'week' | 'month' | 'all' (solo 'hourly', default: 'week')
+ *
+ * 'customer-favorites' devuelve vacío: los pedidos no guardan identidad de cliente,
+ * así que no se puede calcular sin inventar datos.
  */
 export async function GET(request: Request) {
   try {
+    const ctx = await adminCtx();
+    if (!ctx.ok) return ctx.res;
+
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type') || 'dishes';
-    const daysToAnalyze = parseInt(searchParams.get('daysToAnalyze') || '30');
-    const minFrequency = parseFloat(searchParams.get('minFrequency') || '0.3');
-    const timeFilter = searchParams.get('timeFilter') || 'week';
+    const days = Math.min(Math.max(parseInt(searchParams.get('daysToAnalyze') || '30') || 30, 1), 365);
+    const minFrequency = Math.min(Math.max(parseFloat(searchParams.get('minFrequency') || '0.3') || 0.3, 0), 1);
+    const timeFilter = (searchParams.get('timeFilter') || 'week') as TimeFilter;
 
-    console.log(`[Predictive API] Request: type=${type}, days=${daysToAnalyze}, minFreq=${minFrequency}`);
-
-    let data;
-    let error;
-
+    let data: unknown[];
     switch (type) {
       case 'dishes':
-        // Análisis predictivo de platos para preparar con anticipación
-        ({ data, error } = await supabaseAdmin.rpc('get_predictive_dish_analysis', {
-          days_to_analyze: daysToAnalyze,
-          min_frequency_score: minFrequency,
-        }));
-        console.log(`[Predictive API] Dishes result:`, { dataCount: data?.length, error: error?.message });
+        data = await predictiveDishes(ctx.tenant.id, days, minFrequency);
         break;
-
       case 'hourly':
-        // Patrones de pedidos por hora
-        ({ data, error } = await supabaseAdmin.rpc('get_hourly_order_patterns', {
-          time_filter: timeFilter,
-        }));
-        console.log(`[Predictive API] Hourly result:`, { dataCount: data?.length, error: error?.message });
+        data = await hourlyPatterns(ctx.tenant.id, timeFilter);
         break;
-
       case 'customer-favorites':
-        // Platos favoritos de clientes frecuentes
-        ({ data, error } = await supabaseAdmin.rpc('get_customer_favorite_patterns', {
-          days_to_analyze: daysToAnalyze,
-        }));
-        console.log(`[Predictive API] Customer favorites result:`, { dataCount: data?.length, error: error?.message });
+        data = [];
         break;
-
       default:
         return NextResponse.json(
           { error: 'Invalid type parameter. Must be one of: dishes, hourly, customer-favorites' },
@@ -62,23 +43,7 @@ export async function GET(request: Request) {
         );
     }
 
-    if (error) {
-      console.error('Error fetching predictive statistics:', error);
-      return NextResponse.json(
-        {
-          error: 'Failed to fetch predictive statistics',
-          details: error.message,
-          hint: 'Make sure you have run the supabase-predictive-statistics.sql file in your Supabase SQL editor'
-        },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      type,
-      data: data || [],
-    });
+    return NextResponse.json({ success: true, type, data });
   } catch (error) {
     console.error('Error in predictive statistics API:', error);
     return NextResponse.json(

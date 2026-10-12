@@ -1,0 +1,32 @@
+{
+  // Configuración de DESPLIEGUE con wrangler. Apunta a la salida de `npm run build`
+  // (vite + vinext). Los bindings deben coincidir con los de cloudflare.config.ts.
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "restaurantes",
+  "main": "../.cloudflare/output/v0/workers/default/bundle/index.js",
+  "compatibility_date": "2026-09-28",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "../.cloudflare/output/v0/workers/default/assets",
+    "binding": "ASSETS",
+    "not_found_handling": "none"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "restaurantes",
+      "database_id": "3fc1369d-6fde-4a9b-891e-af980ff1723f",
+      "migrations_dir": "../migrations"
+    }
+  ],
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "restaurantes-media" }],
+  // Lunes 05:00 UTC: plato ganador de la semana anterior (ver worker/index.ts)
+  "triggers": { "crons": ["0 5 * * 1"] },
+  "vars": {
+    "ADMIN_EMAILS": "julii1295@gmail.com",
+    "DEFAULT_TENANT_SLUG": "restaurante"
+  },
+  // Secretos (wrangler secret put -c deploy/wrangler.jsonc <NOMBRE>):
+  //   CLERK_SECRET_KEY, CRON_SECRET, EPAYCO_PRIVATE_KEY, TELEGRAM_BOT_TOKEN
+  "observability": { "enabled": true }
+}

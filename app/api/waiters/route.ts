@@ -1,73 +1,69 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
-import { currentUser } from "@clerk/nextjs/server";
-
-async function isAdmin() {
-  const user = await currentUser();
-  if (!user) return false;
-  const adminEmails = process.env.ADMIN_EMAILS?.split(",").map((e) => e.trim()) || [];
-  const email = user.emailAddresses[0]?.emailAddress;
-  return email && adminEmails.includes(email);
-}
+import { adminCtx } from "@/lib/tenant";
+import { all, insert, updateOwned, deleteOwned, isUniqueViolation } from "@/lib/db";
 
 export async function GET() {
-  if (!(await isAdmin())) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
-  if (!supabaseAdmin) return NextResponse.json({ error: "Error de configuración" }, { status: 500 });
+  const ctx = await adminCtx();
+  if (!ctx.ok) return ctx.res;
 
-  const { data, error } = await supabaseAdmin
-    .from("waiters")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data);
+  return NextResponse.json(
+    await all("SELECT * FROM waiters WHERE restaurant_id = ? ORDER BY created_at DESC", ctx.tenant.id)
+  );
 }
 
 export async function POST(request: Request) {
-  if (!(await isAdmin())) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
-  if (!supabaseAdmin) return NextResponse.json({ error: "Error de configuración" }, { status: 500 });
+  const ctx = await adminCtx();
+  if (!ctx.ok) return ctx.res;
 
   const { name, email, pin } = await request.json();
   if (!name || !email || !pin)
     return NextResponse.json({ error: "Nombre, email y PIN son requeridos" }, { status: 400 });
 
-  const { data, error } = await supabaseAdmin
-    .from("waiters")
-    .insert({ name, email: email.toLowerCase().trim(), pin, active: true })
-    .select()
-    .single();
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data, { status: 201 });
+  try {
+    const data = await insert("waiters", {
+      restaurant_id: ctx.tenant.id,
+      name,
+      email: String(email).toLowerCase().trim(),
+      pin: String(pin),
+      active: true,
+    });
+    return NextResponse.json(data, { status: 201 });
+  } catch (error) {
+    if (isUniqueViolation(error))
+      return NextResponse.json({ error: "El correo o el PIN ya están en uso" }, { status: 409 });
+    throw error;
+  }
 }
 
 export async function PATCH(request: Request) {
-  if (!(await isAdmin())) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
-  if (!supabaseAdmin) return NextResponse.json({ error: "Error de configuración" }, { status: 500 });
+  const ctx = await adminCtx();
+  if (!ctx.ok) return ctx.res;
 
   const { id, active, pin } = await request.json();
   if (!id) return NextResponse.json({ error: "id es requerido" }, { status: 400 });
 
-  const update: Record<string, unknown> = {};
-  if (active !== undefined) update.active = active;
-  if (pin) update.pin = pin;
+  const update: Record<string, string | boolean> = {};
+  if (active !== undefined) update.active = !!active;
+  if (pin) update.pin = String(pin);
 
-  const { data, error } = await supabaseAdmin
-    .from("waiters").update(update).eq("id", id).select().single();
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data);
+  try {
+    const data = await updateOwned("waiters", ctx.tenant.id, id, update);
+    if (!data) return NextResponse.json({ error: "Mesero no encontrado" }, { status: 404 });
+    return NextResponse.json(data);
+  } catch (error) {
+    if (isUniqueViolation(error))
+      return NextResponse.json({ error: "Ese PIN ya está en uso" }, { status: 409 });
+    throw error;
+  }
 }
 
 export async function DELETE(request: Request) {
-  if (!(await isAdmin())) return NextResponse.json({ error: "No autorizado" }, { status: 403 });
-  if (!supabaseAdmin) return NextResponse.json({ error: "Error de configuración" }, { status: 500 });
+  const ctx = await adminCtx();
+  if (!ctx.ok) return ctx.res;
 
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get("id");
+  const id = new URL(request.url).searchParams.get("id");
   if (!id) return NextResponse.json({ error: "id es requerido" }, { status: 400 });
 
-  const { error } = await supabaseAdmin.from("waiters").delete().eq("id", id);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  await deleteOwned("waiters", ctx.tenant.id, id);
   return NextResponse.json({ ok: true });
 }

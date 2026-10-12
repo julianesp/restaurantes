@@ -5,9 +5,12 @@ import { useSearchParams } from "next/navigation";
 import { FileText, Download, Eye, Loader2, ArrowLeft, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { downloadInvoice, viewInvoice } from "../../utils/invoice";
+import { useBranding } from "@/context/TenantContext";
 
 function InvoicePageContent() {
   const searchParams = useSearchParams();
+  const branding = useBranding();
+  const restaurant = { name: branding.name, whatsapp: branding.whatsapp, website: typeof window !== 'undefined' ? window.location.origin : undefined };
   const [invoiceData, setInvoiceData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -50,6 +53,7 @@ function InvoicePageContent() {
     if (!invoiceData) return;
 
     downloadInvoice({
+      restaurant,
       reference: invoiceData.reference,
       type: type as 'reserva' | 'pedido',
       customerName: invoiceData.nombre,
@@ -73,6 +77,7 @@ function InvoicePageContent() {
     if (!invoiceData) return;
 
     viewInvoice({
+      restaurant,
       reference: invoiceData.reference,
       type: type as 'reserva' | 'pedido',
       customerName: invoiceData.nombre,

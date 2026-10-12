@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { notifyNewOrder, notifyNewReservation, notifyPaymentError } from '../../../../lib/notificationService';
+import { notifyNewOrder, notifyNewReservation, notifyPaymentError, targetFor } from '../../../../lib/notificationService';
+import { getTenantBySlug } from '@/lib/tenant';
 
 export async function POST(request: Request) {
   try {
@@ -16,10 +17,19 @@ export async function POST(request: Request) {
       x_approval_code,
       x_extra1,
       x_extra2,
+      x_extra3,
       x_customer_name,
       x_customer_phone,
       x_customer_email,
     } = body;
+
+    // El restaurante viaja en extra3 (lo puso create-payment). Sin él no se sabe a quién avisar.
+    const tenant = x_extra3 ? await getTenantBySlug(String(x_extra3)) : null;
+    if (!tenant) {
+      console.error('ePayco webhook sin restaurante identificable (x_extra3):', x_extra3);
+      return NextResponse.json({ success: true });
+    }
+    const target = targetFor(tenant);
 
     if (x_transaction_state === 'Aceptada') {
       console.log(`✅ Pago exitoso - Referencia: ${x_invoice}, ePayco Ref: ${x_ref_payco}`);
@@ -37,7 +47,7 @@ export async function POST(request: Request) {
           time: 'Ver referencia',
           people: 'Ver referencia',
           transactionId: x_transaction_id,
-        }).catch(() => {}); // No bloquear si falla
+        }, target).catch(() => {}); // No bloquear si falla
       } else {
         // Pedido normal
         const amountNumber = parseFloat(x_amount || '0');
@@ -50,12 +60,12 @@ export async function POST(request: Request) {
           items: [{ name: 'Ver detalles en referencia', quantity: 1 }],
           total: amountNumber,
           transactionId: x_transaction_id,
-        }).catch(() => {}); // No bloquear si falla
+        }, target).catch(() => {}); // No bloquear si falla
       }
 
     } else if (x_transaction_state === 'Rechazada') {
       console.log(`❌ Pago rechazado - Referencia: ${x_invoice}`);
-      await notifyPaymentError(`Pago rechazado`, { reference: x_invoice, transactionId: x_transaction_id }).catch(() => {});
+      await notifyPaymentError(`Pago rechazado`, { reference: x_invoice, transactionId: x_transaction_id }, target).catch(() => {});
     } else {
       console.log(`⏳ Pago pendiente - Referencia: ${x_invoice}`);
     }

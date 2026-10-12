@@ -29,7 +29,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Cargar carrito desde localStorage
   useEffect(() => {
-    const savedCart = localStorage.getItem("munay-cart");
+    const savedCart = localStorage.getItem("restaurante-cart");
     if (savedCart) {
       try {
         setCart(JSON.parse(savedCart));
@@ -41,7 +41,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Guardar carrito en localStorage
   useEffect(() => {
-    localStorage.setItem("munay-cart", JSON.stringify(cart));
+    localStorage.setItem("restaurante-cart", JSON.stringify(cart));
   }, [cart]);
 
   const addToCart = (item: Omit<CartItem, "quantity">) => {

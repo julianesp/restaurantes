@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { publicCtx } from '@/lib/tenant';
+import { getFullMenu } from '@/lib/menu';
 // @ts-ignore - jsPDF no tiene tipos completos
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
@@ -16,42 +17,12 @@ declare module 'jspdf' {
 
 export async function GET() {
   try {
-    if (!supabase) {
-      return NextResponse.json(
-        { error: 'Supabase no está configurado' },
-        { status: 503 }
-      );
-    }
+    const ctx = await publicCtx();
+    if (!ctx.ok) return ctx.res;
+    const { tenant } = ctx;
 
-    // Obtener categorías activas
-    const { data: categories, error: categoriesError } = await supabase
-      .from('menu_categories')
-      .select('*')
-      .eq('is_active', true)
-      .order('display_order', { ascending: true });
-
-    if (categoriesError) {
-      console.error('Error al obtener categorías:', categoriesError);
-      return NextResponse.json(
-        { error: 'Error al obtener las categorías' },
-        { status: 500 }
-      );
-    }
-
-    // Obtener todos los items disponibles
-    const { data: items, error: itemsError } = await supabase
-      .from('menu_items')
-      .select('*')
-      .eq('is_available', true)
-      .order('display_order', { ascending: true });
-
-    if (itemsError) {
-      console.error('Error al obtener items:', itemsError);
-      return NextResponse.json(
-        { error: 'Error al obtener los items del menú' },
-        { status: 500 }
-      );
-    }
+    // Categorías activas y platos disponibles, ya agrupados
+    const menu = await getFullMenu(tenant.id);
 
     // Crear PDF
     const doc = new jsPDF();
@@ -61,7 +32,7 @@ export async function GET() {
     // Título principal
     doc.setFontSize(24);
     doc.setFont('helvetica', 'bold');
-    doc.text('Restaurante', pageWidth / 2, yPosition, { align: 'center' });
+    doc.text(tenant.name, pageWidth / 2, yPosition, { align: 'center' });
 
     yPosition += 10;
     doc.setFontSize(16);
@@ -71,17 +42,16 @@ export async function GET() {
     yPosition += 5;
     doc.setFontSize(10);
     doc.setTextColor(100);
-    doc.text('Comida tradicional con amor', pageWidth / 2, yPosition, {
-      align: 'center',
-    });
+    const tagline = typeof tenant.settings?.tagline === 'string' ? tenant.settings.tagline : '';
+    if (tagline) {
+      doc.text(tagline, pageWidth / 2, yPosition, { align: 'center' });
+    }
 
     yPosition += 15;
 
     // Iterar sobre cada categoría
-    categories.forEach((category, index) => {
-      const categoryItems = items.filter(
-        (item) => item.category_id === category.id
-      );
+    menu.forEach((category) => {
+      const categoryItems = category.items;
 
       if (categoryItems.length === 0) return;
 
@@ -102,8 +72,8 @@ export async function GET() {
       // Crear tabla con los items de la categoría
       const tableData = categoryItems.map((item) => {
         let name = item.name;
-        if (item.is_vegetarian) name += ' 🌱';
-        if (item.is_spicy) name += ' 🌶️';
+        if (item.isVegetarian) name += ' 🌱';
+        if (item.isSpicy) name += ' 🌶️';
 
         return [name, item.description || '', item.price];
       });
@@ -140,7 +110,7 @@ export async function GET() {
       doc.setFontSize(8);
       doc.setTextColor(150);
       doc.text(
-        `Restaurante - Página ${i} de ${pageCount}`,
+        `${tenant.name} - Página ${i} de ${pageCount}`,
         pageWidth / 2,
         doc.internal.pageSize.height - 10,
         { align: 'center' }
@@ -154,7 +124,7 @@ export async function GET() {
     return new NextResponse(pdfBuffer, {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': 'attachment; filename="menu-restaurante-munay.pdf"',
+        'Content-Disposition': `attachment; filename="menu-${tenant.slug}.pdf"`,
       },
     });
   } catch (error) {

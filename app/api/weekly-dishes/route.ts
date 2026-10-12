@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+import { publicCtx, adminCtx } from '@/lib/tenant';
+import { updateOwned, pick } from '@/lib/db';
+import {
+  currentFeaturedDish, featuredDishesHistory, currentWeekWinner, publishWeeklyWinner,
+} from '@/lib/weekly';
 
 export interface WeeklyFeaturedDish {
   id: string;
@@ -38,63 +37,34 @@ export interface WeekWinner {
 
 /**
  * GET /api/weekly-dishes
- *
- * Obtiene platos destacados de la semana
- *
  * Query params:
  * - type: 'current' | 'history' | 'winner' (default: 'current')
- * - limit: number (solo para type='history', default: 20)
- * - onlyActive: boolean (solo para type='history', default: false)
+ * - limit / onlyActive: solo para type='history'
+ *
+ * 'current' e 'history' son públicos (se muestran en la landing);
+ * 'winner' expone ventas de la semana en curso y es solo para admins.
  */
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type') || 'current';
-    const limit = parseInt(searchParams.get('limit') || '20');
+    const limit = Math.min(parseInt(searchParams.get('limit') || '20') || 20, 100);
     const onlyActive = searchParams.get('onlyActive') === 'true';
 
-    let data;
-    let error;
-
-    switch (type) {
-      case 'current':
-        // Obtener plato activo actual
-        ({ data, error } = await supabaseAdmin.rpc('get_current_featured_dish'));
-        break;
-
-      case 'history':
-        // Obtener historial de platos destacados
-        ({ data, error } = await supabaseAdmin.rpc('get_featured_dishes_history', {
-          limit_count: limit,
-          only_active: onlyActive,
-        }));
-        break;
-
-      case 'winner':
-        // Obtener ganador de la semana actual (sin publicar)
-        ({ data, error } = await supabaseAdmin.rpc('get_current_week_winner'));
-        break;
-
-      default:
-        return NextResponse.json(
-          { error: 'Invalid type. Must be one of: current, history, winner' },
-          { status: 400 }
-        );
+    if (!['current', 'history', 'winner'].includes(type)) {
+      return NextResponse.json({ error: 'Invalid type. Must be one of: current, history, winner' }, { status: 400 });
     }
 
-    if (error) {
-      console.error('Error fetching weekly dishes:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch weekly dishes', details: error.message },
-        { status: 500 }
-      );
-    }
+    const ctx = type === 'winner' ? await adminCtx() : await publicCtx();
+    if (!ctx.ok) return ctx.res;
+    const id = ctx.tenant.id;
 
-    return NextResponse.json({
-      success: true,
-      type,
-      data: data || (type === 'current' ? null : []),
-    });
+    const data =
+      type === 'current' ? (await currentFeaturedDish(id)) ?? null
+      : type === 'history' ? await featuredDishesHistory(id, limit, onlyActive)
+      : await currentWeekWinner(id);
+
+    return NextResponse.json({ success: true, type, data });
   } catch (error) {
     console.error('Error in weekly dishes API:', error);
     return NextResponse.json(
@@ -104,151 +74,63 @@ export async function GET(request: Request) {
   }
 }
 
-/**
- * POST /api/weekly-dishes
- *
- * Publica un plato como ganador de la semana
- *
- * Body:
- * {
- *   item_id: string,
- *   item_name: string,
- *   item_description: string,
- *   item_price: number,
- *   item_image?: string,
- *   total_orders: number,
- *   total_quantity_sold: number,
- *   total_revenue: number,
- *   week_start_date: string (ISO date),
- *   week_end_date: string (ISO date),
- *   published_by?: string
- * }
- */
+/** POST /api/weekly-dishes — publica un plato como ganador de la semana (admin) */
 export async function POST(request: Request) {
   try {
+    const ctx = await adminCtx();
+    if (!ctx.ok) return ctx.res;
+
     const body = await request.json();
-
-    // Validar campos requeridos
-    const requiredFields = [
-      'item_id',
-      'item_name',
-      'item_price',
-      'total_orders',
-      'total_quantity_sold',
-      'total_revenue',
-      'week_start_date',
-      'week_end_date',
+    const required = [
+      'item_id', 'item_name', 'item_price', 'total_orders', 'total_quantity_sold',
+      'total_revenue', 'week_start_date', 'week_end_date',
     ];
-
-    const missingFields = requiredFields.filter(field => !(field in body));
-    if (missingFields.length > 0) {
-      return NextResponse.json(
-        { error: `Missing required fields: ${missingFields.join(', ')}` },
-        { status: 400 }
-      );
+    const missing = required.filter((field) => !(field in body));
+    if (missing.length > 0) {
+      return NextResponse.json({ error: `Missing required fields: ${missing.join(', ')}` }, { status: 400 });
     }
 
-    const {
-      item_id,
-      item_name,
-      item_description = '',
-      item_price,
-      item_image = null,
-      total_orders,
-      total_quantity_sold,
-      total_revenue,
-      week_start_date,
-      week_end_date,
-      published_by = null,
-    } = body;
-
-    // Publicar el plato ganador
-    const { data, error } = await supabaseAdmin.rpc('publish_weekly_winner', {
-      p_item_id: item_id,
-      p_item_name: item_name,
-      p_item_description: item_description,
-      p_item_price: item_price,
-      p_item_image: item_image,
-      p_total_orders: total_orders,
-      p_total_quantity_sold: total_quantity_sold,
-      p_total_revenue: total_revenue,
-      p_week_start_date: week_start_date,
-      p_week_end_date: week_end_date,
-      p_published_by: published_by,
+    const id = await publishWeeklyWinner(ctx.tenant.id, {
+      item_id: body.item_id,
+      item_name: body.item_name,
+      item_description: body.item_description ?? '',
+      item_price: body.item_price,
+      item_image: body.item_image ?? null,
+      total_orders: body.total_orders,
+      total_quantity_sold: body.total_quantity_sold,
+      total_revenue: body.total_revenue,
+      week_start_date: body.week_start_date,
+      week_end_date: body.week_end_date,
+      published_by: ctx.email,
     });
 
-    if (error) {
-      console.error('Error publishing weekly winner:', error);
-      return NextResponse.json(
-        { error: 'Failed to publish weekly winner', details: error.message },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: 'Weekly winner published successfully',
-      id: data,
-    });
+    return NextResponse.json({ success: true, message: 'Weekly winner published successfully', id });
   } catch (error) {
     console.error('Error in publish weekly dish API:', error);
     return NextResponse.json(
-      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to publish weekly winner', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
 }
 
-/**
- * PATCH /api/weekly-dishes
- *
- * Actualiza un plato destacado (por ejemplo, desactivarlo)
- *
- * Body:
- * {
- *   id: string (UUID),
- *   is_active?: boolean,
- *   item_image?: string
- * }
- */
+/** PATCH /api/weekly-dishes — actualiza un plato destacado (p. ej. desactivarlo) (admin) */
 export async function PATCH(request: Request) {
   try {
+    const ctx = await adminCtx();
+    if (!ctx.ok) return ctx.res;
+
     const body = await request.json();
+    if (!body.id) return NextResponse.json({ error: 'Missing required field: id' }, { status: 400 });
 
-    if (!body.id) {
-      return NextResponse.json(
-        { error: 'Missing required field: id' },
-        { status: 400 }
-      );
-    }
+    const data = await updateOwned('weekly_featured_dishes', ctx.tenant.id, body.id, pick(body, ['is_active', 'item_image']));
+    if (!data) return NextResponse.json({ error: 'Weekly dish not found' }, { status: 404 });
 
-    const { id, ...updates } = body;
-
-    // Actualizar el registro
-    const { data, error } = await supabaseAdmin
-      .from('weekly_featured_dishes')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error updating weekly dish:', error);
-      return NextResponse.json(
-        { error: 'Failed to update weekly dish', details: error.message },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: 'Weekly dish updated successfully',
-      data,
-    });
+    return NextResponse.json({ success: true, message: 'Weekly dish updated successfully', data });
   } catch (error) {
     console.error('Error in update weekly dish API:', error);
     return NextResponse.json(
-      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to update weekly dish', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

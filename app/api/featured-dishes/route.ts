@@ -1,39 +1,25 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+import { publicCtx, adminCtx } from '@/lib/tenant';
+import { all, insert } from '@/lib/db';
 
 /**
  * GET /api/featured-dishes
- * Obtiene todos los platos destacados activos
+ * Obtiene todos los platos destacados activos del restaurante
  */
 export async function GET() {
   try {
-    const { data, error } = await supabaseAdmin
-      .from('featured_dishes')
-      .select('*')
-      .eq('is_active', true)
-      .order('display_order', { ascending: true });
+    const ctx = await publicCtx();
+    if (!ctx.ok) return ctx.res;
 
-    if (error) {
-      console.error('Error fetching featured dishes:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch featured dishes', details: error.message },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: data || [],
-    });
+    const data = await all(
+      'SELECT * FROM featured_dishes WHERE restaurant_id = ? AND is_active = 1 ORDER BY display_order',
+      ctx.tenant.id
+    );
+    return NextResponse.json({ success: true, data });
   } catch (error) {
     console.error('Error in featured dishes API:', error);
     return NextResponse.json(
-      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to fetch featured dishes', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
@@ -41,12 +27,14 @@ export async function GET() {
 
 /**
  * POST /api/featured-dishes
- * Crea un nuevo plato destacado
+ * Crea un nuevo plato destacado (solo admin del restaurante)
  */
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { name, description, price, image_url, display_order } = body;
+    const ctx = await adminCtx();
+    if (!ctx.ok) return ctx.res;
+
+    const { name, description, price, image_url, display_order } = await request.json();
 
     if (!name || !description || !price) {
       return NextResponse.json(
@@ -55,37 +43,21 @@ export async function POST(request: Request) {
       );
     }
 
-    const { data, error } = await supabaseAdmin
-      .from('featured_dishes')
-      .insert([
-        {
-          name,
-          description,
-          price,
-          image_url: image_url || null,
-          display_order: display_order || 0,
-          is_active: true,
-        },
-      ])
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error creating featured dish:', error);
-      return NextResponse.json(
-        { error: 'Failed to create featured dish', details: error.message },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      data,
+    const data = await insert('featured_dishes', {
+      restaurant_id: ctx.tenant.id,
+      name,
+      description,
+      price,
+      image_url: image_url || null,
+      display_order: display_order || 0,
+      is_active: true,
     });
+
+    return NextResponse.json({ success: true, data });
   } catch (error) {
     console.error('Error in create featured dish API:', error);
     return NextResponse.json(
-      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to create featured dish', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

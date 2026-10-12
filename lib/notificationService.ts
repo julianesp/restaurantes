@@ -6,14 +6,32 @@
 const log = (...args: unknown[]) => console.log('[NOTIF]', ...args);
 const logError = (...args: unknown[]) => console.error('[NOTIF ERROR]', ...args);
 
-async function sendTelegramMessage(message: string): Promise<boolean> {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
+/** A quién se notifica: cada restaurante tiene su propio chat de Telegram. */
+export interface NotifyTarget {
+  restaurantName: string;
+  chatId: string | null;
+}
 
-  if (!botToken || !chatId) {
-    log('⚠️ Telegram no configurado. Omitiendo notificación.');
+/**
+ * Destino de las notificaciones de un restaurante: el chat de Telegram que configuró en su panel.
+ * El restaurante original conserva TELEGRAM_CHAT_ID como respaldo. Sin chat configurado no se notifica.
+ */
+export function targetFor(tenant: { name: string; plan: string; settings: Record<string, unknown> }): NotifyTarget {
+  const configured = typeof tenant.settings?.telegram_chat_id === 'string' ? tenant.settings.telegram_chat_id.trim() : '';
+  const chatId = configured || (tenant.plan === 'legacy' ? process.env.TELEGRAM_CHAT_ID || '' : '');
+  return { restaurantName: tenant.name, chatId: chatId || null };
+}
+
+// Un solo bot de la plataforma (TELEGRAM_BOT_TOKEN); cada restaurante lo agrega a su chat.
+async function sendTelegramMessage(message: string, target: NotifyTarget): Promise<boolean> {
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+
+  if (!botToken || !target.chatId) {
+    log('⚠️ Telegram no configurado para este restaurante. Omitiendo notificación.');
     return false;
   }
+
+  const text = `🏪 <b>${escapeHtml(target.restaurantName)}</b>\n${message}`;
 
   try {
     const response = await fetch(
@@ -21,11 +39,7 @@ async function sendTelegramMessage(message: string): Promise<boolean> {
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: message,
-          parse_mode: 'HTML',
-        }),
+        body: JSON.stringify({ chat_id: target.chatId, text, parse_mode: 'HTML' }),
       }
     );
 
@@ -42,6 +56,9 @@ async function sendTelegramMessage(message: string): Promise<boolean> {
     return false;
   }
 }
+
+const escapeHtml = (value: string) =>
+  value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 export interface OrderNotificationData {
   reference: string;
@@ -71,7 +88,7 @@ export interface ReservationNotificationData {
 /**
  * Notifica al chef y administrador sobre un nuevo pedido aprobado
  */
-export async function notifyNewOrder(orderData: OrderNotificationData): Promise<boolean> {
+export async function notifyNewOrder(orderData: OrderNotificationData, target: NotifyTarget): Promise<boolean> {
   try {
     log('🍽️ Enviando notificación de nuevo pedido...');
 
@@ -121,7 +138,7 @@ ${itemsText}
 🕐 <b>Hora:</b> ${fecha}
     `.trim();
 
-    return await sendTelegramMessage(mensaje);
+    return await sendTelegramMessage(mensaje, target);
   } catch (error) {
     logError('Error en notifyNewOrder:', error);
     return false;
@@ -131,7 +148,7 @@ ${itemsText}
 /**
  * Notifica sobre una nueva reserva aprobada
  */
-export async function notifyNewReservation(reservationData: ReservationNotificationData): Promise<boolean> {
+export async function notifyNewReservation(reservationData: ReservationNotificationData, target: NotifyTarget): Promise<boolean> {
   try {
     log('📅 Enviando notificación de nueva reserva...');
 
@@ -162,7 +179,7 @@ export async function notifyNewReservation(reservationData: ReservationNotificat
 ⏰ <b>Registrado:</b> ${fecha}
     `.trim();
 
-    return await sendTelegramMessage(mensaje);
+    return await sendTelegramMessage(mensaje, target);
   } catch (error) {
     logError('Error en notifyNewReservation:', error);
     return false;
@@ -172,7 +189,7 @@ export async function notifyNewReservation(reservationData: ReservationNotificat
 /**
  * Notifica un error crítico en el proceso de pago
  */
-export async function notifyPaymentError(errorMessage: string, context: Record<string, unknown> = {}): Promise<boolean> {
+export async function notifyPaymentError(errorMessage: string, context: Record<string, unknown>, target: NotifyTarget): Promise<boolean> {
   try {
     const mensaje = `
 ⚠️ <b>ERROR EN PAGO</b>
@@ -182,7 +199,7 @@ export async function notifyPaymentError(errorMessage: string, context: Record<s
 🕐 ${new Date().toLocaleString('es-CO')}
     `.trim();
 
-    return await sendTelegramMessage(mensaje);
+    return await sendTelegramMessage(mensaje, target);
   } catch (error) {
     logError('Error en notifyPaymentError:', error);
     return false;
@@ -192,15 +209,12 @@ export async function notifyPaymentError(errorMessage: string, context: Record<s
 /**
  * Envía una notificación de prueba para verificar la configuración
  */
-export async function sendTestNotification(): Promise<{ success: boolean; error?: string }> {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-
-  if (!botToken || !chatId) {
-    return {
-      success: false,
-      error: 'TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID deben estar configurados en las variables de entorno',
-    };
+export async function sendTestNotification(target: NotifyTarget): Promise<{ success: boolean; error?: string }> {
+  if (!process.env.TELEGRAM_BOT_TOKEN) {
+    return { success: false, error: 'El bot de Telegram de la plataforma no está configurado' };
+  }
+  if (!target.chatId) {
+    return { success: false, error: 'Aún no has configurado el ID de tu chat de Telegram' };
   }
 
   const mensaje = `
@@ -208,7 +222,7 @@ export async function sendTestNotification(): Promise<{ success: boolean; error?
 
 ✅ El bot de Telegram está configurado correctamente.
 
-El chef y administrador recibirán notificaciones automáticas cuando:
+Tu equipo recibirá notificaciones automáticas cuando:
 🍽️ Se confirme un nuevo pedido
 📅 Se registre una nueva reserva
 ⚠️ Haya un error en un pago
@@ -216,7 +230,7 @@ El chef y administrador recibirán notificaciones automáticas cuando:
 🕐 ${new Date().toLocaleString('es-CO')}
   `.trim();
 
-  const ok = await sendTelegramMessage(mensaje);
+  const ok = await sendTelegramMessage(mensaje, target);
 
   return ok
     ? { success: true }

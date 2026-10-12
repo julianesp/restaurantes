@@ -8,7 +8,6 @@ import {
   Trash2,
   Save,
   X,
-  ArrowLeft,
   Loader2,
   Coffee,
   Soup,
@@ -18,7 +17,6 @@ import {
   IceCream,
   Cake,
 } from "lucide-react";
-import Link from "next/link";
 import Swal from "sweetalert2";
 import ImageUploader from "@/components/admin/ImageUploader";
 
@@ -371,34 +369,22 @@ export default function AdminMenuPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link
-                href="/admin"
-                className="text-gray-600 dark:text-gray-300 hover:text-primary-500 transition-colors"
-              >
-                <ArrowLeft className="w-6 h-6" />
-              </Link>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Gestión de Menú
-              </h1>
-            </div>
-            <button
-              onClick={() => {
-                resetForm();
-                setIsCreating(true);
-              }}
-              className="flex items-center gap-2 bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-600 transition-colors"
-            >
-              <Plus className="w-5 h-5" />
-              Nuevo Item
-            </button>
-          </div>
+      {/* Título de la página (la navegación y el usuario están en AdminNavbar) */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Gestión de Menú</h1>
+          <button
+            onClick={() => {
+              resetForm();
+              setIsCreating(true);
+            }}
+            className="flex items-center gap-2 bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-600 transition-colors"
+          >
+            <Plus className="w-5 h-5" />
+            Nuevo Item
+          </button>
         </div>
-      </header>
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className={`grid gap-8 ${(isCreating || editingItem) ? "lg:grid-cols-4" : ""}`}>
@@ -501,7 +487,7 @@ export default function AdminMenuPage() {
           {/* Formulario */}
           {(isCreating || editingItem) && (
             <div className="lg:col-span-1">
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 sticky top-24">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 sticky top-6">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                     {editingItem ? "Editar Item" : "Nuevo Item"}

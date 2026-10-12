@@ -1,34 +1,12 @@
 import { NextResponse } from 'next/server';
-import { sendTestNotification, notifyNewOrder } from '../../../lib/notificationService';
+import { sendTestNotification, targetFor } from '../../../lib/notificationService';
+import { adminCtx } from '@/lib/tenant';
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const mode = await Promise.resolve(searchParams.get('mode'));
+// GET /api/test-notification — el admin de un restaurante envía una prueba a SU chat de Telegram
+export async function GET() {
+  const ctx = await adminCtx();
+  if (!ctx.ok) return ctx.res;
 
-  if (mode === 'full') {
-    // Prueba completa con datos de pedido simulado
-    const result = await notifyNewOrder({
-      reference: 'PEDIDO-TEST-' + Date.now(),
-      customerName: 'Cliente Prueba',
-      customerPhone: '+573174503604',
-      customerEmail: 'prueba@restaurante.com',
-      address: 'Calle 1A # 6-7',
-      city: 'Colón',
-      items: [
-        { name: 'Bandeja Paisa', quantity: 2 },
-        { name: 'Jugo de Lulo', quantity: 2 },
-      ],
-      total: 56000,
-      serviceType: 'domicilio',
-      notes: 'Sin cebolla por favor',
-    });
-
-    return NextResponse.json({
-      success: result,
-      message: result ? 'Notificación de pedido de prueba enviada' : 'Error al enviar',
-    });
-  }
-
-  const result = await sendTestNotification();
-  return NextResponse.json(result);
+  const result = await sendTestNotification(targetFor(ctx.tenant));
+  return NextResponse.json(result, { status: result.success ? 200 : 400 });
 }

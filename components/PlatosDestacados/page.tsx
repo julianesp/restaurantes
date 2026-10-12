@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { createWhatsAppMessage } from "@/utils/whatsapp";
+import { useBranding } from "@/context/TenantContext";
 import { ChefHat, Soup, UtensilsCrossed } from "lucide-react";
 
 const featuredDishes = [
@@ -34,6 +35,7 @@ const featuredDishes = [
 ];
 
 export default function PlatosDestacados() {
+  const { whatsapp } = useBranding();
   return (
     <>
       {/* Platos Destacados */}
@@ -81,7 +83,7 @@ export default function PlatosDestacados() {
                         {dish.price}
                       </span>
                       <Link
-                        href={createWhatsAppMessage(dish.name, dish.price)}
+                        href={createWhatsAppMessage(dish.name, dish.price, whatsapp)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors text-sm inline-block"

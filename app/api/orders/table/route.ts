@@ -1,224 +1,135 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { publicCtx } from "@/lib/tenant";
+import { all, first, batch, newId, nowIso, type Row } from "@/lib/db";
+
+const STATUSES = ["pending", "preparing", "ready", "delivered", "cancelled"];
+
+/** Adjunta los items a una lista de pedidos (misma forma que devolvía la API anterior). */
+async function withItems(restaurantId: string, orders: Row[]): Promise<Row[]> {
+  if (orders.length === 0) return [];
+  const ids = orders.map((o) => o.id as string);
+  const items = await all<Row>(
+    `SELECT * FROM table_order_items WHERE restaurant_id = ? AND order_id IN (${ids.map(() => "?").join(", ")})`,
+    restaurantId,
+    ...ids
+  );
+  return orders.map((order) => ({ ...order, items: items.filter((i) => i.order_id === order.id) }));
+}
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { tableId, items, total, timestamp, customerNotes } = body;
+    const ctx = await publicCtx();
+    if (!ctx.ok) return ctx.res;
+    const { tenant } = ctx;
 
-    // Validar datos
-    if (!tableId || !items || items.length === 0) {
-      return NextResponse.json(
-        { error: "Datos incompletos" },
-        { status: 400 }
-      );
+    const { tableId, items, total, customerNotes } = await request.json();
+
+    if (!tableId || !Array.isArray(items) || items.length === 0) {
+      return NextResponse.json({ error: "Datos incompletos" }, { status: 400 });
     }
 
-    if (!supabase) {
-      return NextResponse.json(
-        { error: "Error de configuración de base de datos" },
-        { status: 500 }
-      );
-    }
+    // El sufijo aleatorio evita choques entre restaurantes (order_number es único global)
+    const suffix = Math.random().toString(36).slice(2, 5);
+    const orderNumber = `ORDER-${Date.now()}-${tableId}-${suffix}`;
+    const orderId = newId();
+    const now = nowIso();
 
-    // Generar número de orden único
-    const orderNumber = `ORDER-${Date.now()}-${tableId}`;
+    // Pedido + items en una sola transacción: no puede quedar un pedido sin items
+    await batch([
+      {
+        sql: `INSERT INTO table_orders (id, restaurant_id, order_number, table_id, total, status, customer_notes, created_at, updated_at)
+              VALUES (?, ?, ?, ?, ?, 'pending', ?, ?, ?)`,
+        params: [orderId, tenant.id, orderNumber, String(tableId), parseFloat(total), customerNotes || null, now, now],
+      },
+      ...items.map((item: Row) => {
+        const price = parseInt(String(item.price).replace(/[$.,]/g, ""), 10) || 0;
+        return {
+          sql: `INSERT INTO table_order_items (id, restaurant_id, order_id, item_id, item_name, item_description, item_price, quantity, subtotal, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          params: [
+            newId(), tenant.id, orderId, String(item.id), String(item.name),
+            String(item.description || ""), String(item.price), Number(item.quantity) || 1,
+            price * (Number(item.quantity) || 1), now,
+          ],
+        };
+      }),
+    ]);
 
-    // Crear pedido en la tabla table_orders
-    const { data: order, error: orderError } = await supabase
-      .from("table_orders")
-      .insert({
-        order_number: orderNumber,
-        table_id: tableId.toString(),
-        total: parseFloat(total),
-        status: "pending",
-        customer_notes: customerNotes || null,
-      })
-      .select()
-      .single();
+    const order = await first<Row>("SELECT * FROM table_orders WHERE id = ? AND restaurant_id = ?", orderId, tenant.id);
+    const [fullOrder] = await withItems(tenant.id, order ? [order] : []);
 
-    if (orderError) {
-      console.error("Error creating order:", orderError);
-      return NextResponse.json(
-        { error: "Error al crear el pedido", details: orderError.message },
-        { status: 500 }
-      );
-    }
-
-    // Crear los items del pedido
-    const orderItems = items.map((item: any) => {
-      const price = parseFloat(item.price.replace(/[$.,]/g, "")) || 0;
-      return {
-        order_id: order.id,
-        item_id: item.id.toString(),
-        item_name: item.name,
-        item_description: item.description || "",
-        item_price: item.price,
-        quantity: item.quantity,
-        subtotal: price * item.quantity,
-      };
-    });
-
-    const { error: itemsError } = await supabase
-      .from("table_order_items")
-      .insert(orderItems);
-
-    if (itemsError) {
-      console.error("Error creating order items:", itemsError);
-      // Si falla la creación de items, eliminar el pedido
-      await supabase.from("table_orders").delete().eq("id", order.id);
-      return NextResponse.json(
-        { error: "Error al crear los items del pedido", details: itemsError.message },
-        { status: 500 }
-      );
-    }
-
-    // Obtener el pedido completo con sus items
-    const { data: fullOrder } = await supabase
-      .from("table_orders")
-      .select(`
-        *,
-        items:table_order_items(*)
-      `)
-      .eq("id", order.id)
-      .single();
-
-    return NextResponse.json(
-      { success: true, order: fullOrder },
-      { status: 200 }
-    );
+    return NextResponse.json({ success: true, order: fullOrder }, { status: 200 });
   } catch (error) {
     console.error("Error processing order:", error);
-    return NextResponse.json(
-      { error: "Error al procesar el pedido" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error al procesar el pedido" }, { status: 500 });
   }
 }
 
 export async function GET(request: Request) {
   try {
+    const ctx = await publicCtx();
+    if (!ctx.ok) return ctx.res;
+    const { tenant } = ctx;
+
     const { searchParams } = new URL(request.url);
     const tableId = searchParams.get("tableId");
     const status = searchParams.get("status");
     const orderId = searchParams.get("orderId");
 
-    if (!supabase) {
-      return NextResponse.json(
-        { error: "Error de configuración de base de datos" },
-        { status: 500 }
-      );
-    }
-
-    // Consultar pedido específico por ID
+    // Pedido específico por ID
     if (orderId) {
-      const { data: order, error } = await supabase
-        .from("table_orders")
-        .select(`
-          *,
-          items:table_order_items(*)
-        `)
-        .eq("id", orderId)
-        .single();
-
-      if (error) {
-        console.error("Error fetching order:", error);
-        return NextResponse.json(
-          { error: "Error al obtener el pedido" },
-          { status: 500 }
-        );
-      }
-
-      return NextResponse.json(order);
-    }
-
-    // Construir query
-    let query = supabase
-      .from("table_orders")
-      .select(`
-        *,
-        items:table_order_items(*)
-      `)
-      .order("created_at", { ascending: false });
-
-    // Filtrar por mesa si se especifica
-    if (tableId) {
-      query = query.eq("table_id", tableId);
-    }
-
-    // Filtrar por estado si se especifica
-    if (status) {
-      query = query.eq("status", status);
-    }
-
-    const { data: orders, error } = await query;
-
-    if (error) {
-      console.error("Error fetching orders:", error);
-      return NextResponse.json(
-        { error: "Error al obtener pedidos" },
-        { status: 500 }
+      const order = await first<Row>(
+        "SELECT * FROM table_orders WHERE id = ? AND restaurant_id = ?",
+        orderId,
+        tenant.id
       );
+      if (!order) return NextResponse.json({ error: "Error al obtener el pedido" }, { status: 404 });
+      const [full] = await withItems(tenant.id, [order]);
+      return NextResponse.json(full);
     }
 
-    return NextResponse.json(orders);
+    const params: string[] = [tenant.id];
+    let sql = "SELECT * FROM table_orders WHERE restaurant_id = ?";
+    if (tableId) { sql += " AND table_id = ?"; params.push(tableId); }
+    if (status) { sql += " AND status = ?"; params.push(status); }
+    sql += " ORDER BY created_at DESC";
+
+    return NextResponse.json(await withItems(tenant.id, await all<Row>(sql, ...params)));
   } catch (error) {
     console.error("Error fetching orders:", error);
-    return NextResponse.json(
-      { error: "Error al obtener pedidos" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error al obtener pedidos" }, { status: 500 });
   }
 }
 
 // PATCH para actualizar el estado de un pedido
 export async function PATCH(request: Request) {
   try {
-    const body = await request.json();
-    const { orderId, status, customerNotes } = body;
+    const ctx = await publicCtx();
+    if (!ctx.ok) return ctx.res;
+    const { tenant } = ctx;
 
-    if (!orderId) {
-      return NextResponse.json(
-        { error: "ID de pedido requerido" },
-        { status: 400 }
-      );
+    const { orderId, status, customerNotes } = await request.json();
+
+    if (!orderId) return NextResponse.json({ error: "ID de pedido requerido" }, { status: 400 });
+    if (status && !STATUSES.includes(status)) {
+      return NextResponse.json({ error: "Estado no válido" }, { status: 400 });
     }
 
-    if (!supabase) {
-      return NextResponse.json(
-        { error: "Error de configuración de base de datos" },
-        { status: 500 }
-      );
-    }
+    const sets: string[] = ["updated_at = ?"];
+    const params: Array<string | null> = [nowIso()];
+    if (status) { sets.push("status = ?"); params.push(status); }
+    if (customerNotes !== undefined) { sets.push("customer_notes = ?"); params.push(customerNotes); }
 
-    const updateData: any = {};
-    if (status) updateData.status = status;
-    if (customerNotes !== undefined) updateData.customer_notes = customerNotes;
+    const order = await first<Row>(
+      `UPDATE table_orders SET ${sets.join(", ")} WHERE id = ? AND restaurant_id = ? RETURNING *`,
+      ...params, orderId, tenant.id
+    );
+    if (!order) return NextResponse.json({ error: "Pedido no encontrado" }, { status: 404 });
 
-    const { data: order, error } = await supabase
-      .from("table_orders")
-      .update(updateData)
-      .eq("id", orderId)
-      .select(`
-        *,
-        items:table_order_items(*)
-      `)
-      .single();
-
-    if (error) {
-      console.error("Error updating order:", error);
-      return NextResponse.json(
-        { error: "Error al actualizar el pedido" },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({ success: true, order });
+    const [full] = await withItems(tenant.id, [order]);
+    return NextResponse.json({ success: true, order: full });
   } catch (error) {
     console.error("Error updating order:", error);
-    return NextResponse.json(
-      { error: "Error al actualizar el pedido" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error al actualizar el pedido" }, { status: 500 });
   }
 }

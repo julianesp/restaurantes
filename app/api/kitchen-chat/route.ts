@@ -1,59 +1,46 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
+import { publicCtx } from "@/lib/tenant";
+import { all, insert } from "@/lib/db";
 
 export async function GET(request: Request) {
-  if (!supabaseAdmin) {
-    return NextResponse.json({ error: "Error de configuración de base de datos" }, { status: 500 });
-  }
+  const ctx = await publicCtx();
+  if (!ctx.ok) return ctx.res;
 
   const { searchParams } = new URL(request.url);
   const since = searchParams.get("since"); // ISO timestamp para polling incremental
-  const limit = parseInt(searchParams.get("limit") || "50");
+  const limit = Math.min(parseInt(searchParams.get("limit") || "50") || 50, 200);
 
-  let query = supabaseAdmin
-    .from("kitchen_chat")
-    .select("*")
-    .order("created_at", { ascending: true })
-    .limit(limit);
-
+  const params: Array<string | number> = [ctx.tenant.id];
+  let sql = "SELECT * FROM kitchen_chat WHERE restaurant_id = ?";
   if (since) {
-    query = query.gt("created_at", since);
+    sql += " AND created_at > ?";
+    params.push(since);
   }
+  sql += " ORDER BY created_at LIMIT ?";
+  params.push(limit);
 
-  const { data, error } = await query;
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  return NextResponse.json(data);
+  return NextResponse.json(await all(sql, ...params));
 }
 
 export async function POST(request: Request) {
-  if (!supabaseAdmin) {
-    return NextResponse.json({ error: "Error de configuración de base de datos" }, { status: 500 });
-  }
+  const ctx = await publicCtx();
+  if (!ctx.ok) return ctx.res;
 
-  const body = await request.json();
-  const { sender_role, sender_name, message, order_ref } = body;
+  const { sender_role, sender_name, message, order_ref } = await request.json();
 
   if (!sender_role || !sender_name || !message?.trim()) {
     return NextResponse.json({ error: "sender_role, sender_name y message son requeridos" }, { status: 400 });
   }
-
   if (!["waiter", "chef"].includes(sender_role)) {
     return NextResponse.json({ error: "sender_role debe ser 'waiter' o 'chef'" }, { status: 400 });
   }
 
-  const { data, error } = await supabaseAdmin
-    .from("kitchen_chat")
-    .insert({ sender_role, sender_name, message: message.trim(), order_ref: order_ref || null })
-    .select()
-    .single();
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
+  const data = await insert("kitchen_chat", {
+    restaurant_id: ctx.tenant.id,
+    sender_role,
+    sender_name,
+    message: message.trim(),
+    order_ref: order_ref || null,
+  });
   return NextResponse.json(data, { status: 201 });
 }

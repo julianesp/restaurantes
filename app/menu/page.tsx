@@ -1,4 +1,7 @@
+import { notFound } from "next/navigation";
 import MenuClient from "./MenuClient";
+import { getTenant } from "@/lib/tenant";
+import { getFullMenu } from "@/lib/menu";
 import Navbar from "../../components/Navbar/page";
 import Footer from "../../containers/Footer/page";
 
@@ -24,32 +27,22 @@ interface MenuCategory {
   items: MenuItem[];
 }
 
-// Función para obtener el menú desde la API
+// Lee el menú del restaurante de esta petición directamente de la base de datos
 async function getMenuData(): Promise<MenuCategory[]> {
-  // En el servidor, durante el build, devolver datos de respaldo
-  if (typeof window === 'undefined' && !process.env.NEXT_PUBLIC_BASE_URL) {
-    return getFallbackMenuData();
-  }
+  const tenant = await getTenant();
+  if (!tenant) notFound();
+
+  // Solo el restaurante original conserva el menú de ejemplo como respaldo;
+  // los demás restaurantes nunca deben mostrar platos de otro.
+  const useFallback = tenant.plan === 'legacy';
 
   try {
-    // En producción, usar la URL completa del sitio
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const response = await fetch(`${baseUrl}/api/menu/full`, {
-      cache: 'no-store', // Siempre obtener datos frescos
-      next: { revalidate: 0 }
-    });
-
-    if (!response.ok) {
-      console.error('Error al obtener menú de la API');
-      return getFallbackMenuData();
-    }
-
-    const data = await response.json();
-    return data.length > 0 ? data : getFallbackMenuData();
+    const data = await getFullMenu(tenant.id);
+    if (data.length > 0) return data as MenuCategory[];
   } catch (error) {
     console.error('Error al cargar el menú:', error);
-    return getFallbackMenuData();
   }
+  return useFallback ? getFallbackMenuData() : [];
 }
 
 // Datos de respaldo en caso de que la API falle o no haya datos

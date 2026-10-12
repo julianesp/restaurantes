@@ -1,7 +1,12 @@
 import { NextResponse } from 'next/server';
+import { publicCtx } from '@/lib/tenant';
 
 export async function POST(request: Request) {
   try {
+    const ctx = await publicCtx();
+    if (!ctx.ok) return ctx.res;
+    const { tenant } = ctx;
+
     const body = await request.json();
     const {
       amount,
@@ -47,12 +52,13 @@ export async function POST(request: Request) {
 
     const bearerToken = authResult.token;
     const isTest = process.env.NEXT_PUBLIC_EPAYCO_TEST_MODE === 'true';
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    // Cada restaurante tiene su propio subdominio: se usa el origen de la petición
+    const baseUrl = new URL(request.url).origin;
 
     // Paso 2: Crear sesión de pago
     const sessionData = {
       checkout_version: "2",
-      name: "Restaurante",
+      name: tenant.name,
       currency: "COP",
       amount: amountNum,
       description: description,
@@ -79,6 +85,7 @@ export async function POST(request: Request) {
       extras: {
         extra1: reference,
         extra2: "pedido",
+        extra3: tenant.slug,
       },
     };
 

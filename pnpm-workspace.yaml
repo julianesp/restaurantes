@@ -1,0 +1,14 @@
+# pnpm bloquea los scripts de instalación de las dependencias hasta que se aprueban aquí.
+# Con valores sin decidir, `pnpm install` falla (ERR_PNPM_IGNORED_BUILDS) y `pnpm dev` no arranca.
+allowBuilds:
+  workerd: true            # motor local de Cloudflare Workers (imprescindible para `pnpm dev`)
+  esbuild: true            # binario nativo usado por Vite y por el plugin de styled-jsx
+  '@parcel/watcher': true  # vigilancia de archivos (nativo)
+  '@clerk/shared': false   # solo muestra un aviso de telemetría
+  core-js: false           # solo muestra un mensaje de donación
+  unrs-resolver: false     # usa binarios precompilados; el script es solo un respaldo
+minimumReleaseAgeExclude:
+  - '@cloudflare/build-output-utils@0.8.5'
+  - '@cloudflare/config@0.23.0'
+  - cf@1.0.0-beta.12
+  - wrangler@4.147.0

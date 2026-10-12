@@ -1,17 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import {
-  ArrowLeft,
   Plus,
   Edit,
   Trash2,
   Save,
   X,
   Newspaper,
-  Home,
   Eye,
   EyeOff,
 } from "lucide-react";
@@ -175,45 +172,23 @@ export default function BlogManagementPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link
-                href="/admin"
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              >
-                <ArrowLeft className="w-6 h-6 text-gray-600 dark:text-gray-300" />
-              </Link>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center">
-                  <Newspaper className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Blog & Noticias
-                  </h1>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
-                    Gestiona las publicaciones del blog
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link
-                href="/blog"
-                target="_blank"
-                className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 transition-colors"
-              >
-                <Eye className="w-5 h-5" />
-                <span className="hidden sm:inline">Ver Blog</span>
-              </Link>
-              <UserButton afterSignOutUrl="/" />
-            </div>
+      {/* Título de la página (la navegación y el usuario están en AdminNavbar) */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Blog & Noticias</h1>
+            <p className="text-sm text-gray-600 dark:text-gray-300">Gestiona las publicaciones del blog</p>
           </div>
+          <Link
+            href="/blog"
+            target="_blank"
+            className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-primary-500 transition-colors"
+          >
+            <Eye className="w-5 h-5" />
+            <span>Ver Blog</span>
+          </Link>
         </div>
-      </header>
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Add Button */}

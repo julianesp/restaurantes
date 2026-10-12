@@ -4,8 +4,10 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle, Loader2, XCircle, ArrowLeft, FileText } from "lucide-react";
 import Link from "next/link";
+import { useBranding } from "@/context/TenantContext";
 
 function PaymentSuccessContent() {
+  const { whatsapp: numeroWhatsApp } = useBranding();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("");
@@ -120,7 +122,6 @@ function PaymentSuccessContent() {
             `⏱️ *Mesa reservada por:* 1 hora%0A%0A` +
             `¡Gracias por tu reserva! Te esperamos.`;
 
-          const numeroWhatsApp = "573174503604";
           const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${mensaje}`;
 
           // Esperar 2 segundos antes de redirigir
@@ -147,7 +148,6 @@ function PaymentSuccessContent() {
             `💰 *Total pagado:* $${data.total.toLocaleString("es-CO")} COP%0A%0A` +
             `¡Gracias por tu pedido! Pronto te contactaremos.`;
 
-          const numeroWhatsApp = "573174503604";
           const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${mensaje}`;
 
           // Esperar 2 segundos antes de redirigir

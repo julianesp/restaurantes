@@ -1,6 +1,9 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import AdminNavbar from "@/components/admin/AdminNavbar";
+import AdminShell from "@/components/admin/AdminShell";
+import { getTenant, getTenantRole, getVerifiedEmails } from "@/lib/tenant";
+import { tenantUrl } from "@/lib/tenant-host";
+import { first } from "@/lib/db";
 
 export default async function AdminLayout({
   children,
@@ -13,13 +16,25 @@ export default async function AdminLayout({
     redirect("/sign-in");
   }
 
-  // Verificar si el usuario es administrador autorizado
-  const adminEmails =
-    process.env.ADMIN_EMAILS?.split(",").map((email) => email.trim()) || [];
-  const userEmail = user.emailAddresses[0]?.emailAddress;
+  const tenant = await getTenant();
 
-  if (!userEmail || !adminEmails.includes(userEmail)) {
-    // Redirigir a la página principal si no es administrador
+  if (!tenant) {
+    // Dominio raíz de la plataforma: llevar al usuario a su restaurante o al registro
+    const emails = await getVerifiedEmails();
+    const owned = emails.length
+      ? await first<{ slug: string }>(
+          `SELECT r.slug FROM restaurant_members m JOIN restaurants r ON r.id = m.restaurant_id
+           WHERE m.email IN (${emails.map(() => "?").join(", ")}) LIMIT 1`,
+          ...emails
+        )
+      : null;
+    const slug = owned?.slug;
+    redirect(slug ? tenantUrl(slug, "/admin") : "/registro");
+  }
+
+  // Solo miembros de ESTE restaurante (o administradores de la plataforma) pueden entrar
+  const role = await getTenantRole(tenant);
+  if (!role) {
     redirect("/?unauthorized=true");
   }
 
@@ -32,10 +47,5 @@ export default async function AdminLayout({
     })),
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-primary-50 dark:from-gray-900 dark:to-primary-950">
-      <AdminNavbar user={serializedUser} />
-      <main>{children}</main>
-    </div>
-  );
+  return <AdminShell user={serializedUser}>{children}</AdminShell>;
 }

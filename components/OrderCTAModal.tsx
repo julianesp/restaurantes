@@ -7,6 +7,7 @@ import {
   createDeliveryMessage,
   createTableReservationMessage,
 } from "../utils/whatsapp";
+import { useBranding } from "@/context/TenantContext";
 import ReservationModal from "./ReservationModal";
 
 interface OrderCTAModalProps {
@@ -15,6 +16,7 @@ interface OrderCTAModalProps {
 }
 
 const OrderCTAModal = ({ isOpen, onClose }: OrderCTAModalProps) => {
+  const { whatsapp } = useBranding();
   const [showReservationModal, setShowReservationModal] = useState(false);
 
   const handleReservation = () => {
@@ -49,7 +51,7 @@ const OrderCTAModal = ({ isOpen, onClose }: OrderCTAModalProps) => {
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-stretch">
               {/* Solicitar Entrega */}
               <Link
-                href={createDeliveryMessage()}
+                href={createDeliveryMessage(whatsapp)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex-1 group"

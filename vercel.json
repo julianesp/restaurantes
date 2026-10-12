@@ -1,8 +1,0 @@
-{
-  "crons": [
-    {
-      "path": "/api/cron/publish-weekly-winner",
-      "schedule": "0 5 * * 1"
-    }
-  ]
-}

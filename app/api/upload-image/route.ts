@@ -1,65 +1,55 @@
 import { NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
-import path from 'path';
-import { randomUUID } from 'crypto';
+import { env } from 'cloudflare:workers';
+import { adminCtx } from '@/lib/tenant';
+
+const ALLOWED: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'image/jpg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'image/gif': 'gif',
+};
+const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 
 /**
  * POST /api/upload-image
- * Sube una imagen al directorio public/uploads/featured-dishes
+ * Sube una imagen a R2 bajo la carpeta del restaurante (solo admin del restaurante).
+ * Devuelve la URL pública /media/<restaurante>/<carpeta>/<archivo>.
  */
 export async function POST(request: Request) {
   try {
-    const formData = await request.formData();
-    const file = formData.get('file') as File;
+    const ctx = await adminCtx();
+    if (!ctx.ok) return ctx.res;
 
-    if (!file) {
-      return NextResponse.json(
-        { error: 'No se proporcionó ningún archivo' },
-        { status: 400 }
-      );
+    const bucket = (env as unknown as { MEDIA?: R2Bucket }).MEDIA;
+    if (!bucket) return NextResponse.json({ error: 'Almacenamiento no configurado' }, { status: 503 });
+
+    const formData = await request.formData();
+    const file = formData.get('file');
+    if (!(file instanceof File)) {
+      return NextResponse.json({ error: 'No se proporcionó ningún archivo' }, { status: 400 });
     }
 
-    // Validar tipo de archivo
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
-    if (!allowedTypes.includes(file.type)) {
+    const extension = ALLOWED[file.type];
+    if (!extension) {
       return NextResponse.json(
         { error: 'Tipo de archivo no permitido. Solo se aceptan imágenes (JPEG, PNG, WebP, GIF)' },
         { status: 400 }
       );
     }
-
-    // Validar tamaño (máximo 5MB)
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    if (file.size > maxSize) {
-      return NextResponse.json(
-        { error: 'El archivo es muy grande. Tamaño máximo: 5MB' },
-        { status: 400 }
-      );
+    if (file.size > MAX_SIZE) {
+      return NextResponse.json({ error: 'El archivo es muy grande. Tamaño máximo: 5MB' }, { status: 400 });
     }
 
-    // Convertir archivo a buffer
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    // La extensión sale del tipo MIME validado, no del nombre enviado por el cliente
+    const filename = `${crypto.randomUUID()}.${extension}`;
+    const key = `${ctx.tenant.id}/images/${filename}`;
 
-    // Generar nombre único para el archivo
-    const fileExtension = file.name.split('.').pop();
-    const uniqueFilename = `${randomUUID()}.${fileExtension}`;
-
-    // Ruta donde se guardará el archivo
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'featured-dishes');
-    const filePath = path.join(uploadDir, uniqueFilename);
-
-    // Guardar el archivo
-    await writeFile(filePath, buffer);
-
-    // URL pública del archivo
-    const publicUrl = `/uploads/featured-dishes/${uniqueFilename}`;
-
-    return NextResponse.json({
-      success: true,
-      url: publicUrl,
-      filename: uniqueFilename,
+    await bucket.put(key, await file.arrayBuffer(), {
+      httpMetadata: { contentType: file.type, cacheControl: 'public, max-age=31536000, immutable' },
     });
+
+    return NextResponse.json({ success: true, url: `/media/${key}`, filename });
   } catch (error) {
     console.error('Error uploading image:', error);
     return NextResponse.json(

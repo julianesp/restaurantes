@@ -1,21 +1,21 @@
 import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase";
+import { publicCtx } from "@/lib/tenant";
+import { first } from "@/lib/db";
 
-// POST: verificar PIN del mesero (ruta pública)
+// POST: verificar PIN del mesero dentro del restaurante actual (ruta pública)
 export async function POST(request: Request) {
-  if (!supabaseAdmin) return NextResponse.json({ error: "Error de configuración" }, { status: 500 });
+  const ctx = await publicCtx();
+  if (!ctx.ok) return ctx.res;
 
   const { pin } = await request.json();
   if (!pin) return NextResponse.json({ error: "PIN requerido" }, { status: 400 });
 
-  const { data, error } = await supabaseAdmin
-    .from("waiters")
-    .select("id, name, email, active")
-    .eq("pin", pin)
-    .eq("active", true)
-    .single();
+  const waiter = await first(
+    "SELECT id, name, email, active FROM waiters WHERE restaurant_id = ? AND pin = ? AND active = 1",
+    ctx.tenant.id,
+    String(pin)
+  );
 
-  if (error || !data) return NextResponse.json({ error: "PIN incorrecto o mesero inactivo" }, { status: 401 });
-
-  return NextResponse.json({ ok: true, waiter: data });
+  if (!waiter) return NextResponse.json({ error: "PIN incorrecto o mesero inactivo" }, { status: 401 });
+  return NextResponse.json({ ok: true, waiter });
 }

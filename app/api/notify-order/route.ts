@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
-import { notifyNewOrder } from '../../../lib/notificationService';
+import { notifyNewOrder, targetFor } from '../../../lib/notificationService';
+import { publicCtx } from '@/lib/tenant';
 
 export async function POST(request: Request) {
   try {
+    const ctx = await publicCtx();
+    if (!ctx.ok) return ctx.res;
+
     const body = await request.json();
 
     const { reference, customerName, customerPhone, customerEmail, address, city, items, total, serviceType, notes, transactionId } = body;
@@ -23,7 +27,7 @@ export async function POST(request: Request) {
       serviceType,
       notes,
       transactionId,
-    });
+    }, targetFor(ctx.tenant));
 
     return NextResponse.json({ success: true });
   } catch (error) {

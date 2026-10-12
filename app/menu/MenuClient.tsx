@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useCart } from "../../context/CartContext";
+import { useBranding } from "@/context/TenantContext";
 
 // Tipos de datos
 interface MenuItem {
@@ -49,6 +50,7 @@ interface MenuClientProps {
 }
 
 export default function MenuClient({ initialMenuData }: MenuClientProps) {
+  const branding = useBranding();
   const [selectedCategory, setSelectedCategory] = useState<string>(
     initialMenuData[0]?.id || ""
   );
@@ -89,7 +91,7 @@ export default function MenuClient({ initialMenuData }: MenuClientProps) {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "menu-restaurante-munay.pdf";
+        a.download = `menu-${branding.slug}.pdf`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
