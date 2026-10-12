@@ -107,7 +107,7 @@ const Footer = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-14">
             {/* Columna 1 — Marca */}
             <div className="lg:col-span-1 flex flex-col gap-5 items-center text-center">
-              <div className="flex items-center gap-3">
+              <div className="group flex items-center gap-3">
                 <div
                   className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
                   style={{ backgroundColor: "rgb(255 255 255 / 0.12)" }}

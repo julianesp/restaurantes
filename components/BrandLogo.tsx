@@ -2,12 +2,18 @@
 
 import Image from "next/image";
 import { useBranding } from "@/context/TenantContext";
+import { BrasayaMark } from "@/components/BrasayaLogo";
 
 /** Logo del restaurante; si no tiene, muestra un círculo con su inicial. */
 export default function BrandLogo({ size, className = "" }: { size: number; className?: string }) {
   const { logoUrl, name } = useBranding();
 
-  // SVG (p. ej. el logo de Brasaya): <img> directo, el optimizador de imágenes no procesa SVG
+  // Logo de Brasaya: en línea (no <img>) para que la llama pueda animarse al pasar el mouse
+  if (logoUrl === "/brand/brasaya-mark.svg") {
+    return <BrasayaMark size={size} className={className} />;
+  }
+
+  // Otros SVG: <img> directo, el optimizador de imágenes no procesa SVG
   if (logoUrl && /\.svg($|\?)/i.test(logoUrl)) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
