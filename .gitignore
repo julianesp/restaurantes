@@ -45,6 +45,8 @@ next-env.d.ts
 
 # Ocultar archivos de ayuda de Claude
 *.sql
+# Las migraciones numeradas sí se versionan (esquema de la base). seed-legacy.sql sigue ignorado (datos).
+!migrations/0*.sql
 /dist/
 .vinext/
 .cloudflare/
