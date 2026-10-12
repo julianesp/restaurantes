@@ -15,6 +15,7 @@ import {
   Check,
 } from "lucide-react";
 import GuidedTour from "@/components/platform/GuidedTour";
+import FeatureTabs from "@/components/platform/FeatureTabs";
 import EmberEdge from "@/components/EmberEdge";
 import PlatformHeader from "@/components/platform/PlatformHeader";
 import FoodSlider from "@/components/FoodSlider";
@@ -175,6 +176,9 @@ export default function PlataformaPage() {
 
         {/* Recorrido guiado con gráficos */}
         <GuidedTour />
+
+        {/* Más características, por rol */}
+        <FeatureTabs />
 
         {/* Cómo empezar */}
         <section id="empezar" className="scroll-mt-24 px-4 py-20 sm:px-6 md:py-28">
