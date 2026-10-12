@@ -17,19 +17,25 @@ export default function LocationMap({
   address = "Calle 123 #45-67, Ciudad",
   phone = "+57 300 000 0000",
   hours = "Lun-Dom: 11:00 AM - 6:00 PM",
-  latitude = 1.2059389,
-  longitude = -76.9288038,
+  latitude,
+  longitude,
 }: LocationMapProps) {
   const [mapLoaded, setMapLoaded] = useState(false);
 
+  // El mapa se ubica por coordenadas si se dan; si no, por la dirección (así sirve para cualquier ciudad)
+  const place =
+    latitude != null && longitude != null
+      ? `${latitude},${longitude}`
+      : encodeURIComponent(`${address}, Colombia`);
+
   // URL para Google Maps (web)
-  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${place}`;
 
   // URL para obtener direcciones
-  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
+  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${place}`;
 
-  // URL para el iframe del mapa embebido con las coordenadas correctas
-  const embedMapUrl = `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${latitude},${longitude}&zoom=15`;
+  // URL para el iframe del mapa embebido
+  const embedMapUrl = `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${place}&zoom=15`;
 
   const handleGetDirections = () => {
     window.open(directionsUrl, "_blank");
@@ -40,24 +46,18 @@ export default function LocationMap({
   };
 
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-8 location-section-bg">
+    <section className="px-4 py-20 sm:px-6 md:py-28 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex justify-center mb-6">
-            <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-accent-500 rounded-full flex items-center justify-center shadow-2xl animate-float">
-              <MapPin className="w-10 h-10 text-white" />
-            </div>
-          </div>
+        {/* Encabezado */}
+        <div className="mb-10 max-w-2xl" data-aos="fade-up">
           <h2
-            className="text-4xl font-bold text-gray-900 dark:text-white mb-4"
+            className="text-3xl md:text-4xl font-bold text-gray-950 dark:text-white mb-4"
             id="contacto"
           >
-            📍 Encuéntranos Aquí
+            Dónde estamos
           </h2>
-          <p className="text-xl text-black max-w-2xl mx-auto dark:text-white">
-            Visítanos en nuestra ubicación o solicita delivery. ¡Estamos listos
-            para atenderte!
+          <p className="text-lg text-gray-600 dark:text-gray-300">
+            Venga a almorzar con nosotros o pida a domicilio. Lo esperamos.
           </p>
         </div>
 
@@ -65,7 +65,7 @@ export default function LocationMap({
           {/* Información del Negocio */}
           <div className="space-y-6">
             {/* Tarjeta de Información */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-xl border border-gray-100 dark:border-gray-700">
+            <div className="bg-white dark:bg-gray-900 rounded-3xl p-8 border border-gray-200 dark:border-gray-800">
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
                 {businessName}
               </h3>
@@ -87,8 +87,8 @@ export default function LocationMap({
 
               {/* Teléfono */}
               <div className="flex items-start space-x-4 mb-6">
-                <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Phone className="w-6 h-6 text-green-600 dark:text-green-400" />
+                <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Phone className="w-6 h-6 text-primary-600 dark:text-primary-400" />
                 </div>
                 <div className="flex-1">
                   <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-1">
@@ -122,15 +122,15 @@ export default function LocationMap({
               <div className="space-y-3">
                 <button
                   onClick={handleGetDirections}
-                  className="w-full bg-gradient-to-r from-primary-500 to-accent-500 hover:from-primary-600 hover:to-accent-600 text-white px-6 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center space-x-3"
+                  className="w-full bg-primary-600 hover:bg-primary-700 text-white px-6 py-3.5 rounded-full font-semibold flex items-center justify-center space-x-3"
                 >
                   <Navigation className="w-5 h-5" />
-                  <span>Cómo Llegar</span>
+                  <span>Cómo llegar</span>
                 </button>
 
                 <button
                   onClick={handleOpenMap}
-                  className="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white border-2 border-gray-300 dark:border-gray-600 px-6 py-4 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-200 flex items-center justify-center space-x-3"
+                  className="w-full bg-transparent text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 px-6 py-3.5 rounded-full font-semibold hover:bg-gray-50 dark:hover:bg-gray-800 flex items-center justify-center space-x-3"
                 >
                   <ExternalLink className="w-5 h-5" />
                   <span>Abrir en Google Maps</span>
@@ -138,25 +138,11 @@ export default function LocationMap({
               </div>
             </div>
 
-            {/* Información Adicional */}
-            <div className="bg-gradient-to-r from-primary-50 to-accent-50 dark:from-primary-900/20 dark:to-accent-900/20 rounded-2xl p-6 border border-primary-200 dark:border-primary-800">
-              <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                <strong className="text-primary-600 dark:text-primary-400">
-                  💡 Consejo:
-                </strong>{" "}
-                Haz clic en{" "}
-                <span className="font-bold text-gray-900 dark:text-white">
-                  Cómo Llegar
-                </span>{" "}
-                para obtener direcciones desde tu ubicación actual. También
-                ofrecemos servicio de delivery a domicilio.
-              </p>
-            </div>
           </div>
 
           {/* Mapa */}
           <div className="relative">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700 h-full min-h-[500px]">
+            <div className="bg-white dark:bg-gray-900 rounded-3xl overflow-hidden border border-gray-200 dark:border-gray-800 h-full min-h-[420px]">
               {/* Skeleton loader mientras carga el mapa */}
               {!mapLoaded && (
                 <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
@@ -176,46 +162,19 @@ export default function LocationMap({
                 src={embedMapUrl}
                 width="100%"
                 height="100%"
-                style={{ border: 0, minHeight: "500px" }}
+                style={{ border: 0, minHeight: "420px" }}
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 onLoad={() => setMapLoaded(true)}
-                className="rounded-2xl"
+                className="rounded-3xl"
                 title={`Ubicación de ${businessName}`}
               />
             </div>
 
-            {/* Marcador personalizado (opcional, se muestra sobre el iframe) */}
-            <div className="absolute top-4 right-4 bg-white dark:bg-gray-800 rounded-full p-3 shadow-lg border border-gray-200 dark:border-gray-700">
-              <MapPin className="w-6 h-6 text-primary-500 dark:text-primary-400 animate-pulse-slow" />
-            </div>
           </div>
         </div>
 
-        {/* Call to Action adicional */}
-        <div className="mt-12 text-center">
-          <div className="bg-gradient-to-r from-primary-500 to-accent-500 rounded-2xl p-8 text-white">
-            <h3 className="text-2xl md:text-3xl font-bold mb-3">
-              ¿Prefieres que llevemos la comida hasta ti?
-            </h3>
-            <p className="text-lg mb-6 opacity-90">
-              Solicita nuestro servicio de entrega y disfruta de nuestros
-              platillos en la comodidad de tu hogar
-            </p>
-            <button
-              onClick={() => {
-                const deliverySection = document.getElementById("delivery");
-                if (deliverySection) {
-                  deliverySection.scrollIntoView({ behavior: "smooth" });
-                }
-              }}
-              className="bg-white text-primary-600 px-8 py-4 rounded-full font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 inline-flex items-center space-x-2"
-            >
-              <span>🏍️ Ver Opciones de entrega</span>
-            </button>
-          </div>
-        </div>
       </div>
     </section>
   );

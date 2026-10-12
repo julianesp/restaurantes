@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 import {
   Star,
@@ -17,32 +16,31 @@ import {
   Bike,
   MapPin,
   Phone,
-  Award,
-  Heart,
+  HandHeart,
   Leaf,
-  DollarSign,
-  CreditCard,
+  CookingPot,
+  ArrowRight,
+  Info,
 } from "lucide-react";
 
-import FloatingFooter from "../components/FloatingFooter";
-import Navbar from "../components/Navbar/page";
-import Footer from "../containers/Footer/page";
-import ScrollToTopButton from "../components/ScrollToTopButton";
-import FoodSlider from "../components/FoodSlider";
-import LocationMap from "../components/LocationMap";
-import OrderCTAModal from "../components/OrderCTAModal";
-import TestimonialsSection from "../components/TestimonialsSection";
-import DishDetailModal from "../components/DishDetailModal";
-import PlatDeLaSemaine from "../components/PlatDeLaSemaine";
+import FloatingFooter from "@/components/FloatingFooter";
+import Navbar from "@/components/Navbar/page";
+import Footer from "@/containers/Footer/page";
+import ScrollToTopButton from "@/components/ScrollToTopButton";
+import FoodSlider from "@/components/FoodSlider";
+import LocationMap from "@/components/LocationMap";
+import OrderCTAModal from "@/components/OrderCTAModal";
+import TestimonialsSection from "@/components/TestimonialsSection";
+import DishDetailModal from "@/components/DishDetailModal";
+import PlatoDeLaSemana from "@/components/PlatoDeLaSemana";
 import Link from "next/link";
-import styles from "../styles/Home.module.scss";
-import { useRevealOnScroll } from "../utils/useRevealOnScroll";
+import { useBranding } from "@/context/TenantContext";
 
 const mostPopular = {
   id: 9000,
   name: "Plato Estrella",
   description:
-    "El plato más solicitado por nuestros comensales. Una combinación perfecta de sabores tradicionales con un toque moderno. Preparado con ingredientes de primera calidad, este plato es una explosión de sabor que deleitará tu paladar. Ideal para quienes buscan una experiencia gastronómica memorable.",
+    "El que más nos piden. Sabor de casa, porción generosa y hecho con ingredientes frescos del día.",
   price: "$25.000",
   icon: Star,
   color: "text-yellow-500",
@@ -61,7 +59,7 @@ const dishOfTheDay = {
   id: 9003,
   name: "Especial del Día",
   description:
-    "Una deliciosa propuesta gastronómica seleccionada especialmente para hoy. Ingredientes frescos y sabores únicos que harán de tu experiencia algo inolvidable. Nuestro chef renueva esta opción diariamente para ofrecerte siempre lo mejor de la temporada. Una combinación equilibrada de proteínas, vegetales y carbohidratos que te dejará satisfecho.",
+    "Lo que salió hoy de la cocina: proteína, principio y ensalada, como un buen corrientazo bien servido.",
   price: "$23.990",
   icon: Flame,
   color: "text-accent",
@@ -81,11 +79,11 @@ const specialOffer = {
   id: 9001,
   name: "Menú Familiar",
   description:
-    "Perfecto para compartir en familia o con amigos. Ingredientes frescos y preparación artesanal que te encantará. Incluye una variedad de platos principales, acompañamientos y bebidas para 4-5 personas. Una opción económica y deliciosa para disfrutar en grupo. Todos nuestros menús familiares están preparados con el mismo cuidado y dedicación que nuestros platos individuales.",
+    "Para compartir el domingo: platos fuertes, acompañamientos y bebidas para 4 o 5 personas.",
   price: "$55.000",
   icon: Utensils,
   color: "text-primary-500",
-  discount: "18% OFF",
+  discount: "-18%",
   category: "Menús Especiales",
   image: "https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/restaurants/3.jpg",
   ingredients: ["Variedad de proteínas", "Acompañamientos múltiples", "Ensaladas frescas", "Bebidas incluidas", "Postre sorpresa"],
@@ -101,11 +99,11 @@ const chefRecommendation = {
   id: 9002,
   name: "Selección del Chef",
   description:
-    "Una exquisita combinación de ingredientes cuidadosamente seleccionados por nuestro chef. Preparado con técnicas tradicionales y productos frescos de temporada. Perfecta para quienes buscan sabor y calidad en cada bocado. Este plato representa la máxima expresión de nuestra cocina, fusionando sabores tradicionales con técnicas modernas de preparación. Una experiencia culinaria única.",
+    "El plato que el chef pediría para él: receta tradicional con producto de temporada.",
   price: "$32.900",
   icon: ChefHat,
-  color: "text-purple-600",
-  badge: "Chef's Choice",
+  color: "text-primary-600",
+  badge: "La del chef",
   category: "Especialidades del Chef",
   image: "https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/restaurants/4.jpg",
   ingredients: ["Proteína selecta", "Vegetales gourmet", "Reducción especial", "Guarnición premium", "Hierbas frescas"],
@@ -119,11 +117,11 @@ const chefRecommendation = {
 
 // Menu categories with icons
 const menuCategories = [
-  { icon: Coffee, label: "Bebidas", color: "text-amber-600" },
-  { icon: Wine, label: "Vinos", color: "text-primary-500" },
-  { icon: Soup, label: "Sopas", color: "text-accent-500" },
-  { icon: Salad, label: "Ensaladas", color: "text-green-600" },
-  { icon: UtensilsCrossed, label: "Platos Fuertes", color: "text-red-700" },
+  { icon: Soup, label: "Sopas" },
+  { icon: UtensilsCrossed, label: "Platos fuertes" },
+  { icon: Salad, label: "Ensaladas" },
+  { icon: Coffee, label: "Bebidas" },
+  { icon: Wine, label: "Vinos" },
 ];
 
 // Comidas especiales para el slider - SE CARGAN DESDE LA BASE DE DATOS
@@ -176,26 +174,12 @@ const fallbackFoods = [
   },
 ];
 
-export default function Home() {
-  // Hooks de animación para diferentes secciones
-  const heroReveal = useRevealOnScroll<HTMLDivElement>();
-  const specialtiesReveal = useRevealOnScroll<HTMLDivElement>();
-  const popularDishReveal = useRevealOnScroll<HTMLDivElement>();
-  const dishOfDayReveal = useRevealOnScroll<HTMLDivElement>();
-  const specialOfferReveal = useRevealOnScroll<HTMLDivElement>();
-  const chefReveal = useRevealOnScroll<HTMLDivElement>();
-  const menuReveal = useRevealOnScroll<HTMLDivElement>();
-  const deliveryReveal = useRevealOnScroll<HTMLDivElement>();
-  const infoReveal = useRevealOnScroll<HTMLDivElement>();
-
-  const { theme } = useTheme();
-  const [themePulse, setThemePulse] = useState(false);
-  const [waveAuto, setWaveAuto] = useState(false);
+export default function LegacyHome() {
+  const branding = useBranding();
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [selectedDish, setSelectedDish] = useState<typeof mostPopular | null>(null);
   const [isDishModalOpen, setIsDishModalOpen] = useState(false);
   const [specialFoods, setSpecialFoods] = useState<any[]>(fallbackFoods);
-  const h2Ref = useRef<HTMLHeadingElement | null>(null);
 
   const handleDishClick = (dish: typeof mostPopular) => {
     setSelectedDish(dish);
@@ -230,670 +214,256 @@ export default function Home() {
     loadFeaturedDishes();
   }, []);
 
-  useEffect(() => {
-    // Disparar animación de tema solo si el hero está visible
-    if (!heroReveal.isVisible) return;
-
-    // Reiniciar para permitir reproducir animación varias veces
-    setThemePulse(false);
-    const start = setTimeout(() => setThemePulse(true), 10);
-    const stop = setTimeout(() => setThemePulse(false), 900);
-
-    return () => {
-      clearTimeout(start);
-      clearTimeout(stop);
-    };
-  }, [theme, heroReveal.isVisible]);
-
-  // Observer para ejecutar la ola automáticamente cuando el h2 esté al 50% del viewport
-  useEffect(() => {
-    const el = h2Ref.current;
-    if (!el) return;
-
-    let startTimeout: number | undefined;
-    let stopTimeout: number | undefined;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-            // reproducir animación (se puede volver a reproducir al salir/entrar)
-            setWaveAuto(false);
-            startTimeout = window.setTimeout(() => setWaveAuto(true), 10);
-            stopTimeout = window.setTimeout(() => setWaveAuto(false), 900);
-          }
-        });
-      },
-      { threshold: [0.5] },
-    );
-
-    observer.observe(el);
-
-    return () => {
-      observer.disconnect();
-      if (startTimeout) clearTimeout(startTimeout);
-      if (stopTimeout) clearTimeout(stopTimeout);
-    };
-  }, [h2Ref]);
+  // Mosaico "Para hoy": el primero ocupa la celda grande
+  const todayPicks = [
+    { dish: mostPopular, label: "El más pedido", tag: null as string | null },
+    { dish: dishOfTheDay, label: "Especial del día", tag: dishOfTheDay.special },
+    { dish: specialOffer, label: "Menú familiar", tag: specialOffer.discount },
+    { dish: chefRecommendation, label: "Recomendación del chef", tag: chefRecommendation.badge },
+  ];
 
   return (
     <div className="min-h-screen bg-transparent flex flex-col">
-      {/* <AnnouncementBanner /> */}
       <Navbar />
 
-      {/* Slider de Comidas Especiales */}
-      <div
-        ref={specialtiesReveal.ref}
-        id="especialidades"
-        className="relative h-screen w-full"
-      >
-        {/* <h3 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-8 pt-6 px-4">
-          Nuestras Especialidades
-        </h3> */}
+      {/* Slider de especialidades */}
+      <div id="especialidades" className="relative h-[100dvh] w-full">
         <FoodSlider foods={specialFoods} autoplayInterval={5000} />
       </div>
 
-      {/* Contenedor principal del contenido */}
-      <div className="relative z-10 bg-white dark:bg-gray-900">
+      <div className="relative z-10 bg-[rgb(var(--background))]">
         {/* Bienvenida */}
-        <section
-          id="inicio"
-          className="py-12 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900"
-        >
-          {/* Hero Section with Icon */}
-          <div
-            ref={heroReveal.ref}
-            className={`max-w-6xl mx-auto text-center mb-12 reveal-on-scroll reveal-scale-up ${
-              heroReveal.isVisible ? "visible" : ""
-            }`}
-          >
-            <div className="flex justify-center mb-8 mt-16">
-              <div className="relative">
-                <div className="w-32 h-32 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-full flex items-center justify-center shadow-2xl animate-float">
-                  <ChefHat className="w-16 h-16 text-white" />
-                </div>
-                <div className="absolute -top-2 -right-2 w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg animate-pulse-slow">
-                  <Star className="w-6 h-6 text-gray-900 dark:text-amber-50" />
-                </div>
-              </div>
-            </div>
-
-            <div className="backdrop-blur-sm">
-              <h2
-                ref={h2Ref}
-                className={`text-5xl font-bold text-black dark:text-white mb-6 wave-parent ${
-                  waveAuto ? "wave-animate" : ""
-                }`}
-                aria-label="Bienvenido a Tu Restaurante"
-              >
-                <span
-                  className={`reveal-on-scroll reveal-from-left delay-200 inline-block ${
-                    heroReveal.isVisible ? "visible" : ""
-                  } ${themePulse ? "theme-animate" : ""}`}
-                  aria-label="Bienvenido a"
-                >
-                  {"Bienvenido a ".split("").map((ch, i) => (
-                    <span
-                      key={i}
-                      className="char inline-block"
-                      style={{ ["--i" as unknown as string]: `${i}` }}
-                      aria-hidden
-                    >
-                      {ch === " " ? "\u00A0" : ch}
-                    </span>
-                  ))}
-                </span>
-                <span
-                  className={`reveal-on-scroll reveal-from-right delay-200 inline-block text-purple-900 ${
-                    heroReveal.isVisible ? "visible" : ""
-                  } ${themePulse ? "theme-animate" : ""}`}
-                  aria-label="Restaurante"
-                >
-                  {"Restaurante".split("").map((ch, i) => (
-                    <span
-                      key={i}
-                      className="char inline-block"
-                      style={{ ["--i" as unknown as string]: `${i}` }}
-                      aria-hidden
-                    >
-                      {ch === " " ? "\u00A0" : ch}
-                    </span>
-                  ))}
-                </span>
+        <section id="inicio" className="px-4 py-20 sm:px-6 md:py-28 lg:px-8">
+          <div className="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-[1.1fr_1fr] md:gap-16">
+            <div data-aos="fade-up">
+              <h2 className="mb-5 text-4xl font-bold leading-[1.05] text-gray-950 dark:text-white md:text-5xl lg:text-6xl">
+                Bienvenidos a <span className="text-primary-600 dark:text-primary-400">{branding.name}</span>
               </h2>
+              <p className="mb-8 max-w-[52ch] text-lg leading-relaxed text-gray-600 dark:text-gray-300">
+                {branding.tagline ||
+                  "Sazón de casa, porciones generosas y el sabor de siempre. Aquí se come como en familia."}
+              </p>
+              <div className="mb-9 flex flex-wrap gap-2.5 text-sm">
+                {branding.hours && (
+                  <span className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3.5 py-2 text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300">
+                    <Clock className="h-4 w-4 text-primary-600 dark:text-primary-400" /> {branding.hours}
+                  </span>
+                )}
+                {branding.address && (
+                  <span className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3.5 py-2 text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300">
+                    <MapPin className="h-4 w-4 text-primary-600 dark:text-primary-400" /> {branding.address}
+                  </span>
+                )}
+              </div>
+              <Link
+                href="/menu"
+                className="btn-press group inline-flex items-center gap-2 rounded-full bg-primary-600 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary-900/15 hover:bg-primary-700"
+              >
+                Ver la carta
+                <ArrowRight className="h-4 w-4 transition-transform duration-200 ease-out group-hover:translate-x-0.5" />
+              </Link>
             </div>
-            <p className="text-xl text-black dark:text-white mb-8 max-w-3xl mx-auto">
-              Donde cada plato es una obra maestra. Ingredientes frescos,
-              recetas tradicionales y la pasión por la auténtica cocina se
-              encuentran en cada bocado.
-            </p>
-          </div>
 
-          {/* Menu Categories */}
-          <div className="max-w-6xl mx-auto py-12">
-            <h4 className="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">
-              Explora Nuestro Menú
-            </h4>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-6 ">
+            {/* Categorías de la carta */}
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3" data-aos="fade-up" data-aos-delay="80">
               {menuCategories.map((category, index) => (
-                <div
-                  key={index}
-                  className="bg-white/90 backdrop-blur-sm dark:bg-gray-800 rounded-xl p-6 shadow-lg hover-lift cursor-pointer border border-gray-200 dark:border-gray-700"
+                <Link
+                  key={category.label}
+                  href="/menu"
+                  className={`btn-press group flex flex-col justify-between gap-6 rounded-3xl border border-gray-200 bg-white p-5 hover:border-primary-300 hover:bg-primary-50 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-primary-700 dark:hover:bg-primary-900/30 ${
+                    index === 0 ? "col-span-2 sm:col-span-1 sm:row-span-2" : ""
+                  }`}
                 >
-                  <div
-                    className={`flex flex-col items-center space-y-3 ${category.color}`}
-                  >
-                    <category.icon className="w-12 h-12" />
-                    <span className="text-sm font-semibold text-gray-900  dark:text-gray-100 text-center">
-                      {category.label}
-                    </span>
-                  </div>
-                </div>
+                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300">
+                    <category.icon className="h-6 w-6" strokeWidth={1.75} />
+                  </span>
+                  <span className="font-semibold text-gray-900 dark:text-gray-100">{category.label}</span>
+                </Link>
               ))}
             </div>
           </div>
         </section>
 
-        <section
-          
-          className={`severalFoods ${styles.severalFoods} max-w-6xl mx-auto`}
-        >
-          {/* Plato Más Popular */}
-          <section
-            className={`py-16 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800 parallax-container`}
-          >
-            <div
-              ref={popularDishReveal.ref}
-              id="destacadas"
-              className={`max-w-6xl mx-auto reveal-on-scroll reveal-from-bottom ${
-                popularDishReveal.isVisible ? "visible" : ""
-              }`}
-            >
-              <div className="text-center mb-12">
-                <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                  🏆 El Más Pedido
-                </h3>
-              </div>
-
-              <div className="bg-gradient-to-r from-yellow-100 to-accent-100 dark:from-yellow-900/30 dark:to-accent-900/30 rounded-2xl p-8 max-w-4xl mx-auto hover-lift" id="">
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-48 h-48 mb-6 relative rounded-full bg-gradient-to-br from-yellow-400 to-accent-500 flex items-center justify-center shadow-lg">
-                    <mostPopular.icon
-                      className={`w-24 h-24 ${mostPopular.color}`}
-                    />
-                  </div>
-                  <h4 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                    {mostPopular.name}
-                  </h4>
-                  <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-2xl">
-                    {mostPopular.description}
-                  </p>
-                  <div className="flex flex-col items-center space-y-4">
-                    <span
-                      className="text-4xl font-bold text-primary-500"
-                      style={{
-                        textShadow:
-                          "0 0 2px #000, 0 1px 4px #000, 1px 0 2px #000",
-                      }}
-                    >
-                      {mostPopular.price}
+        {/* Para hoy: mosaico con los destacados */}
+        <section id="destacadas" className="px-4 pb-20 sm:px-6 md:pb-28 lg:px-8">
+          <div className="mx-auto max-w-6xl">
+            <h2 className="mb-8 text-3xl font-bold text-gray-950 dark:text-white md:text-4xl" data-aos="fade-up">
+              Para hoy
+            </h2>
+            <div className="grid auto-rows-[260px] gap-4 md:grid-cols-4 md:auto-rows-[240px]">
+              {todayPicks.map(({ dish, label, tag }, index) => (
+                <button
+                  key={dish.id}
+                  type="button"
+                  onClick={() => handleDishClick(dish)}
+                  data-aos="fade-up"
+                  data-aos-delay={index * 60}
+                  className={`group relative overflow-hidden rounded-3xl bg-gray-200 text-left dark:bg-gray-800 ${
+                    index === 0 ? "md:col-span-2 md:row-span-2" : index === 1 ? "md:col-span-2" : ""
+                  }`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={dish.image}
+                    alt={dish.name}
+                    loading="lazy"
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04] motion-reduce:transition-none"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                  {tag && (
+                    <span className="absolute right-4 top-4 rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-stone-950">
+                      {tag}
                     </span>
-                    <button
-                      onClick={() => handleDishClick(mostPopular)}
-                      className="bg-primary-500 text-white px-8 py-4 text-lg rounded-lg hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 inline-flex items-center gap-2"
-                    >
-                      Ver Detalles y Agregar
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Plato del Día */}
-          <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-accent-50 to-yellow-50 dark:from-accent-900/20 dark:to-yellow-900/20 parallax-container">
-            <div
-              ref={dishOfDayReveal.ref}
-              className={`max-w-6xl mx-auto reveal-on-scroll reveal-from-left ${
-                dishOfDayReveal.isVisible ? "visible" : ""
-              }`}
-            >
-              <div className="text-center mb-12">
-                <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                  🌅 Especial del Día
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300">
-                  {dishOfTheDay.special}
-                </p>
-              </div>
-
-              <div className="bg-gradient-to-r from-accent-100 to-primary-100 dark:from-accent-900/30 dark:to-primary-900/30 rounded-2xl p-8 max-w-4xl mx-auto hover-lift">
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-48 h-48 mb-6 relative rounded-full bg-gradient-to-br from-accent-400 to-primary-500 flex items-center justify-center shadow-lg">
-                    <dishOfTheDay.icon
-                      className={`w-24 h-24 ${dishOfTheDay.color}`}
-                    />
-                  </div>
-                  <h4 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                    {dishOfTheDay.name}
-                  </h4>
-                  <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-2xl">
-                    {dishOfTheDay.description}
-                  </p>
-                  <div className="flex flex-col items-center space-y-4">
-                    <span
-                      className="text-4xl font-bold text-primary-500"
-                      style={{
-                        textShadow:
-                          "0 0 2px #000, 0 1px 4px #000, 1px 0 2px #000",
-                      }}
-                    >
-                      {dishOfTheDay.price}
-                    </span>
-                    <button
-                      onClick={() => handleDishClick(dishOfTheDay)}
-                      className="bg-primary-500 text-white px-8 py-4 text-lg rounded-lg hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 inline-flex items-center gap-2"
-                    >
-                      Ver Detalles y Agregar
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Oferta Especial */}
-          <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800 parallax-container">
-            <div
-              ref={specialOfferReveal.ref}
-              className={`max-w-6xl mx-auto reveal-on-scroll reveal-from-right ${
-                specialOfferReveal.isVisible ? "visible" : ""
-              }`}
-            >
-              <div className="text-center mb-12">
-                <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                  🔥 Oferta Especial
-                </h3>
-                <p className="text-primary-500 dark:text-primary-400 font-semibold text-lg">
-                  {specialOffer.discount}
-                </p>
-              </div>
-
-              <div className="bg-gradient-to-r from-primary-100 to-pink-100 dark:from-primary-900/30 dark:to-pink-900/30 rounded-2xl p-8 max-w-4xl mx-auto relative hover-lift">
-                {/* Badge de descuento */}
-                <div className="absolute -top-4 -right-4 bg-primary-500 text-white px-4 py-2 rounded-full font-bold text-sm transform rotate-12 shadow-lg">
-                  {specialOffer.discount}
-                </div>
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-48 h-48 mb-6 relative rounded-full bg-gradient-to-br from-primary-400 to-pink-500 flex items-center justify-center shadow-lg">
-                    <specialOffer.icon
-                      className={`w-24 h-24 ${specialOffer.color}`}
-                    />
-                  </div>
-                  <h4 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                    {specialOffer.name}
-                  </h4>
-                  <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-2xl">
-                    {specialOffer.description}
-                  </p>
-                  <div className="flex flex-col items-center space-y-4">
-                    <div className="flex items-center space-x-4">
-                      <span
-                        className="text-4xl font-bold text-primary-500"
-                        style={{
-                          textShadow:
-                            "0 0 2px #000, 0 1px 4px #000, 1px 0 2px #000",
-                        }}
-                      >
-                        {specialOffer.price}
+                  )}
+                  <div className="absolute inset-x-0 bottom-0 p-5 text-white md:p-6">
+                    <p className="mb-1 text-sm font-medium text-white/75">{label}</p>
+                    <h3 className={`font-bold leading-tight ${index === 0 ? "text-3xl md:text-4xl" : "text-xl"}`}>
+                      {dish.name}
+                    </h3>
+                    {index === 0 && (
+                      <p className="mt-2 max-w-md text-white/80 line-clamp-2">{dish.description}</p>
+                    )}
+                    <div className="mt-3 flex items-center justify-between gap-3">
+                      <span className="text-lg font-bold tabular-nums">{dish.price}</span>
+                      <span className="inline-flex items-center gap-1 text-sm font-semibold text-white/90">
+                        Ver detalles
+                        <ArrowRight className="h-4 w-4 transition-transform duration-200 ease-out group-hover:translate-x-0.5" />
                       </span>
                     </div>
-                    <button
-                      onClick={() => handleDishClick(specialOffer)}
-                      className="bg-primary-500 text-white px-8 py-4 text-lg rounded-lg hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 inline-flex items-center gap-2"
-                    >
-                      Ver Detalles y Agregar
-                    </button>
                   </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Recomendación del Chef */}
-          <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 parallax-container">
-            <div
-              ref={chefReveal.ref}
-              className={`max-w-6xl mx-auto reveal-on-scroll reveal-scale-up ${
-                chefReveal.isVisible ? "visible" : ""
-              }`}
-            >
-              <div className="text-center mb-12">
-                <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                  👨‍🍳 Recomendación del Chef
-                </h3>
-                <p className="text-purple-600 dark:text-purple-400 font-semibold">
-                  {chefRecommendation.badge}
-                </p>
-              </div>
-
-              <div className="bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-2xl p-8 max-w-4xl mx-auto relative hover-lift">
-                {/* Badge de chef */}
-                <div className="absolute -top-4 -left-4 bg-primary-500 text-white px-4 py-2 rounded-full font-bold text-sm shadow-lg">
-                  Chef Choice
-                </div>
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-48 h-48 mb-6 relative rounded-full bg-gradient-to-br from-purple-400 to-indigo-500 flex items-center justify-center shadow-lg">
-                    <chefRecommendation.icon
-                      className={`w-24 h-24 ${chefRecommendation.color}`}
-                    />
-                  </div>
-                  <h4 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                    {chefRecommendation.name}
-                  </h4>
-                  <p className="text-gray-600 dark:text-gray-300 mb-6 max-w-2xl">
-                    {chefRecommendation.description}
-                  </p>
-                  <div className="flex flex-col items-center space-y-4">
-                    <span
-                      className="text-4xl font-bold text-primary-500"
-                      style={{
-                        textShadow:
-                          "0 0 2px #000, 0 1px 4px #000, 1px 0 2px #000",
-                      }}
-                    >
-                      {chefRecommendation.price}
-                    </span>
-                    <button
-                      onClick={() => handleDishClick(chefRecommendation)}
-                      className="bg-primary-500 text-white px-8 py-4 text-lg rounded-lg hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 inline-flex items-center gap-2"
-                    >
-                      Ver Detalles y Agregar
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        </section>
-
-        {/* Plato de la Semana - French Luxury Style */}
-        <PlatDeLaSemaine />
-
-        {/* Nuestro Menú */}
-        <section
-          id="menu-comidas"
-          className={`relative py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-primary-50 dark:from-gray-900 dark:to-primary-950`}
-        >
-          <div
-            ref={menuReveal.ref}
-            className={`max-w-6xl mx-auto reveal-on-scroll reveal-from-bottom ${
-              menuReveal.isVisible ? "visible" : ""
-            }`}
-          >
-            <div className="text-center mb-12">
-              <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                🍽️ Nuestro Menú
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                Descubre nuestra variedad de platos tradicionales y
-                especialidades. ¡Contacta para conocer precios y disponibilidad!
-              </p>
-            </div>
-
-            <div className="relative">
-              {/* Menu Grid with Icons */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-                <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg hover-lift">
-                  <Coffee className="w-16 h-16 text-amber-600 mx-auto mb-4" />
-                  <h4 className="text-lg font-bold text-center dark:text-white">
-                    Bebidas
-                  </h4>
-                </div>
-                <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg hover-lift">
-                  <Wine className="w-16 h-16 text-primary-500 mx-auto mb-4" />
-                  <h4 className="text-lg font-bold text-center dark:text-white">
-                    Vinos
-                  </h4>
-                </div>
-                <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg hover-lift">
-                  <Soup className="w-16 h-16 text-accent-500 mx-auto mb-4" />
-                  <h4 className="text-lg font-bold text-center dark:text-white">
-                    Sopas
-                  </h4>
-                </div>
-                <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg hover-lift">
-                  <Salad className="w-16 h-16 text-green-600 mx-auto mb-4" />
-                  <h4 className="text-lg font-bold text-center dark:text-white">
-                    Ensaladas
-                  </h4>
-                </div>
-              </div>
-
-              {/* CTA Button */}
-              <div className="text-center mt-8">
-                <Link
-                  href="/menu"
-                  className="inline-flex items-center bg-primary-500 text-white px-8 py-4 text-lg rounded-lg hover:bg-primary-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-                >
-                  <Utensils className="h-6 w-6 mr-2" />
-                  Ver Menú Completo
-                </Link>
-              </div>
+                </button>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* Sección de Envíos a Domicilio */}
-        <section
-          id="delivery"
-          className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-accent-50 to-yellow-50 dark:from-accent-900/20 dark:to-yellow-900/20"
-        >
+        {/* Plato de la semana */}
+        <PlatoDeLaSemana />
+
+        {/* Nuestro menú: franja de llamada a la acción */}
+        <section id="menu-comidas" className="px-4 py-20 sm:px-6 md:py-24 lg:px-8">
           <div
-            ref={deliveryReveal.ref}
-            className={`max-w-6xl mx-auto reveal-on-scroll reveal-scale-up ${
-              deliveryReveal.isVisible ? "visible" : ""
-            }`}
+            className="relative mx-auto max-w-6xl overflow-hidden rounded-[32px] bg-primary-700 px-6 py-14 text-white sm:px-12 md:py-16 dark:bg-primary-900"
+            data-aos="fade-up"
           >
-            {/* Header */}
-            <div className="text-center mb-12">
-              <div className="flex justify-center mb-6">
-                <div className="relative">
-                  <div className="w-24 h-24 bg-gradient-to-br from-accent-500 to-primary-500 rounded-full flex items-center justify-center shadow-2xl animate-float">
-                    <Bike className="w-12 h-12 text-white" />
-                  </div>
-                  <div className="absolute -top-2 -right-2 w-10 h-10 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
-                    <Phone className="w-5 h-5 text-white" />
-                  </div>
-                </div>
-              </div>
-              <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                🏍️ Envíos a Domicilio
-              </h2>
-              <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                Disfruta de nuestros deliciosos platos en la comodidad de tu
-                hogar. Servicio rápido y confiable con mototaxistas locales.
+            <CookingPot
+              aria-hidden
+              className="pointer-events-none absolute -bottom-10 -right-6 h-56 w-56 text-white/[0.07] md:h-72 md:w-72"
+              strokeWidth={1.25}
+            />
+            <div className="relative max-w-xl">
+              <h2 className="mb-4 text-3xl font-bold md:text-4xl">¿Con hambre? Mire la carta completa</h2>
+              <p className="mb-8 text-lg text-white/80">
+                Sopas, platos fuertes, ensaladas y bebidas. Pida en línea y lo tenemos listo cuando llegue.
               </p>
-            </div>
-
-            {/* Cards de beneficios */}
-            <div className="grid md:grid-cols-3 gap-8 mb-12">
-              <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover-lift text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-accent-400 to-primary-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Clock className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
-                  Entrega Rápida
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300">
-                  Tiempo estimado de entrega: 30-45 minutos dependiendo de tu
-                  ubicación
-                </p>
-              </div>
-
-              <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover-lift text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-accent-400 to-primary-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <MapPin className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
-                  Amplia Cobertura
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300">
-                  Realizamos envíos en toda la ciudad. Contáctanos para
-                  confirmar tu zona
-                </p>
-              </div>
-
-              <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg hover-lift text-center">
-                <div className="w-16 h-16 bg-gradient-to-br from-accent-400 to-primary-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Bike className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
-                  Apoyo Local
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300">
-                  Trabajamos con mototaxistas locales, generando empleo en
-                  nuestra comunidad
-                </p>
-              </div>
-            </div>
-
-            {/* Información de Costos */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 md:p-8 shadow-lg border-2 border-primary-200 dark:border-primary-800 mb-8">
-              <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center">
-                    <DollarSign className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
-                      Costo de Envío
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      Consultar
-                    </p>
-                  </div>
-                </div>
-
-                <div className="hidden md:block w-px h-16 bg-gray-300 dark:bg-gray-600"></div>
-
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary-400 to-secondary-600 rounded-full flex items-center justify-center">
-                    <CreditCard className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
-                      Forma de Pago
-                    </p>
-                    <p className="text-lg font-bold text-gray-900 dark:text-white">
-                      Previo al Envío
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 dark:border-yellow-600 p-4 rounded">
-                <div className="flex items-start">
-                  <div className="flex-shrink-0">
-                    <svg
-                      className="h-5 w-5 text-yellow-400"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                      <strong>Importante:</strong> El costo de envío se debe
-                      cancelar antes de que el repartidor salga con tu pedido.
-                      Te confirmaremos el monto según tu ubicación.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* CTA Section */}
-            <div className="bg-gradient-to-r from-accent-100 to-primary-100 dark:from-accent-900/30 dark:to-primary-900/30 rounded-2xl p-8 md:p-12 text-center">
-              <h3 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                ¿Listo para pedir?
-              </h3>
-              <p className="text-gray-700 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-                Haz tu pedido por WhatsApp y disfruta de comida deliciosa en tu
-                casa. ¡Te llevamos el sabor hasta tu puerta!
-              </p>
-              <button
-                onClick={() => setShowOrderModal(true)}
-                className="bg-gradient-to-r from-accent-600 to-primary-600 text-white px-10 py-5 rounded-full font-bold text-lg shadow-lg hover:shadow-2xl transform hover:-translate-y-2 hover:scale-105 transition-all duration-500 inline-flex items-center space-x-3"
+              <Link
+                href="/menu"
+                className="btn-press inline-flex items-center gap-2 rounded-full bg-[#fafaf9] px-7 py-3.5 font-semibold text-primary-800 hover:bg-primary-50 dark:hover:bg-[#fafaf9]/90"
               >
-                <Utensils className="w-6 h-6" />
-                <span>Ver Opciones de Pedido</span>
-              </button>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mt-6">
-                💡 También puedes llamarnos al <strong>321-555-7890</strong>
-              </p>
+                <Utensils className="h-5 w-5" />
+                Ver menú completo
+              </Link>
             </div>
           </div>
         </section>
 
-        {/* Información Adicional */}
-        <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-900 dark:bg-gray-950 text-white">
-          <div
-            ref={infoReveal.ref}
-            className={`max-w-6xl mx-auto grid md:grid-cols-3 gap-8 text-center reveal-on-scroll reveal-from-bottom ${
-              infoReveal.isVisible ? "visible" : ""
-            }`}
-          >
-            <div>
-              <Leaf className="h-12 w-12 text-green-400 dark:text-green-500 mx-auto mb-4 transition-all duration-500 delay-100 hover:scale-110 hover:text-green-300" />
-              <h4 className="text-xl font-bold mb-2 underline underline-offset-4 text-white">
-                Ingredientes Naturales
-              </h4>
-              <p className="text-gray-100 dark:text-gray-300">
-                Productos frescos y de primera calidad, seleccionados
-                cuidadosamente para garantizar el mejor sabor en cada plato
+        {/* Domicilios */}
+        <section id="delivery" className="px-4 pb-20 sm:px-6 md:pb-28 lg:px-8">
+          <div className="mx-auto max-w-6xl">
+            <div className="mb-10 max-w-2xl" data-aos="fade-up">
+              <h2 className="mb-4 text-3xl font-bold text-gray-950 dark:text-white md:text-4xl">
+                Domicilios a su casa
+              </h2>
+              <p className="text-lg text-gray-600 dark:text-gray-300">
+                Pídalo por WhatsApp y se lo llevamos calientico. Trabajamos con mototaxistas del barrio.
               </p>
             </div>
-            <div>
-              <Heart className="h-12 w-12 text-red-400 dark:text-red-500 mx-auto mb-4 transition-all duration-500 delay-100 hover:scale-125 hover:text-red-300 animate-pulse-slow" />
-              <h4 className="text-xl font-bold mb-2 underline underline-offset-4 text-white">
-                Hecho con Pasión
-              </h4>
-              <p className="text-gray-100 dark:text-gray-300">
-                Cada receta es preparada con dedicación y amor por nuestros
-                chefs, siguiendo tradiciones culinarias auténticas
-              </p>
-            </div>
-            <div>
-              <Award className="h-12 w-12 text-yellow-400 dark:text-yellow-500 mx-auto mb-4 transition-all duration-500 delay-100 hover:rotate-12 hover:scale-110 hover:text-yellow-300" />
-              <h4 className="text-xl font-bold mb-2 underline underline-offset-4 text-white">
-                Experiencia Premium
-              </h4>
-              <p className="text-gray-100 dark:text-gray-300">
-                Más de 10 años deleitando paladares exigentes con sabores únicos
-                y un servicio de excelencia incomparable
-              </p>
+
+            <div className="grid gap-4 md:grid-cols-[1.4fr_1fr]">
+              <ul className="divide-y divide-gray-200 rounded-3xl border border-gray-200 bg-white px-6 dark:divide-gray-800 dark:border-gray-800 dark:bg-gray-900">
+                {[
+                  { icon: Clock, title: "Llega en 30 a 45 minutos", text: "Según qué tan lejos esté de nosotros." },
+                  { icon: MapPin, title: "Cubrimos toda la ciudad", text: "Escríbanos para confirmar su zona." },
+                  { icon: Bike, title: "Repartidores locales", text: "Cada domicilio es trabajo para la gente del barrio." },
+                ].map((item) => (
+                  <li key={item.title} className="flex items-start gap-4 py-5">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary-50 text-primary-700 dark:bg-primary-900/50 dark:text-primary-300">
+                      <item.icon className="h-5 w-5" />
+                    </span>
+                    <div>
+                      <p className="font-semibold text-gray-950 dark:text-white">{item.title}</p>
+                      <p className="text-gray-600 dark:text-gray-400">{item.text}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="flex flex-col justify-between gap-6 rounded-3xl bg-gray-100 p-6 dark:bg-gray-900 md:p-8">
+                <div className="space-y-3">
+                  <p className="flex items-baseline justify-between gap-4">
+                    <span className="text-gray-600 dark:text-gray-400">Costo del domicilio</span>
+                    <span className="font-semibold text-gray-950 dark:text-white">Según la zona</span>
+                  </p>
+                  <p className="flex items-baseline justify-between gap-4">
+                    <span className="text-gray-600 dark:text-gray-400">Pago</span>
+                    <span className="font-semibold text-gray-950 dark:text-white">Antes del envío</span>
+                  </p>
+                  <p className="flex gap-2 rounded-2xl bg-yellow-50 p-3 text-sm text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-200">
+                    <Info className="mt-0.5 h-4 w-4 shrink-0" />
+                    El domicilio se paga antes de que el repartidor salga. Le confirmamos el valor según su dirección.
+                  </p>
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setShowOrderModal(true)}
+                    className="flex w-full items-center justify-center gap-2 rounded-full bg-primary-600 px-6 py-3.5 font-semibold text-white hover:bg-primary-700"
+                  >
+                    <Bike className="h-5 w-5" />
+                    Pedir a domicilio
+                  </button>
+                  {branding.phone && (
+                    <a
+                      href={`tel:${branding.phone.replace(/[^\d+]/g, "")}`}
+                      className="mt-3 flex items-center justify-center gap-2 text-sm text-gray-600 hover:text-gray-950 dark:text-gray-400 dark:hover:text-white"
+                    >
+                      <Phone className="h-4 w-4" /> O llámenos al {branding.phone}
+                    </a>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Sección de Testimonios */}
+        {/* Lo que nos distingue */}
+        <section className="border-y border-gray-200 bg-white px-4 py-16 dark:border-gray-800 dark:bg-gray-900 sm:px-6 lg:px-8">
+          <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-3">
+            {[
+              { icon: Leaf, title: "Del mercado a la olla", text: "Compramos fresco cada mañana: verduras, carnes y frutas de temporada." },
+              { icon: ChefHat, title: "Sazón de casa", text: "Recetas de toda la vida, preparadas sin afán y con buen sabor." },
+              { icon: HandHeart, title: "Atención con cariño", text: "Lo atendemos como en familia, en el local o a domicilio." },
+            ].map((item, index) => (
+              <div key={item.title} className="flex gap-4" data-aos="fade-up" data-aos-delay={index * 60}>
+                <item.icon className="h-7 w-7 shrink-0 text-primary-600 dark:text-primary-400" strokeWidth={1.75} />
+                <div>
+                  <h3 className="mb-1.5 text-lg font-semibold text-gray-950 dark:text-white">{item.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-400">{item.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Testimonios */}
         <TestimonialsSection />
 
-        {/* Sección de Ubicación */}
+        {/* Ubicación */}
         <LocationMap
-          businessName="Restaurante"
-          address="Valle de Sibundoy, Putumayo, Colombia"
-          phone="+57 300 000 0000"
-          hours="Lunes-Domingo: 8:00 AM - 8:00 PM"
-          latitude={1.1557}
-          longitude={-76.8978}
-          
+          businessName={branding.name}
+          address={[branding.address, branding.city].filter(Boolean).join(", ")}
+          phone={branding.phone}
+          hours={branding.hours}
         />
 
         <Footer />
@@ -902,20 +472,12 @@ export default function Home() {
 
         <ScrollToTopButton />
 
-        {/* Modal de Opciones de Pedido */}
-        <OrderCTAModal
-          isOpen={showOrderModal}
-          onClose={() => setShowOrderModal(false)}
-        />
+        {/* Modal de opciones de pedido */}
+        <OrderCTAModal isOpen={showOrderModal} onClose={() => setShowOrderModal(false)} />
 
-        {/* Modal de Detalles del Plato */}
-        <DishDetailModal
-          isOpen={isDishModalOpen}
-          onClose={() => setIsDishModalOpen(false)}
-          dish={selectedDish}
-        />
+        {/* Modal de detalles del plato */}
+        <DishDetailModal isOpen={isDishModalOpen} onClose={() => setIsDishModalOpen(false)} dish={selectedDish} />
       </div>
-      {/* Cierre del contenedor dark-minimalist */}
     </div>
   );
 }

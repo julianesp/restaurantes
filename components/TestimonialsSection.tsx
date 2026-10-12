@@ -85,23 +85,20 @@ export default function TestimonialsSection() {
   };
 
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
+    <section className="py-20 md:py-28 px-4 sm:px-6 lg:px-8">
       <div
         ref={testimonialsReveal.ref}
-        className={`max-w-7xl mx-auto reveal-on-scroll reveal-from-bottom ${
+        className={`max-w-6xl mx-auto reveal-on-scroll reveal-from-bottom ${
           testimonialsReveal.isVisible ? "visible" : ""
         }`}
       >
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex justify-center mb-6">
-            <MessageSquare className="w-16 h-16 text-primary-500" />
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Lo Que Dicen Nuestros Clientes
+        <div className="mb-10 max-w-2xl">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-950 dark:text-white mb-4">
+            Lo que dicen nuestros comensales
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            La opinión de nuestros comensales es muy importante para nosotros
+          <p className="text-lg text-gray-600 dark:text-gray-300">
+            Cuéntenos cómo le fue: su opinión nos ayuda a mejorar cada día.
           </p>
         </div>
 
