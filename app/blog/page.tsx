@@ -119,7 +119,9 @@ export default function BlogPage() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
+    // Fechas "AAAA-MM-DD" = medianoche UTC: formatear en UTC para que servidor y navegador coincidan
     return date.toLocaleDateString("es-CO", {
+      timeZone: "UTC",
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -130,8 +132,8 @@ export default function BlogPage() {
     const colors = {
       "platos-especiales": "bg-accent-100 text-accent-700 dark:bg-accent-900/30 dark:text-accent-300",
       noticias: "bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300",
-      recetas: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
-      eventos: "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300",
+      recetas: "bg-primary-100 text-primary-800 dark:bg-primary-900/40 dark:text-primary-300",
+      eventos: "bg-gray-200 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
     };
     return colors[category as keyof typeof colors] || "bg-gray-100 text-gray-700";
   };
