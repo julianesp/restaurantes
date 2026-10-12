@@ -13,12 +13,16 @@ import {
   Upload,
   Share2,
   Check,
+  MessageCircle,
+  ShieldCheck,
 } from "lucide-react";
 import GuidedTour from "@/components/platform/GuidedTour";
 import FeatureTabs from "@/components/platform/FeatureTabs";
 import EmberEdge from "@/components/EmberEdge";
 import PlatformHeader from "@/components/platform/PlatformHeader";
 import FoodSlider from "@/components/FoodSlider";
+import BrasayaLogo from "@/components/BrasayaLogo";
+import { tenantUrl } from "@/lib/tenant-host";
 
 export const metadata = {
   title: "Brasaya: tu restaurante, encendido en línea",
@@ -44,6 +48,11 @@ const benefits = [
 ];
 
 const PRICE = "$69.900";
+
+// Contacto comercial de Brasaya (mismo WhatsApp del restaurante principal; cambiarlo aquí si hace falta)
+const WHATSAPP = "573174503604";
+const WHATSAPP_LABEL = "+57 317 450 3604";
+const WHATSAPP_URL = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent("Hola, quiero saber más sobre Brasaya para mi restaurante.")}`;
 
 const included = [
   "Sitio web propio con tu logo y tu color",
@@ -249,14 +258,57 @@ export default function PlataformaPage() {
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-          <div className="flex flex-col items-start justify-between gap-4 border-t border-white/15 pt-6 text-sm text-white/70 sm:flex-row sm:items-center">
-            <span>© {new Date().getFullYear()} Brasaya. Hecho en Colombia.</span>
-            <div className="flex gap-5">
-              <a href="#servicios" className="hover:text-white">Servicios</a>
-              <a href="#recorrido" className="hover:text-white">Recorrido</a>
-              <a href="#precio" className="hover:text-white">Precio</a>
-              <Link href="/sign-in" className="hover:text-white">Iniciar sesión</Link>
+          {/* Datos y enlaces */}
+          <div className="grid gap-10 border-t border-white/15 pt-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
+            <div>
+              <Link href="/" aria-label="Brasaya, inicio" className="group mb-4 inline-flex [&_.font-display]:!text-white [&_.font-display_span]:!text-[#FFD166]">
+                <BrasayaLogo size={34} />
+              </Link>
+              <p className="max-w-xs text-sm leading-relaxed text-white/75">
+                La plataforma para restaurantes de toda Colombia: carta, pedidos, cocina y ventas en un solo lugar.
+              </p>
             </div>
+
+            <nav aria-label="Producto">
+              <h3 className="mb-4 text-sm font-semibold text-white">Producto</h3>
+              <ul className="space-y-2.5 text-sm text-white/75">
+                <li><a href="#servicios" className="hover:text-white">Servicios</a></li>
+                <li><a href="#recorrido" className="hover:text-white">Recorrido guiado</a></li>
+                <li><a href="#caracteristicas" className="hover:text-white">Características</a></li>
+                <li><a href="#precio" className="hover:text-white">Precio</a></li>
+              </ul>
+            </nav>
+
+            <nav aria-label="Para restaurantes">
+              <h3 className="mb-4 text-sm font-semibold text-white">Para restaurantes</h3>
+              <ul className="space-y-2.5 text-sm text-white/75">
+                <li><Link href="/registro" className="hover:text-white">Crear mi restaurante</Link></li>
+                <li><Link href="/sign-in" className="hover:text-white">Iniciar sesión</Link></li>
+                <li><a href={tenantUrl("restaurante")} className="hover:text-white">Ver un restaurante de ejemplo</a></li>
+              </ul>
+            </nav>
+
+            <div>
+              <h3 className="mb-4 text-sm font-semibold text-white">Contacto</h3>
+              <ul className="space-y-3 text-sm text-white/75">
+                <li>
+                  <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-white">
+                    <MessageCircle className="h-4 w-4 shrink-0" />
+                    WhatsApp {WHATSAPP_LABEL}
+                  </a>
+                </li>
+                <li className="inline-flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 shrink-0" />
+                  Pagos seguros con ePayco
+                </li>
+                <li>Soporte en español</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="mt-12 flex flex-col items-start justify-between gap-2 border-t border-white/15 pt-6 text-sm text-white/60 sm:flex-row sm:items-center">
+            <span>© {new Date().getFullYear()} Brasaya. Hecho en Colombia.</span>
+            <span>brasaya.com</span>
           </div>
         </div>
       </footer>
