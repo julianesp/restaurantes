@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { ShoppingCart as CartIcon } from "lucide-react";
 import { useCart } from "../context/CartContext";
@@ -11,9 +11,20 @@ export default function CartButton() {
   const { getCartCount } = useCart();
   const cartCount = getCartCount();
   const pathname = usePathname();
+  // La landing de Brasaya se sirve en "/" (reescrita a /plataforma): se reconoce por su marcador
+  const [onPlatform, setOnPlatform] = useState(false);
+  useEffect(() => {
+    setOnPlatform(!!document.querySelector("[data-platform-landing]"));
+  }, [pathname]);
 
-  // No mostrar el carrito de clientes en el panel del mesero ni en admin
-  if (pathname.startsWith("/mesero") || pathname.startsWith("/admin"))
+  // No mostrar el carrito de clientes en el panel del mesero, en admin ni en las páginas de la plataforma
+  if (
+    pathname.startsWith("/mesero") ||
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/plataforma") ||
+    pathname.startsWith("/registro") ||
+    onPlatform
+  )
     return null;
 
   return (

@@ -69,7 +69,7 @@ export default function FoodSlider({
   return (
     <div className="absolute top-0 left-0 w-full h-full z-0">
       <div className="relative overflow-hidden h-full shadow-none">
-        <div className="relative h-[100dvh]">
+        <div className="relative h-full">
           {foods.map((food, index) => {
             const active = index === currentIndex;
             return (

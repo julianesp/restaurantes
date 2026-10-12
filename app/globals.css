@@ -178,6 +178,17 @@ a.btn-press:active {
 [data-aos="fade-right"] { transform: translate3d(-24px, 0, 0); }
 [data-aos^="fade"].aos-animate { transform: translate3d(0, 0, 0); }
 
+/* Barra de progreso del recorrido guiado (landing de la plataforma): solo transform */
+.tour-progress {
+  animation-name: tour-progress;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+@keyframes tour-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
 /* Cambio de tema: transición corta de colores, sin mover nada */
 html.theme-transition,
 html.theme-transition *,
