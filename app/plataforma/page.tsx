@@ -34,17 +34,20 @@ export const metadata = {
 // Fotos de ejemplo (las mismas del restaurante de prueba)
 const PHOTO = (n: number) => `https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/restaurants/${n}.jpg`;
 
-// Láminas de la presentación: beneficios de tener cuenta en Brasaya
+// Láminas de la presentación: beneficios de tener cuenta en Brasaya.
+// Ilustraciones en public/plataforma/ (fuente en scripts/plataforma-slides/); el dispositivo está a la
+// derecha, así que en pantallas estrechas cada una se encuadra sobre él (imagePosition).
+const SLIDE = (name: string) => `/plataforma/${name}.webp`;
 const benefits = [
-  { id: 1, image: PHOTO(1), name: "Tu carta, siempre al día", price: "Menú digital",
+  { id: 1, image: SLIDE("menu-digital"), imagePosition: "77% 50%", name: "Tu carta, siempre al día", price: "Menú digital",
     description: "Cambia platos y precios desde el celular y tus clientes lo ven al instante." },
-  { id: 2, image: PHOTO(2), name: "Pedidos sin filas", price: "Pedidos por QR",
+  { id: 2, image: SLIDE("pedidos-qr"), imagePosition: "76% 50%", name: "Pedidos sin filas", price: "Pedidos por QR",
     description: "Tus clientes piden desde la mesa y la cocina recibe el pedido enseguida." },
-  { id: 3, image: PHOTO(3), name: "Domicilios que llegan completos", price: "Domicilios",
+  { id: 3, image: SLIDE("domicilios"), imagePosition: "96% 50%", name: "Domicilios que llegan completos", price: "Domicilios",
     description: "El cliente arma su pedido en tu sitio y te llega listo por WhatsApp." },
-  { id: 4, image: PHOTO(4), name: "Clientes que vuelven", price: "Tiqueteras",
+  { id: 4, image: SLIDE("tiqueteras"), imagePosition: "64% 50%", name: "Clientes que vuelven", price: "Tiqueteras",
     description: "Vende paquetes de almuerzos por adelantado y lleva el saldo de cada cliente." },
-  { id: 5, image: PHOTO(5), name: "Sabes cuánto vendes", price: "Estadísticas",
+  { id: 5, image: SLIDE("estadisticas"), imagePosition: "84% 50%", name: "Sabes cuánto vendes", price: "Estadísticas",
     description: "Ventas del día, la semana y el mes, y tu plato estrella, sin hojas de cálculo." },
 ];
 

@@ -10,6 +10,8 @@ interface FoodItem {
   description: string;
   image: string;
   price?: string;
+  // Encuadre de la imagen en pantallas estrechas (object-position), p. ej. "80% 50%"
+  imagePosition?: string;
 }
 
 interface FoodSliderProps {
@@ -95,6 +97,7 @@ export default function FoodSlider({
                       alt={food.name}
                       fill
                       className="object-cover"
+                      style={food.imagePosition ? { objectPosition: food.imagePosition } : undefined}
                       priority={index === 0}
                     />
                   </div>

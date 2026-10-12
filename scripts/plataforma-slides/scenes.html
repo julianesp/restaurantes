@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Geist:wght@400;500;600&display=block" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: #120d09; }
+  body { font-family: "Geist", system-ui, sans-serif; color: #1c1917; }
+  .display { font-family: "Outfit", system-ui, sans-serif; }
+
+  /* ---------- Fondo común ---------- */
+  .stage { position: absolute; inset: 0; overflow: hidden;
+    background:
+      radial-gradient(900px 700px at 72% 42%, rgba(235,129,15,.38), transparent 70%),
+      radial-gradient(600px 500px at 90% 90%, rgba(190,60,20,.35), transparent 70%),
+      radial-gradient(700px 600px at 10% 20%, rgba(60,40,25,.6), transparent 70%),
+      linear-gradient(160deg, #1d1510 0%, #120d09 55%, #0d0906 100%);
+  }
+  .table { position: absolute; left: -10%; right: -10%; bottom: -120px; height: 470px;
+    background:
+      repeating-linear-gradient(92deg, rgba(0,0,0,.0) 0 38px, rgba(0,0,0,.10) 38px 40px, rgba(255,255,255,.02) 40px 90px),
+      linear-gradient(180deg, #6b3f1f 0%, #4a2a14 45%, #2a170b 100%);
+    transform: perspective(1200px) rotateX(58deg); transform-origin: top center;
+    box-shadow: 0 -40px 120px rgba(235,129,15,.18) inset;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 30%); mask-image: linear-gradient(to bottom, transparent 0%, #000 30%);
+  }
+  .table::after { content: ""; position: absolute; inset: 0;
+    background: radial-gradient(60% 80% at 70% 0%, rgba(255,190,110,.22), transparent 70%); }
+  .bokeh { position: absolute; border-radius: 50%; filter: blur(2px); }
+  .shadow-xl { box-shadow: 0 50px 90px -20px rgba(0,0,0,.75), 0 18px 40px -12px rgba(0,0,0,.55); }
+
+  /* ---------- Teléfono ---------- */
+  .phone { position: absolute; width: 400px; height: 820px; border-radius: 62px; background: #0b0b0c;
+    padding: 14px; box-shadow: 0 0 0 2px #2c2c2e, 0 60px 110px -20px rgba(0,0,0,.85), 0 24px 50px -10px rgba(0,0,0,.6); }
+  .phone::before { content: ""; position: absolute; top: 26px; left: 50%; width: 112px; height: 32px; margin-left: -56px;
+    background: #000; border-radius: 20px; z-index: 5; }
+  .screen { position: relative; width: 100%; height: 100%; border-radius: 48px; overflow: hidden; background: #fafaf9; }
+  .status { height: 58px; display: flex; align-items: center; justify-content: space-between; padding: 8px 30px 0;
+    font: 600 15px "Geist"; color: #1c1917; }
+
+  /* ---------- Platos (miniaturas) ---------- */
+  .plate { border-radius: 50%; background: radial-gradient(circle, #fff 58%, #e7e5e4 60%, #fff 66%); position: relative; flex: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,.18); }
+  .plate i { position: absolute; border-radius: 50%; }
+
+  .card { background: #fff; border-radius: 22px; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; font-weight: 600; }
+  .brand { color: #ad5c0b; }
+  .bg-brand { background: #d0730e; color: #fff; }
+
+  .float { position: absolute; background: rgba(255,255,255,.97); border-radius: 22px; padding: 18px 22px;
+    box-shadow: 0 30px 60px -15px rgba(0,0,0,.6), 0 10px 24px -8px rgba(0,0,0,.4); display: flex; align-items: center; gap: 14px; }
+  .float .ic { width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center; flex: none; }
+  .float b { display: block; font: 700 19px "Outfit"; color: #1c1917; }
+  .float span { font-size: 15px; color: #78716c; }
+
+  .scene { display: none; }
+  .scene.on { display: block; }
+</style>
+</head>
+<body>
+
+<!-- 1. Menú digital -->
+<div class="scene" id="s1">
+  <div class="stage"></div>
+  <div class="table"></div>
+  <div class="phone" style="left:1180px; top:120px; transform: rotate(-6deg);">
+    <div class="screen">
+      <div class="status"><span>12:30</span><span>●●● ▮</span></div>
+      <div style="padding: 4px 24px 0;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+          <div style="width:46px;height:46px;border-radius:14px;background:#d0730e;display:flex;align-items:center;justify-content:center;">
+            <svg width="28" height="28" viewBox="0 0 64 64"><path d="M32 8c4 8 14 13 14 25.5C46 42 39.7 48 32 48s-14-6-14-14.5c0-5.5 2.8-9.5 6-12.2.3 4.6 2.2 7.6 5.5 8.8C28.5 22.4 29.2 15 32 8z" fill="#FAFAF9"/><path d="M32.5 31c2 3.2 5.5 5 5.5 9 0 3.3-2.6 5.8-5.7 5.8-3 0-5.3-2.3-5.3-5.4 0-3.6 3.2-5.6 5.5-9.4z" fill="#FFD166"/></svg>
+          </div>
+          <div><div class="display" style="font-size:22px;font-weight:700;">Fogón Criollo</div><div style="font-size:13px;color:#78716c;">Abierto · Domicilios</div></div>
+        </div>
+        <div style="display:flex; gap:8px; margin-bottom:18px;">
+          <span class="pill bg-brand" style="padding:8px 16px;font-size:14px;">Almuerzos</span>
+          <span class="pill" style="padding:8px 16px;font-size:14px;background:#f5f5f4;color:#57534e;">Sopas</span>
+          <span class="pill" style="padding:8px 16px;font-size:14px;background:#f5f5f4;color:#57534e;">Bebidas</span>
+        </div>
+        <!-- Especial del día -->
+        <div style="border-radius:24px; padding:18px; margin-bottom:16px; background: linear-gradient(135deg,#d0730e,#8a3f0a); color:#fff; display:flex; gap:14px; align-items:center;">
+          <div class="plate" style="width:88px;height:88px;">
+            <i style="left:20px;top:22px;width:30px;height:24px;background:#8b5a2b;"></i>
+            <i style="left:42px;top:20px;width:26px;height:26px;background:#f4d35e;"></i>
+            <i style="left:24px;top:46px;width:40px;height:20px;background:#fafaf9;box-shadow:inset 0 0 0 2px #eee;"></i>
+            <i style="left:52px;top:44px;width:16px;height:16px;background:#4d7c0f;"></i>
+          </div>
+          <div style="flex:1;">
+            <span class="pill" style="background:#ffd166;color:#5c2d06;font-size:11px;padding:4px 10px;margin-bottom:6px;">ESPECIAL DE HOY</span>
+            <div class="display" style="font-size:19px;font-weight:700;line-height:1.15;">Corrientazo de la casa</div>
+            <div style="font-size:16px;font-weight:600;margin-top:4px;">$18.000</div>
+          </div>
+        </div>
+        <!-- Lista -->
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div class="card" style="display:flex;gap:14px;align-items:center;padding:12px;box-shadow:0 2px 10px rgba(0,0,0,.06);">
+            <div class="plate" style="width:64px;height:64px;"><i style="left:14px;top:14px;width:36px;height:36px;background:radial-gradient(circle,#f6c453,#d98e1f);"></i><i style="left:26px;top:20px;width:10px;height:10px;background:#3f6212;"></i></div>
+            <div style="flex:1;"><div style="font-weight:600;font-size:16px;">Ajiaco santafereño</div><div style="font-size:13px;color:#78716c;">Pollo, mazorca y guascas</div></div>
+            <div style="font-weight:700;font-size:16px;" class="brand">$24.000</div>
+          </div>
+          <div class="card" style="display:flex;gap:14px;align-items:center;padding:12px;box-shadow:0 2px 10px rgba(0,0,0,.06);">
+            <div class="plate" style="width:64px;height:64px;"><i style="left:12px;top:16px;width:20px;height:18px;background:#7c4a21;"></i><i style="left:30px;top:13px;width:22px;height:22px;background:#f4d35e;"></i><i style="left:16px;top:34px;width:32px;height:16px;background:#a16207;"></i></div>
+            <div style="flex:1;"><div style="font-weight:600;font-size:16px;">Bandeja paisa</div><div style="font-size:13px;color:#78716c;">Frijoles, chicharrón, huevo</div></div>
+            <div style="font-weight:700;font-size:16px;" class="brand">$32.000</div>
+          </div>
+          <div class="card" style="display:flex;gap:14px;align-items:center;padding:12px;box-shadow:0 2px 10px rgba(0,0,0,.06);">
+            <div class="plate" style="width:64px;height:64px;"><i style="left:14px;top:18px;width:36px;height:26px;background:#b45309;border-radius:40%;"></i><i style="left:20px;top:40px;width:24px;height:10px;background:#65a30d;"></i></div>
+            <div style="flex:1;"><div style="font-weight:600;font-size:16px;">Sobrebarriga a la criolla</div><div style="font-size:13px;color:#78716c;">Con papa salada y arroz</div></div>
+            <div style="font-weight:700;font-size:16px;" class="brand">$28.000</div>
+          </div>
+          <div class="card" style="display:flex;gap:14px;align-items:center;padding:12px;box-shadow:0 2px 10px rgba(0,0,0,.06);">
+            <div class="plate" style="width:64px;height:64px;"><i style="left:18px;top:14px;width:28px;height:36px;background:linear-gradient(#fde68a,#f59e0b);border-radius:30%;"></i></div>
+            <div style="flex:1;"><div style="font-weight:600;font-size:16px;">Limonada de coco</div><div style="font-size:13px;color:#78716c;">Natural, 16 oz</div></div>
+            <div style="font-weight:700;font-size:16px;" class="brand">$9.000</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="float" style="left:1530px; top:250px; transform: rotate(3deg);">
+    <div class="ic" style="background:#dcfce7;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <div><b>Precio actualizado</b><span>Visible al instante</span></div>
+  </div>
+  <div class="float" style="left:1010px; top:720px; transform: rotate(-3deg);">
+    <div class="ic" style="background:#fef3c7;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+    <div><b>Editar plato</b><span>Ajiaco · $24.000</span></div>
+  </div>
+</div>
+
+<!-- 2. Pedidos por QR -->
+<div class="scene" id="s2">
+  <div class="stage"></div>
+  <div class="table"></div>
+  <!-- Porta-QR de mesa -->
+  <div style="position:absolute; left:1020px; top:260px; width:380px; height:560px; transform: rotate(-3deg);">
+    <div class="shadow-xl" style="position:absolute; inset:0; border-radius:30px; background:#fafaf9; padding:34px 36px; text-align:center;">
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px;">
+        <div style="width:34px;height:34px;border-radius:10px;background:#d0730e;display:flex;align-items:center;justify-content:center;">
+          <svg width="22" height="22" viewBox="0 0 64 64"><path d="M32 8c4 8 14 13 14 25.5C46 42 39.7 48 32 48s-14-6-14-14.5c0-5.5 2.8-9.5 6-12.2.3 4.6 2.2 7.6 5.5 8.8C28.5 22.4 29.2 15 32 8z" fill="#FAFAF9"/></svg>
+        </div>
+        <span class="display" style="font-size:20px;font-weight:700;">Fogón Criollo</span>
+      </div>
+      <div class="display" style="font-size:54px;font-weight:800;line-height:1;margin:14px 0 4px;">Mesa 7</div>
+      <div style="font-size:17px;color:#78716c;margin-bottom:22px;">Escanea, pide y paga desde tu celular</div>
+      <canvas id="qr" width="260" height="260" style="width:260px;height:260px;border-radius:12px;"></canvas>
+    </div>
+    <div style="position:absolute; left:40px; right:40px; bottom:-34px; height:40px; border-radius:0 0 18px 18px; background:#c9c4bf;"></div>
+  </div>
+  <!-- Teléfono con el carrito -->
+  <div class="phone" style="left:1400px; top:170px; transform: rotate(7deg) scale(.92);">
+    <div class="screen">
+      <div class="status"><span>1:05</span><span>●●● ▮</span></div>
+      <div style="padding: 6px 24px;">
+        <div style="font-size:14px;color:#78716c;">Fogón Criollo</div>
+        <div class="display" style="font-size:28px;font-weight:700;margin-bottom:16px;">Tu pedido · Mesa 7</div>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:18px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px;border-radius:18px;background:#f5f5f4;"><div><div style="font-weight:600;">2 × Ajiaco santafereño</div><div style="font-size:13px;color:#78716c;">Con aguacate</div></div><b>$48.000</b></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px;border-radius:18px;background:#f5f5f4;"><div><div style="font-weight:600;">1 × Bandeja paisa</div><div style="font-size:13px;color:#78716c;">Sin chicharrón</div></div><b>$32.000</b></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px;border-radius:18px;background:#f5f5f4;"><div><div style="font-weight:600;">3 × Limonada de coco</div><div style="font-size:13px;color:#78716c;">Bien fría</div></div><b>$27.000</b></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:18px;padding:0 4px 18px;border-bottom:1px solid #e7e5e4;margin-bottom:18px;"><span style="color:#57534e;">Total</span><b class="display" style="font-size:24px;">$107.000</b></div>
+        <div class="bg-brand" style="border-radius:999px;padding:18px;text-align:center;font-weight:700;font-size:18px;">Enviar a cocina</div>
+        <div style="text-align:center;font-size:14px;color:#78716c;margin-top:14px;">o pagar en línea</div>
+      </div>
+    </div>
+  </div>
+  <div class="float" style="left:1300px; top:820px; transform: rotate(-2deg);">
+    <div class="ic" style="background:#fef3c7;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z"/><path d="M6 17h12"/></svg></div>
+    <div><b>Nuevo pedido · Mesa 7</b><span>Llegó a cocina hace 2 s</span></div>
+  </div>
+</div>
+
+<!-- 3. Domicilios -->
+<div class="scene" id="s3">
+  <div class="stage"></div>
+  <!-- Mapa estilizado -->
+  <svg style="position:absolute; left:820px; top:0; opacity:.55;" width="1100" height="1080" viewBox="0 0 1100 1080">
+    <defs>
+      <radialGradient id="fade" cx="55%" cy="45%" r="60%"><stop offset="0" stop-color="#fff" stop-opacity="1"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+      <mask id="m"><rect width="1100" height="1080" fill="url(#fade)"/></mask>
+    </defs>
+    <g mask="url(#m)" stroke="#e7a25a" stroke-opacity=".35" fill="none">
+      <g stroke-width="2">
+        <path d="M0 140 L1100 210"/><path d="M0 330 L1100 360"/><path d="M0 520 L1100 500"/><path d="M0 700 L1100 740"/><path d="M0 900 L1100 880"/>
+        <path d="M120 0 L170 1080"/><path d="M330 0 L300 1080"/><path d="M520 0 L560 1080"/><path d="M740 0 L700 1080"/><path d="M940 0 L980 1080"/>
+      </g>
+      <g stroke-width="9" stroke-opacity=".5"><path d="M0 610 C 300 560, 500 700, 1100 620"/><path d="M420 0 C 460 300, 380 700, 450 1080"/></g>
+    </g>
+    <path d="M150 860 C 260 760, 300 700, 450 640 S 700 520, 860 300" stroke="#ffd166" stroke-width="7" stroke-linecap="round" stroke-dasharray="2 18" fill="none"/>
+    <circle cx="150" cy="860" r="16" fill="#d0730e" stroke="#fff" stroke-width="5"/>
+    <g transform="translate(860 300)"><circle r="44" fill="#d0730e" opacity=".25"/><circle r="22" fill="#d0730e" stroke="#fff" stroke-width="5"/></g>
+  </svg>
+  <!-- Moto -->
+  <div style="position:absolute; left:1225px; top:590px; width:92px; height:92px; border-radius:50%; background:#fafaf9; display:flex; align-items:center; justify-content:center; box-shadow:0 20px 40px -10px rgba(0,0,0,.6);">
+    <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#ad5c0b" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>
+  </div>
+  <!-- Teléfono con chat -->
+  <div class="phone" style="left:1440px; top:120px; transform: rotate(5deg);">
+    <div class="screen" style="background:#efeae2;">
+      <div style="background:#075e54; color:#fff; padding:52px 22px 16px; display:flex; align-items:center; gap:12px;">
+        <div style="width:44px;height:44px;border-radius:50%;background:#d0730e;display:flex;align-items:center;justify-content:center;">
+          <svg width="26" height="26" viewBox="0 0 64 64"><path d="M32 8c4 8 14 13 14 25.5C46 42 39.7 48 32 48s-14-6-14-14.5c0-5.5 2.8-9.5 6-12.2.3 4.6 2.2 7.6 5.5 8.8C28.5 22.4 29.2 15 32 8z" fill="#FAFAF9"/></svg>
+        </div>
+        <div><div style="font-weight:600;font-size:17px;">Fogón Criollo</div><div style="font-size:13px;opacity:.8;">en línea</div></div>
+      </div>
+      <div style="padding:18px 16px; display:flex; flex-direction:column; gap:12px; font-size:15px; line-height:1.4;">
+        <div style="align-self:flex-end; max-width:88%; background:#d9fdd3; border-radius:16px 4px 16px 16px; padding:14px 16px; box-shadow:0 1px 1px rgba(0,0,0,.08);">
+          <div style="font-weight:700;margin-bottom:6px;">🛵 Nuevo domicilio</div>
+          <div>2 × Bandeja paisa ........ $64.000</div>
+          <div>1 × Ajiaco santafereño .. $24.000</div>
+          <div>2 × Limonada de coco .... $18.000</div>
+          <div style="border-top:1px dashed #9ca3af;margin:8px 0;"></div>
+          <div style="font-weight:700;">Total: $106.000</div>
+          <div style="margin-top:8px;">📍 Calle 45 # 12-30, apto 302</div>
+          <div>💵 Paga en efectivo</div>
+          <div style="text-align:right;font-size:12px;color:#667781;margin-top:4px;">12:41 ✓✓</div>
+        </div>
+        <div style="align-self:flex-start; max-width:80%; background:#fff; border-radius:4px 16px 16px 16px; padding:12px 16px; box-shadow:0 1px 1px rgba(0,0,0,.08);">
+          ¡Recibido! Su pedido sale en 25 minutos 🙌
+          <div style="text-align:right;font-size:12px;color:#667781;margin-top:4px;">12:42</div>
+        </div>
+        <div style="align-self:flex-start; max-width:80%; background:#fff; border-radius:4px 16px 16px 16px; padding:12px 16px; box-shadow:0 1px 1px rgba(0,0,0,.08);">
+          🛵 El domiciliario ya va en camino.
+          <div style="text-align:right;font-size:12px;color:#667781;margin-top:4px;">13:06</div>
+        </div>
+        <div style="align-self:flex-end; max-width:60%; background:#d9fdd3; border-radius:16px 4px 16px 16px; padding:12px 16px; box-shadow:0 1px 1px rgba(0,0,0,.08);">
+          ¡Gracias! 😋
+          <div style="text-align:right;font-size:12px;color:#667781;margin-top:4px;">13:07 ✓✓</div>
+        </div>
+      </div>
+      <div style="position:absolute;left:12px;right:12px;bottom:22px;display:flex;gap:8px;align-items:center;">
+        <div style="flex:1;background:#fff;border-radius:999px;padding:14px 18px;color:#8696a0;font-size:15px;">Mensaje</div>
+        <div style="width:48px;height:48px;border-radius:50%;background:#00a884;"></div>
+      </div>
+    </div>
+  </div>
+  <div class="float" style="left:1020px; top:300px; transform: rotate(-3deg);">
+    <div class="ic" style="background:#dcfce7;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <div><b>Pedido completo</b><span>Platos, dirección y pago</span></div>
+  </div>
+</div>
+
+<!-- 4. Tiqueteras -->
+<div class="scene" id="s4">
+  <div class="stage"></div>
+  <div class="table"></div>
+  <!-- Tarjeta de atrás -->
+  <div class="shadow-xl" style="position:absolute; left:1150px; top:210px; width:620px; height:380px; border-radius:30px; background:linear-gradient(135deg,#7c2d12,#431407); transform: rotate(9deg);"></div>
+  <!-- Tiquetera principal -->
+  <div class="shadow-xl" style="position:absolute; left:1030px; top:300px; width:660px; height:420px; border-radius:30px; background:linear-gradient(135deg,#e8891a 0%,#b85f0c 60%,#8a3f0a 100%); transform: rotate(-5deg); padding:34px 38px; color:#fff; overflow:hidden;">
+    <div style="position:absolute; right:-80px; top:-80px; width:300px; height:300px; border-radius:50%; background:rgba(255,209,102,.18);"></div>
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; position:relative;">
+      <div>
+        <div style="font-size:15px; letter-spacing:.14em; text-transform:uppercase; opacity:.85;">Tiquetera</div>
+        <div class="display" style="font-size:42px; font-weight:800; line-height:1.05;">20 almuerzos</div>
+        <div style="font-size:17px; opacity:.9; margin-top:4px;">Fogón Criollo · Laura Méndez</div>
+      </div>
+      <div style="width:60px;height:60px;border-radius:18px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;">
+        <svg width="36" height="36" viewBox="0 0 64 64"><path d="M32 8c4 8 14 13 14 25.5C46 42 39.7 48 32 48s-14-6-14-14.5c0-5.5 2.8-9.5 6-12.2.3 4.6 2.2 7.6 5.5 8.8C28.5 22.4 29.2 15 32 8z" fill="#FAFAF9"/><path d="M32.5 31c2 3.2 5.5 5 5.5 9 0 3.3-2.6 5.8-5.7 5.8-3 0-5.3-2.3-5.3-5.4 0-3.6 3.2-5.6 5.5-9.4z" fill="#FFD166"/></svg>
+      </div>
+    </div>
+    <div id="slots" style="display:grid; grid-template-columns:repeat(10, 46px); gap:12px; margin-top:34px; position:relative;"></div>
+    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:32px; position:relative;">
+      <div><div style="font-size:15px;opacity:.85;">Saldo</div><div class="display" style="font-size:34px;font-weight:700;">7 almuerzos</div></div>
+      <div style="font-size:15px;opacity:.85;text-align:right;">Pagada por adelantado<br><b style="font-size:20px;opacity:1;">$300.000</b></div>
+    </div>
+  </div>
+  <div class="float" style="left:1450px; top:780px; transform: rotate(2deg);">
+    <div class="ic" style="background:#fef3c7;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg></div>
+    <div><b>Almuerzo 13 de 20</b><span>Descontado hoy, 12:15</span></div>
+  </div>
+  <div class="float" style="left:1000px; top:150px; transform: rotate(-3deg);">
+    <div class="ic" style="background:#dcfce7;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+    <div><b>38 clientes fijos</b><span>Con tiquetera activa</span></div>
+  </div>
+</div>
+
+<!-- 5. Estadísticas -->
+<div class="scene" id="s5">
+  <div class="stage"></div>
+  <div class="table"></div>
+  <!-- Tableta con el panel -->
+  <div style="position:absolute; left:960px; top:170px; width:860px; height:600px; border-radius:40px; background:#0b0b0c; padding:18px; box-shadow:0 0 0 2px #2c2c2e, 0 60px 110px -20px rgba(0,0,0,.85); transform: rotate(-4deg);">
+    <div style="width:100%; height:100%; border-radius:26px; background:#fafaf9; padding:30px 34px; overflow:hidden;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:22px;">
+        <div><div style="font-size:14px;color:#78716c;">Fogón Criollo</div><div class="display" style="font-size:30px;font-weight:700;">Estadísticas</div></div>
+        <div style="display:flex; gap:6px; background:#f5f5f4; padding:5px; border-radius:999px; font-size:14px; font-weight:600;">
+          <span style="padding:7px 14px;color:#57534e;">Hoy</span><span class="bg-brand" style="padding:7px 14px;border-radius:999px;">Semana</span><span style="padding:7px 14px;color:#57534e;">Mes</span>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:22px;">
+        <div style="background:#fff; border:1px solid #e7e5e4; border-radius:20px; padding:16px 18px;"><div style="font-size:13px;color:#78716c;">Ventas de la semana</div><div class="display" style="font-size:28px;font-weight:700;">$8.940.000</div><div style="font-size:13px;color:#15803d;font-weight:600;">▲ 12% vs. anterior</div></div>
+        <div style="background:#fff; border:1px solid #e7e5e4; border-radius:20px; padding:16px 18px;"><div style="font-size:13px;color:#78716c;">Pedidos</div><div class="display" style="font-size:28px;font-weight:700;">412</div><div style="font-size:13px;color:#15803d;font-weight:600;">▲ 31 más</div></div>
+        <div style="background:#fff; border:1px solid #e7e5e4; border-radius:20px; padding:16px 18px;"><div style="font-size:13px;color:#78716c;">Ticket promedio</div><div class="display" style="font-size:28px;font-weight:700;">$21.700</div><div style="font-size:13px;color:#78716c;font-weight:600;">Estable</div></div>
+      </div>
+      <div style="background:#fff; border:1px solid #e7e5e4; border-radius:20px; padding:18px 22px 14px; height:300px;">
+        <div style="font-size:14px;color:#57534e;font-weight:600;margin-bottom:10px;">Ventas por día</div>
+        <div id="bars" style="display:flex; align-items:flex-end; gap:22px; height:212px; padding: 0 6px; border-bottom:1px solid #e7e5e4;"></div>
+        <div style="display:flex; gap:22px; padding: 8px 6px 0; font-size:13px; color:#78716c;" id="days"></div>
+      </div>
+    </div>
+  </div>
+  <div class="float" style="left:1560px; top:110px; transform: rotate(4deg);">
+    <div class="ic" style="background:#fef3c7;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></div>
+    <div><b>Plato estrella</b><span>Ajiaco · 96 vendidos</span></div>
+  </div>
+  <div class="float" style="left:900px; top:760px; transform: rotate(-3deg);">
+    <div class="ic" style="background:#dcfce7;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></svg></div>
+    <div><b>Hoy: $1.284.000</b><span>46 pedidos hasta ahora</span></div>
+  </div>
+</div>
+
+<script>
+  // Bokeh de fondo (semilla fija)
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  document.querySelectorAll('.stage').forEach(st => {
+    for (let i = 0; i < 26; i++) {
+      const b = document.createElement('div'); b.className = 'bokeh';
+      const s = 8 + rnd() * 46; const x = 700 + rnd() * 1250; const y = rnd() * 700;
+      b.style.cssText = `width:${s}px;height:${s}px;left:${x}px;top:${y}px;background:rgba(255,${150 + rnd()*70|0},${60 + rnd()*40|0},${.06 + rnd()*.16});filter:blur(${1 + rnd()*5}px)`;
+      st.appendChild(b);
+    }
+  });
+
+  // QR decorativo (patrón con marcas de posición)
+  const qr = document.getElementById('qr'), c = qr.getContext('2d'), N = 29, cell = 260 / N;
+  c.fillStyle = '#fff'; c.fillRect(0, 0, 260, 260); c.fillStyle = '#1c1917';
+  const finder = (x, y) => { for (let i = 0; i < 7; i++) for (let j = 0; j < 7; j++) {
+    const edge = i === 0 || i === 6 || j === 0 || j === 6, core = i >= 2 && i <= 4 && j >= 2 && j <= 4;
+    if (edge || core) c.fillRect((x + i) * cell, (y + j) * cell, cell + .4, cell + .4); } };
+  const inFinder = (i, j) => (i < 8 && j < 8) || (i > N - 9 && j < 8) || (i < 8 && j > N - 9);
+  seed = 42;
+  for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) if (!inFinder(i, j) && rnd() > .52) c.fillRect(i * cell, j * cell, cell + .4, cell + .4);
+  finder(0, 0); finder(N - 7, 0); finder(0, N - 7);
+  // Logo al centro
+  c.fillStyle = '#fff'; c.fillRect(105, 105, 50, 50); c.fillStyle = '#d0730e';
+  c.beginPath(); c.roundRect(110, 110, 40, 40, 10); c.fill();
+
+  // Casillas de la tiquetera
+  const slots = document.getElementById('slots');
+  for (let i = 0; i < 20; i++) {
+    const d = document.createElement('div'); const used = i < 13;
+    d.style.cssText = `width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;` +
+      (used ? 'background:rgba(255,255,255,.95);' : 'border:2.5px dashed rgba(255,255,255,.6);');
+    if (used) d.innerHTML = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#b85f0c" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+    slots.appendChild(d);
+  }
+
+  // Barras de ventas
+  const vals = [62, 71, 58, 80, 96, 100, 74], days = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  const bars = document.getElementById('bars'), dl = document.getElementById('days');
+  vals.forEach((v, i) => {
+    const b = document.createElement('div');
+    b.style.cssText = `flex:1;height:${v * 2.05}px;border-radius:12px 12px 4px 4px;background:${i === 5 ? 'linear-gradient(#e8891a,#ad5c0b)' : '#f3d3a8'};`;
+    bars.appendChild(b);
+    const t = document.createElement('div'); t.style.cssText = 'flex:1;text-align:center;'; t.textContent = days[i]; dl.appendChild(t);
+  });
+
+  const id = location.hash.slice(1) || 's1';
+  document.getElementById(id).classList.add('on');
+</script>
+</body>
+</html>
