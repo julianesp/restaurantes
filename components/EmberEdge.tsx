@@ -190,7 +190,7 @@ export default function EmberEdge() {
       const d = Math.abs(cx - x);
       if (d > RADIUS) return;
       const last = lastPoke.current.get(el) ?? 0;
-      if (now - last < 380) return; // cada trozo descansa un momento entre sacudidas
+      if (now - last < 600) return; // cada trozo termina su salto (560 ms) antes del siguiente
       lastPoke.current.set(el, now);
       const k = 1 - d / RADIUS; // más cerca, más fuerte
       const tilt = Number(el.dataset.tilt);
@@ -246,15 +246,11 @@ export default function EmberEdge() {
     stir(e.clientX, true); // toque o clic: ráfaga más fuerte
   };
 
-  // Mientras el cursor siga encima (aunque esté quieto), las brasas siguen soltando chispas
+  // Mientras el cursor siga encima (aunque esté quieto), los carbones siguen saltando y echando chispas
   const smolder = useRef(0);
   const smolderTick = () => {
-    const root = ref.current;
-    if (root) {
-      const rect = root.getBoundingClientRect();
-      const jitter = (Math.random() - 0.5) * 40; // alrededor del cursor, no siempre en el mismo punto
-      flare(((lastX.current - rect.left + jitter) / rect.width) * 100);
-    }
+    const jitter = (Math.random() - 0.5) * 40; // alrededor del cursor, no siempre en el mismo punto
+    stir(lastX.current + jitter);
     smolder.current = window.setTimeout(smolderTick, 160 + Math.random() * 220);
   };
   const onPointerEnter = (e: React.PointerEvent) => {
