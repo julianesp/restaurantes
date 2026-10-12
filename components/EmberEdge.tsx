@@ -245,7 +245,35 @@ export default function EmberEdge() {
     if (reduceMotion()) return;
     stir(e.clientX, true); // toque o clic: ráfaga más fuerte
   };
-  useEffect(() => () => cancelAnimationFrame(frame.current), []);
+
+  // Mientras el cursor siga encima (aunque esté quieto), las brasas siguen soltando chispas
+  const smolder = useRef(0);
+  const smolderTick = () => {
+    const root = ref.current;
+    if (root) {
+      const rect = root.getBoundingClientRect();
+      const jitter = (Math.random() - 0.5) * 40; // alrededor del cursor, no siempre en el mismo punto
+      flare(((lastX.current - rect.left + jitter) / rect.width) * 100);
+    }
+    smolder.current = window.setTimeout(smolderTick, 160 + Math.random() * 220);
+  };
+  const onPointerEnter = (e: React.PointerEvent) => {
+    if (e.pointerType !== "mouse" || reduceMotion()) return;
+    lastX.current = e.clientX;
+    clearTimeout(smolder.current);
+    smolder.current = window.setTimeout(smolderTick, 120);
+  };
+  const onPointerLeave = () => {
+    clearTimeout(smolder.current);
+    smolder.current = 0;
+  };
+  useEffect(
+    () => () => {
+      cancelAnimationFrame(frame.current);
+      clearTimeout(smolder.current);
+    },
+    [],
+  );
 
   return (
     <div ref={ref} className={styles.edge} data-active={active || undefined} aria-hidden>
@@ -323,7 +351,13 @@ export default function EmberEdge() {
       {/* Fogonazos y chispitas al remover las brasas */}
       <div ref={flareRef} className={styles.flareLayer} />
       {/* Franja sensible al cursor sobre la cama de brasas */}
-      <div className={styles.stirZone} onPointerMove={onPointerMove} onPointerDown={onPointerDown} />
+      <div
+        className={styles.stirZone}
+        onPointerMove={onPointerMove}
+        onPointerDown={onPointerDown}
+        onPointerEnter={onPointerEnter}
+        onPointerLeave={onPointerLeave}
+      />
     </div>
   );
 }
