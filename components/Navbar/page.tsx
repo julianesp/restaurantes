@@ -110,7 +110,7 @@ const Navbar = () => {
 
   return (
     <nav ref={navRef} className="fixed inset-x-0 top-0 z-40 px-3 pt-3 sm:px-4">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 rounded-full border border-gray-900/[0.08] bg-white/85 pl-2.5 pr-2.5 shadow-[0_8px_30px_-12px_rgb(28_25_23_/_0.25)] backdrop-blur-xl dark:border-white/10 dark:bg-gray-950/80 dark:shadow-[0_8px_30px_-12px_rgb(0_0_0_/_0.6)]">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 rounded-full border border-gray-900/[0.08] bg-white/70 pl-2.5 pr-2.5 shadow-[0_8px_30px_-12px_rgb(28_25_23_/_0.25)] backdrop-blur-xl dark:border-white/10 dark:bg-gray-950/65 dark:shadow-[0_8px_30px_-12px_rgb(0_0_0_/_0.6)]">
         {/* Marca */}
         <Link href="/" className="flex min-w-0 items-center gap-2.5 rounded-full pr-2" title="Ir a inicio">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-[10px]">
