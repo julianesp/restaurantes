@@ -75,7 +75,7 @@ export default async function RootLayout({
   // En el dominio raíz (sin restaurante) se usa una marca neutra de la plataforma
   const branding = tenant
     ? brandingFor(tenant)
-    : { ...brandingFor({ id: "", slug: "", name: "Brasaya", status: "active", plan: "platform", trial_ends_at: null, owner_email: "", custom_domain: null, settings: {} }) };
+    : { ...brandingFor({ id: "", slug: "", name: "Brasaya", status: "active", plan: "platform", trial_ends_at: null, paid_until: null, owner_email: "", custom_domain: null, settings: {} }) };
   const theme = themeCss(branding.primaryColor);
   // Tema por la hora de Colombia: claro 7:00-18:00, oscuro el resto (ver lib/theme-schedule.ts)
   const period = colombiaPeriod();

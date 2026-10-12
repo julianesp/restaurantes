@@ -20,6 +20,7 @@ import {
   Globe,
   PanelLeftClose,
   PanelLeftOpen,
+  CreditCard,
 } from "lucide-react";
 import { useState } from "react";
 import { UserButton } from "@clerk/nextjs";
@@ -112,6 +113,11 @@ const navItems = [
     href: "/",
     icon: Globe,
     external: true,
+  },
+  {
+    name: "Suscripción",
+    href: "/admin/suscripcion",
+    icon: CreditCard,
   },
   {
     name: "Configuración",

@@ -1,15 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import AdminNavbar from "@/components/admin/AdminNavbar";
+import { BillingBanner, BillingBlocked } from "@/components/admin/BillingNotice";
+import type { BillingState } from "@/lib/billing";
 
 type User = Parameters<typeof AdminNavbar>[0]["user"];
 
 const STORAGE_KEY = "admin-sidebar-hidden";
 
 /** Estructura del admin: navegación + contenido. Recuerda si la barra lateral está oculta. */
-export default function AdminShell({ user, children }: { user: User; children: React.ReactNode }) {
+export default function AdminShell({
+  user,
+  billing,
+  children,
+}: {
+  user: User;
+  billing: BillingState;
+  children: React.ReactNode;
+}) {
   const [hidden, setHidden] = useState(false);
+  const pathname = usePathname();
+  // Cuenta suspendida por falta de pago: solo queda disponible la página de suscripción
+  const blocked = billing.blocked && pathname !== "/admin/suscripcion";
 
   // Se lee tras montar (no en el render) para que servidor y cliente coincidan
   useEffect(() => {
@@ -35,7 +49,8 @@ export default function AdminShell({ user, children }: { user: User; children: R
       <main
         className={`pt-12 transition-[padding] duration-200 ${hidden ? "md:pt-14 md:pl-0" : "md:pt-0 md:pl-64"}`}
       >
-        {children}
+        {!blocked && pathname !== "/admin/suscripcion" && <BillingBanner state={billing} />}
+        {blocked ? <BillingBlocked state={billing} /> : children}
       </main>
     </div>
   );

@@ -1,12 +1,22 @@
 import { NextResponse } from 'next/server';
 import { notifyNewOrder, notifyNewReservation, notifyPaymentError, targetFor } from '../../../../lib/notificationService';
 import { getTenantBySlug } from '@/lib/tenant';
+import { readWebhookBody } from '@/lib/epayco';
+import { applySubscriptionPayment, SUBSCRIPTION_KIND } from '@/lib/subscriptions';
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    // ePayco envía la confirmación como formulario (o JSON, según la configuración)
+    const body = await readWebhookBody(request);
 
-    console.log('ePayco webhook received:', body);
+    console.log('ePayco webhook received:', { ref: body.x_ref_payco, invoice: body.x_invoice, state: body.x_transaction_state, kind: body.x_extra2 });
+
+    // Mensualidad de Brasaya: se valida contra la API de ePayco y se suma el mes (idempotente)
+    if (body.x_extra2 === SUBSCRIPTION_KIND || String(body.x_invoice || body.x_id_invoice || '').toUpperCase().startsWith('BRSY-')) {
+      const result = await applySubscriptionPayment(String(body.x_ref_payco || ''));
+      console.log('Suscripción:', body.x_extra3, result);
+      return NextResponse.json({ success: true });
+    }
 
     const {
       x_ref_payco,

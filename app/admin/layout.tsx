@@ -4,6 +4,7 @@ import AdminShell from "@/components/admin/AdminShell";
 import { getTenant, getTenantRole, getVerifiedEmails } from "@/lib/tenant";
 import { tenantUrl } from "@/lib/tenant-host";
 import { first } from "@/lib/db";
+import { billingState } from "@/lib/billing";
 
 export default async function AdminLayout({
   children,
@@ -47,5 +48,12 @@ export default async function AdminLayout({
     })),
   };
 
-  return <AdminShell user={serializedUser}>{children}</AdminShell>;
+  // Estado de la suscripción: aviso de pago o bloqueo del panel (ver lib/billing.ts)
+  const billing = billingState(tenant);
+
+  return (
+    <AdminShell user={serializedUser} billing={billing}>
+      {children}
+    </AdminShell>
+  );
 }

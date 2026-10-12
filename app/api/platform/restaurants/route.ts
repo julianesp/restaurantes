@@ -1,9 +1,9 @@
+import { TRIAL_DAYS } from "@/lib/billing";
 import { NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { first, batch, newId, nowIso, isUniqueViolation } from "@/lib/db";
 import { RESERVED_SLUGS, SLUG_REGEX, tenantUrl } from "@/lib/tenant-host";
 
-const TRIAL_DAYS = 14;
 
 // Categorías iniciales para que el menú no empiece vacío
 const DEFAULT_CATEGORIES = [

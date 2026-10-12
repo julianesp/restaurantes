@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { first } from "@/lib/db";
 import { TENANT_SLUG_HEADER, TENANT_HOST_HEADER } from "@/lib/tenant-host";
+import { billingState } from "@/lib/billing";
 
 // ---------------------------------------------------------------------------
 // Configuración
@@ -35,13 +36,15 @@ export interface Tenant {
   status: "trial" | "active" | "past_due" | "suspended" | "canceled";
   plan: string;
   trial_ends_at: string | null;
+  /** Último mes pagado de la suscripción (ver lib/billing.ts) */
+  paid_until: string | null;
   owner_email: string;
   custom_domain: string | null;
   settings: Record<string, unknown>;
 }
 
 const TENANT_COLUMNS =
-  "id, slug, name, status, plan, trial_ends_at, owner_email, custom_domain, settings";
+  "id, slug, name, status, plan, trial_ends_at, paid_until, owner_email, custom_domain, settings";
 
 // ---------------------------------------------------------------------------
 // Búsqueda con caché corta en memoria (por instancia)
@@ -92,9 +95,12 @@ export async function getTenant(): Promise<Tenant | null> {
   return tenant;
 }
 
-/** Un restaurante suspendido o cancelado no sirve contenido público. */
+/**
+ * ¿El restaurante sirve contenido? No, si está suspendido o cancelado (a mano) o si la prueba o el
+ * último mes pagado vencieron y pasaron los días de gracia (ver lib/billing.ts).
+ */
 export function isTenantServing(t: Tenant): boolean {
-  return t.status !== "suspended" && t.status !== "canceled";
+  return !billingState(t).blocked;
 }
 
 // ---------------------------------------------------------------------------
@@ -188,8 +194,18 @@ export async function publicCtx(): Promise<PublicCtx | Fail> {
   return { ok: true, tenant };
 }
 
-export async function adminCtx(): Promise<AdminCtx | Fail> {
-  const base = await publicCtx();
+/**
+ * Contexto de administración. `allowUnpaid`: deja entrar aunque la suscripción esté vencida
+ * (solo para las rutas de pago, para que el restaurante pueda reactivarse).
+ */
+export async function adminCtx(opts: { allowUnpaid?: boolean } = {}): Promise<AdminCtx | Fail> {
+  let base: PublicCtx | Fail;
+  if (opts.allowUnpaid) {
+    const tenant = await getTenant();
+    base = tenant ? { ok: true, tenant } : fail("Restaurante no encontrado", 404);
+  } else {
+    base = await publicCtx();
+  }
   if (!base.ok) return base;
   const user = await currentUser();
   if (!user) return fail("No autenticado", 401);

@@ -23,6 +23,7 @@ import PlatformHeader from "@/components/platform/PlatformHeader";
 import FoodSlider from "@/components/FoodSlider";
 import BrasayaLogo from "@/components/BrasayaLogo";
 import { tenantUrl } from "@/lib/tenant-host";
+import { MONTHLY_PRICE_LABEL } from "@/lib/billing";
 
 export const metadata = {
   title: "Brasaya: tu restaurante, encendido en línea",
@@ -47,7 +48,7 @@ const benefits = [
     description: "Ventas del día, la semana y el mes, y tu plato estrella, sin hojas de cálculo." },
 ];
 
-const PRICE = "$69.900";
+const PRICE = MONTHLY_PRICE_LABEL;
 
 // Contacto comercial de Brasaya (mismo WhatsApp del restaurante principal; cambiarlo aquí si hace falta)
 const WHATSAPP = "573174503604";
