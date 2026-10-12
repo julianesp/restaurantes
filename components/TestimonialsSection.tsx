@@ -5,6 +5,7 @@ import { Star, ThumbsUp, MessageSquare, User } from "lucide-react";
 import { useRevealOnScroll } from "../utils/useRevealOnScroll";
 import { useUser, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
+import { useBranding } from "@/context/TenantContext";
 
 interface Testimonial {
   id: number;
@@ -22,6 +23,7 @@ interface Testimonial {
 const testimonials: Testimonial[] = [];
 
 export default function TestimonialsSection() {
+  const { name } = useBranding();
   const { isSignedIn, user } = useUser();
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [newReview, setNewReview] = useState({
@@ -324,7 +326,7 @@ export default function TestimonialsSection() {
               Aún no hay reseñas
             </h3>
             <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-6">
-              Sé el primero en compartir tu experiencia en Restaurante. Tus comentarios ayudan a otros comensales y nos permiten mejorar nuestro servicio.
+              Sé el primero en compartir tu experiencia en {name}. Tus comentarios ayudan a otros comensales y nos permiten mejorar nuestro servicio.
             </p>
             {isSignedIn ? (
               <button

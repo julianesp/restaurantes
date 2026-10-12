@@ -1,12 +1,16 @@
 import { SignIn } from "@clerk/nextjs";
+import { getTenant } from "@/lib/tenant";
 
-export default function SignInPage() {
+export default async function SignInPage() {
+  // Nombre del restaurante actual (en el dominio raíz no hay restaurante: se muestra la plataforma)
+  const name = (await getTenant())?.name ?? "Brasaya";
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-primary-50 dark:from-gray-900 dark:to-primary-950 p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Restaurante
+            {name}
           </h1>
           <p className="text-gray-600 dark:text-gray-300">
             Inicia sesión para dejar tu reseña o acceder al panel administrativo
