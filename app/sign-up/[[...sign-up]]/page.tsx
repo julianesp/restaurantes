@@ -18,19 +18,18 @@ export default function SignUpPage() {
               rootBox: "mx-auto",
               card: "shadow-2xl",
               formButtonPrimary:
-                "bg-primary-500 hover:bg-primary-600 text-sm normal-case",
+                "bg-primary-600 hover:bg-primary-700 text-sm normal-case",
               socialButtonsBlockButton:
-                "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700",
+                "bg-white border-gray-300 text-gray-900 hover:bg-gray-50",
               socialButtonsBlockButtonText: "font-medium",
               formFieldInput:
-                "bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600",
+                "bg-white border-gray-300",
               footerActionLink: "text-primary-500 hover:text-primary-600",
             },
           }}
           routing="path"
           path="/sign-up"
           signInUrl="/sign-in"
-          forceRedirectUrl="/"
           fallbackRedirectUrl="/"
         />
       </div>
