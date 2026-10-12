@@ -64,8 +64,9 @@ export default clerkMiddleware(async (auth, req) => {
 
   const forward = () => NextResponse.next({ request: { headers: requestHeaders } });
 
-  // Dominio raíz de la plataforma: la portada es la landing del SaaS
-  if (host.kind === "platform" && req.nextUrl.pathname === "/") {
+  // Dominio raíz de la plataforma (y hosts sin restaurante: localhost, *.workers.dev): la portada es
+  // la landing de Brasaya, no la de un restaurante. Cada restaurante vive en <slug>.<dominio>.
+  if ((host.kind === "platform" || host.kind === "fallback") && req.nextUrl.pathname === "/") {
     const url = req.nextUrl.clone();
     url.pathname = "/plataforma";
     return NextResponse.rewrite(url, { request: { headers: requestHeaders } });
