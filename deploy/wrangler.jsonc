@@ -6,6 +6,10 @@
   "main": "../.cloudflare/output/v0/workers/default/bundle/index.js",
   "compatibility_date": "2026-09-28",
   "compatibility_flags": ["nodejs_compat"],
+  // Sin keep_names: wrangler re-empaqueta con esbuild y, con esta opción (activa por defecto), mete
+  // llamadas a __name() dentro de funciones que se serializan a texto (el script en línea de
+  // next-themes), que en el navegador fallan con "ReferenceError: __name is not defined".
+  "keep_names": false,
   "assets": {
     "directory": "../.cloudflare/output/v0/workers/default/assets",
     "binding": "ASSETS",
