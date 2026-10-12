@@ -11,6 +11,8 @@ import styles from "./EmberEdge.module.scss";
  * - Se pausa cuando no está en pantalla (IntersectionObserver).
  * - Con "reducir movimiento": brasas encendidas quietas, sin humo ni chispas.
  * - Posiciones pseudoaleatorias con semilla fija (enteros): servidor y navegador generan lo mismo.
+ * - Interacción: al pasar el cursor (o tocar) los trozos cercanos se sacuden, las brasas se avivan y
+ *   salen lenguas de llama y chispas (Web Animations API, sin re-render de React).
  */
 
 // mulberry32: generador con aritmética entera, idéntico en cualquier motor de JS
@@ -124,6 +126,124 @@ export default function EmberEdge() {
     return () => io.disconnect();
   }, []);
 
+  // --- Interacción: remover las brasas con el cursor -------------------------------------------
+  const flareRef = useRef<HTMLDivElement>(null);
+  const frame = useRef(0);
+  const lastX = useRef(0);
+  const lastPoke = useRef(new WeakMap<Element, number>());
+
+  const flare = (leftPct: number, big = false) => {
+    const layer = flareRef.current;
+    if (!layer || layer.childElementCount > 36) return; // tope de destellos simultáneos
+    const licks = big || Math.random() < 0.5 ? 2 : 1;
+    for (let n = 0; n < licks; n++) {
+      const lick = document.createElement("span");
+      lick.className = styles.flare;
+      const w = (big ? 14 : 11) + Math.random() * 9;
+      lick.style.left = `${leftPct + (Math.random() - 0.5) * 1.6}%`;
+      lick.style.width = `${w}px`;
+      lick.style.height = `${w * (2 + Math.random() * 0.7)}px`;
+      layer.appendChild(lick);
+      const dx = (Math.random() - 0.5) * 14;
+      const rise = (big ? 24 : 16) + Math.random() * 14;
+      lick
+        .animate(
+          [
+            { transform: "translate3d(-50%, 2px, 0) scale(0.6, 0.35)", opacity: 0 },
+            { transform: "translate3d(-50%, -2px, 0) scale(1.05, 1.1)", opacity: 1, offset: 0.18 },
+            { transform: `translate3d(calc(-50% + ${dx * 0.5}px), ${-rise * 0.55}px, 0) scale(0.85, 1.25)`, opacity: 0.95, offset: 0.55 },
+            { transform: `translate3d(calc(-50% + ${dx}px), ${-rise}px, 0) scale(0.35, 1.4)`, opacity: 0 },
+          ],
+          { duration: 620 + Math.random() * 360, delay: n * 70, easing: "cubic-bezier(0.25, 0.8, 0.35, 1)", fill: "backwards" },
+        )
+        .finished.then(() => lick.remove(), () => lick.remove());
+    }
+
+    if (Math.random() < 0.45) {
+      const spark = document.createElement("span");
+      spark.className = styles.flareSpark;
+      spark.style.left = `${leftPct}%`;
+      layer.appendChild(spark);
+      const sdx = (Math.random() - 0.5) * 50;
+      spark
+        .animate(
+          [
+            { transform: "translate3d(-50%, 0, 0)", opacity: 1 },
+            { transform: `translate3d(calc(-50% + ${sdx}px), ${-40 - Math.random() * 50}px, 0)`, opacity: 0 },
+          ],
+          { duration: 700 + Math.random() * 500, easing: "cubic-bezier(0.2, 0.6, 0.4, 1)" },
+        )
+        .finished.then(() => spark.remove(), () => spark.remove());
+    }
+  };
+
+  const stir = (clientX: number, burst = false) => {
+    const root = ref.current;
+    if (!root) return;
+    const rect = root.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const RADIUS = burst ? 90 : 64;
+    const now = performance.now();
+
+    root.querySelectorAll<HTMLElement>("[data-coal]").forEach((el) => {
+      const cx = (Number(el.dataset.left) / 100) * rect.width;
+      const d = Math.abs(cx - x);
+      if (d > RADIUS) return;
+      const last = lastPoke.current.get(el) ?? 0;
+      if (now - last < 380) return; // cada trozo descansa un momento entre sacudidas
+      lastPoke.current.set(el, now);
+      const k = 1 - d / RADIUS; // más cerca, más fuerte
+      const tilt = Number(el.dataset.tilt);
+      const base = `translateX(-50%) rotate(${tilt}deg)`;
+      el.animate(
+        [
+          { transform: base },
+          { transform: `translateX(-50%) translate(${-2 * k}px, ${-3.5 * k}px) rotate(${tilt + 6 * k}deg)` },
+          { transform: `translateX(-50%) translate(${2 * k}px, ${-1.5 * k}px) rotate(${tilt - 4 * k}deg)` },
+          { transform: `translateX(-50%) translate(${-0.6 * k}px, ${-0.6 * k}px) rotate(${tilt + 1.5 * k}deg)` },
+          { transform: base },
+        ],
+        { duration: 420, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
+      );
+      if (Math.random() < (burst ? 1 : 0.8) * k + 0.1) flare(Number(el.dataset.left), burst);
+    });
+
+    // Las brasas cercanas se avivan
+    root.querySelectorAll<HTMLElement>("[data-ember]").forEach((el) => {
+      const cx = (Number(el.dataset.left) / 100) * rect.width;
+      const d = Math.abs(cx - x);
+      if (d > RADIUS * 1.2) return;
+      const k = 1 - d / (RADIUS * 1.2);
+      el.animate(
+        [
+          { transform: "translateX(-50%) scale(1)", opacity: 0.8 },
+          { transform: `translateX(-50%) scale(${1 + 0.7 * k})`, opacity: 1, offset: 0.3 },
+          { transform: "translateX(-50%) scale(1)", opacity: 0.8 },
+        ],
+        { duration: 700, easing: "ease-out" },
+      );
+    });
+  };
+
+  const reduceMotion = () =>
+    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (e.pointerType !== "mouse" || reduceMotion()) return;
+    lastX.current = e.clientX;
+    if (!frame.current) {
+      frame.current = requestAnimationFrame(() => {
+        frame.current = 0;
+        stir(lastX.current);
+      });
+    }
+  };
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (reduceMotion()) return;
+    stir(e.clientX, true); // toque o clic: ráfaga más fuerte
+  };
+  useEffect(() => () => cancelAnimationFrame(frame.current), []);
+
   return (
     <div ref={ref} className={styles.edge} data-active={active || undefined} aria-hidden>
       {/* Humo: sube toda la pantalla y se pierde detrás del navbar */}
@@ -180,6 +300,8 @@ export default function EmberEdge() {
       {FIELD.embers.map((e, i) => (
         <span
           key={i}
+          data-ember
+          data-left={e.left}
           className={styles.ember}
           style={{
             left: `${e.left}%`,
@@ -194,6 +316,11 @@ export default function EmberEdge() {
       {FIELD.coals.map((c, i) => (
         <Coal key={i} c={c} />
       ))}
+
+      {/* Lenguas de llama y chispas al remover las brasas */}
+      <div ref={flareRef} className={styles.flareLayer} />
+      {/* Franja sensible al cursor sobre la cama de brasas */}
+      <div className={styles.stirZone} onPointerMove={onPointerMove} onPointerDown={onPointerDown} />
     </div>
   );
 }
@@ -203,6 +330,9 @@ type CoalData = (typeof FIELD.coals)[number];
 function Coal({ c, back = false }: { c: CoalData; back?: boolean }) {
   return (
     <span
+      data-coal
+      data-left={c.left}
+      data-tilt={c.tilt}
       className={`${styles.coal} ${back ? styles.back : ""} ${c.hot ? styles.hot : ""}`}
       style={{
         left: `${c.left}%`,
