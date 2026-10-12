@@ -1,6 +1,6 @@
 {
-  "name": "ResFood",
-  "short_name": "ResFood",
+  "name": "Brasaya",
+  "short_name": "Brasaya",
   "description": "Menú digital, pedidos por QR y gestión para restaurantes.",
   "start_url": "/",
   "display": "standalone",

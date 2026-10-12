@@ -31,7 +31,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Íconos de la plataforma ResFood (pestaña, iOS, Android). Ver public/brand/.
+// Íconos de la plataforma Brasaya (pestaña, iOS, Android). Ver public/brand/.
 const icons: Metadata["icons"] = {
   icon: [
     { url: "/brand/favicon.svg", type: "image/svg+xml" },
@@ -46,7 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
   // Dominio raíz: metadatos de la plataforma (la landing define su propio título)
   if (!tenant) {
     return {
-      title: "ResFood: tu restaurante en línea",
+      title: "Brasaya: tu restaurante en línea",
       description: "Menú digital, pedidos por QR y gestión para restaurantes.",
       icons,
       manifest: "/manifest.json",
@@ -75,7 +75,7 @@ export default async function RootLayout({
   // En el dominio raíz (sin restaurante) se usa una marca neutra de la plataforma
   const branding = tenant
     ? brandingFor(tenant)
-    : { ...brandingFor({ id: "", slug: "", name: "ResFood", status: "active", plan: "platform", trial_ends_at: null, owner_email: "", custom_domain: null, settings: {} }) };
+    : { ...brandingFor({ id: "", slug: "", name: "Brasaya", status: "active", plan: "platform", trial_ends_at: null, owner_email: "", custom_domain: null, settings: {} }) };
   const theme = themeCss(branding.primaryColor);
   // Tema por la hora de Colombia: claro 7:00-18:00, oscuro el resto (ver lib/theme-schedule.ts)
   const period = colombiaPeriod();

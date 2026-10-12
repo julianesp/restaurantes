@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import SuggestionBox from "../../components/SuggestionBox";
 import BrandLogo from "../../components/BrandLogo";
-import { ResFoodMark } from "../../components/ResFoodLogo";
+import { BrasayaMark } from "../../components/BrasayaLogo";
 import EmberEdge from "../../components/EmberEdge";
 import { useBranding } from "../../context/TenantContext";
 import styles from "../../styles/Footer.module.scss";
@@ -301,8 +301,8 @@ const Footer = () => {
                 © {new Date().getFullYear()} {branding.name}. Todos los derechos reservados.
               </p>
               <span className="inline-flex items-center gap-2 text-xs text-white/60">
-                <ResFoodMark size={18} />
-                Hecho con ResFood
+                <BrasayaMark size={18} />
+                Hecho con Brasaya
               </span>
             </div>
           </div>

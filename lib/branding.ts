@@ -35,7 +35,7 @@ const LEGACY_DEFAULTS: Partial<Branding> = {
   hours: "Lun–Dom: 11:00 am – 6:00 pm",
   phone: "+57 300 000 0000",
   whatsapp: "573174503604",
-  logoUrl: "/brand/resfood-mark.svg",
+  logoUrl: "/brand/brasaya-mark.svg",
 };
 
 const str = (v: unknown): string => (typeof v === "string" ? v.trim() : "");

@@ -7,7 +7,7 @@ import { useBranding } from "@/context/TenantContext";
 export default function BrandLogo({ size, className = "" }: { size: number; className?: string }) {
   const { logoUrl, name } = useBranding();
 
-  // SVG (p. ej. el logo de ResFood): <img> directo, el optimizador de imágenes no procesa SVG
+  // SVG (p. ej. el logo de Brasaya): <img> directo, el optimizador de imágenes no procesa SVG
   if (logoUrl && /\.svg($|\?)/i.test(logoUrl)) {
     return (
       // eslint-disable-next-line @next/next/no-img-element

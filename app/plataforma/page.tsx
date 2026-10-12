@@ -1,9 +1,9 @@
 import Link from "next/link";
-import ResFoodLogo from "@/components/ResFoodLogo";
+import BrasayaLogo from "@/components/BrasayaLogo";
 import ThemeToggle from "@/components/ThemeToggle";
 
 export const metadata = {
-  title: "ResFood: gestiona tu restaurante en línea",
+  title: "Brasaya: gestiona tu restaurante en línea",
   description:
     "Menú digital, pedidos por QR, meseros, cocina y tiqueteras en un solo lugar. Prueba gratis 14 días.",
 };
@@ -21,7 +21,7 @@ export default function PlataformaPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-primary-50 dark:from-gray-900 dark:to-primary-950">
       <header className="max-w-5xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between">
-        <ResFoodLogo size={34} />
+        <BrasayaLogo size={34} />
         <nav className="flex items-center gap-4 text-sm font-medium">
           <ThemeToggle />
           <Link href="/sign-in" className="text-gray-700 dark:text-gray-200 hover:text-primary-600">Iniciar sesión</Link>
