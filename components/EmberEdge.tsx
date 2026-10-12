@@ -195,15 +195,18 @@ export default function EmberEdge() {
       const k = 1 - d / RADIUS; // más cerca, más fuerte
       const tilt = Number(el.dataset.tilt);
       const base = `translateX(-50%) rotate(${tilt}deg)`;
+      // Salto: sube con un giro, cae, rebota un poco y se asienta (más alto cuanto más cerca)
+      const lift = (burst ? 20 : 14) * k + 4;
+      const side = Math.random() < 0.5 ? -1 : 1;
       el.animate(
         [
-          { transform: base },
-          { transform: `translateX(-50%) translate(${-2 * k}px, ${-3.5 * k}px) rotate(${tilt + 6 * k}deg)` },
-          { transform: `translateX(-50%) translate(${2 * k}px, ${-1.5 * k}px) rotate(${tilt - 4 * k}deg)` },
-          { transform: `translateX(-50%) translate(${-0.6 * k}px, ${-0.6 * k}px) rotate(${tilt + 1.5 * k}deg)` },
-          { transform: base },
+          { transform: base, offset: 0 },
+          { transform: `translateX(-50%) translate(${side * 2.5 * k}px, ${-lift}px) rotate(${tilt + side * 9 * k}deg)`, offset: 0.32 },
+          { transform: `translateX(-50%) translate(${side * 1.5 * k}px, 0px) rotate(${tilt - side * 3 * k}deg)`, offset: 0.62 },
+          { transform: `translateX(-50%) translate(${side * 0.6 * k}px, ${-lift * 0.25}px) rotate(${tilt + side * 1.5 * k}deg)`, offset: 0.8 },
+          { transform: base, offset: 1 },
         ],
-        { duration: 420, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
+        { duration: 560, easing: "cubic-bezier(0.33, 0.9, 0.4, 1)" },
       );
       if (Math.random() < (burst ? 1 : 0.7) * k + 0.1) flare(Number(el.dataset.left), burst);
     });
