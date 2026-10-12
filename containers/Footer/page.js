@@ -6,6 +6,7 @@ import Image from "next/image";
 import SuggestionBox from "../../components/SuggestionBox";
 import BrandLogo from "../../components/BrandLogo";
 import { ResFoodMark } from "../../components/ResFoodLogo";
+import EmberEdge from "../../components/EmberEdge";
 import { useBranding } from "../../context/TenantContext";
 import styles from "../../styles/Footer.module.scss";
 
@@ -95,14 +96,8 @@ const Footer = () => {
 
   return (
     <footer id="contacto" className={styles.footer}>
-      {/* Franja decorativa superior */}
-      <div
-        className="w-full h-1"
-        style={{
-          background:
-            "rgb(var(--primary-400))",
-        }}
-      />
+      {/* Borde de carbón encendido con humo */}
+      <EmberEdge />
 
       <div
         className="w-full px-4 sm:px-6 lg:px-8 py-16"
