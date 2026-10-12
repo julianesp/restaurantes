@@ -12,7 +12,7 @@ import styles from "./EmberEdge.module.scss";
  * - Con "reducir movimiento": brasas encendidas quietas, sin humo ni chispas.
  * - Posiciones pseudoaleatorias con semilla fija (enteros): servidor y navegador generan lo mismo.
  * - Interacción: al pasar el cursor (o tocar) los trozos cercanos se sacuden, las brasas se avivan y
- *   salen lenguas de llama y chispas (Web Animations API, sin re-render de React).
+ *   saltan chispitas (Web Animations API, sin re-render de React).
  */
 
 // mulberry32: generador con aritmética entera, idéntico en cualquier motor de JS
@@ -132,46 +132,46 @@ export default function EmberEdge() {
   const lastX = useRef(0);
   const lastPoke = useRef(new WeakMap<Element, number>());
 
+  // Al moverse un trozo: un fogonazo breve en el punto y unas chispitas que saltan y se apagan
   const flare = (leftPct: number, big = false) => {
     const layer = flareRef.current;
-    if (!layer || layer.childElementCount > 36) return; // tope de destellos simultáneos
-    const licks = big || Math.random() < 0.5 ? 2 : 1;
-    for (let n = 0; n < licks; n++) {
-      const lick = document.createElement("span");
-      lick.className = styles.flare;
-      const w = (big ? 14 : 11) + Math.random() * 9;
-      lick.style.left = `${leftPct + (Math.random() - 0.5) * 1.6}%`;
-      lick.style.width = `${w}px`;
-      lick.style.height = `${w * (2 + Math.random() * 0.7)}px`;
-      layer.appendChild(lick);
-      const dx = (Math.random() - 0.5) * 14;
-      const rise = (big ? 24 : 16) + Math.random() * 14;
-      lick
-        .animate(
-          [
-            { transform: "translate3d(-50%, 2px, 0) scale(0.6, 0.35)", opacity: 0 },
-            { transform: "translate3d(-50%, -2px, 0) scale(1.05, 1.1)", opacity: 1, offset: 0.18 },
-            { transform: `translate3d(calc(-50% + ${dx * 0.5}px), ${-rise * 0.55}px, 0) scale(0.85, 1.25)`, opacity: 0.95, offset: 0.55 },
-            { transform: `translate3d(calc(-50% + ${dx}px), ${-rise}px, 0) scale(0.35, 1.4)`, opacity: 0 },
-          ],
-          { duration: 620 + Math.random() * 360, delay: n * 70, easing: "cubic-bezier(0.25, 0.8, 0.35, 1)", fill: "backwards" },
-        )
-        .finished.then(() => lick.remove(), () => lick.remove());
-    }
+    if (!layer || layer.childElementCount > 48) return; // tope de destellos simultáneos
 
-    if (Math.random() < 0.45) {
+    const flash = document.createElement("span");
+    flash.className = styles.flash;
+    flash.style.left = `${leftPct}%`;
+    layer.appendChild(flash);
+    flash
+      .animate(
+        [
+          { transform: "translate3d(-50%, 50%, 0) scale(0.4)", opacity: 0 },
+          { transform: "translate3d(-50%, 50%, 0) scale(1.15)", opacity: 1, offset: 0.25 },
+          { transform: "translate3d(-50%, 50%, 0) scale(1.4)", opacity: 0 },
+        ],
+        { duration: 260, easing: "ease-out" },
+      )
+      .finished.then(() => flash.remove(), () => flash.remove());
+
+    const count = (big ? 5 : 3) + Math.floor(Math.random() * 3);
+    for (let n = 0; n < count; n++) {
       const spark = document.createElement("span");
       spark.className = styles.flareSpark;
-      spark.style.left = `${leftPct}%`;
+      const size = 2 + Math.random() * 2;
+      spark.style.left = `${leftPct + (Math.random() - 0.5) * 0.8}%`;
+      spark.style.width = `${size}px`;
+      spark.style.height = `${size}px`;
       layer.appendChild(spark);
-      const sdx = (Math.random() - 0.5) * 50;
+      // Pequeño salto en arco: sube, se abre hacia un lado y cae un poco al apagarse
+      const dx = (Math.random() - 0.5) * (big ? 46 : 30);
+      const up = (big ? 18 : 10) + Math.random() * (big ? 22 : 16);
       spark
         .animate(
           [
-            { transform: "translate3d(-50%, 0, 0)", opacity: 1 },
-            { transform: `translate3d(calc(-50% + ${sdx}px), ${-40 - Math.random() * 50}px, 0)`, opacity: 0 },
+            { transform: "translate3d(-50%, 0, 0) scale(1)", opacity: 1 },
+            { transform: `translate3d(calc(-50% + ${dx * 0.6}px), ${-up}px, 0) scale(1)`, opacity: 1, offset: 0.45 },
+            { transform: `translate3d(calc(-50% + ${dx}px), ${-up * 0.7}px, 0) scale(0.4)`, opacity: 0 },
           ],
-          { duration: 700 + Math.random() * 500, easing: "cubic-bezier(0.2, 0.6, 0.4, 1)" },
+          { duration: 380 + Math.random() * 380, delay: Math.random() * 60, easing: "cubic-bezier(0.2, 0.7, 0.4, 1)", fill: "backwards" },
         )
         .finished.then(() => spark.remove(), () => spark.remove());
     }
@@ -205,7 +205,7 @@ export default function EmberEdge() {
         ],
         { duration: 420, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
       );
-      if (Math.random() < (burst ? 1 : 0.8) * k + 0.1) flare(Number(el.dataset.left), burst);
+      if (Math.random() < (burst ? 1 : 0.7) * k + 0.1) flare(Number(el.dataset.left), burst);
     });
 
     // Las brasas cercanas se avivan
@@ -317,7 +317,7 @@ export default function EmberEdge() {
         <Coal key={i} c={c} />
       ))}
 
-      {/* Lenguas de llama y chispas al remover las brasas */}
+      {/* Fogonazos y chispitas al remover las brasas */}
       <div ref={flareRef} className={styles.flareLayer} />
       {/* Franja sensible al cursor sobre la cama de brasas */}
       <div className={styles.stirZone} onPointerMove={onPointerMove} onPointerDown={onPointerDown} />

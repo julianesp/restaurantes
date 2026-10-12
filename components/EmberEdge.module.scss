@@ -218,31 +218,27 @@
   pointer-events: none;
 }
 
-.flare {
+// Fogonazo breve en el trozo que se mueve
+.flash {
   position: absolute;
   bottom: 0;
-  border-radius: 50% 50% 46% 46% / 62% 62% 38% 38%;
-  background: radial-gradient(
-    ellipse at 50% 80%,
-    #fff7c2 0%,
-    #ffcf4a 24%,
-    #ff9a1f 46%,
-    #ff5a00 64%,
-    rgb(255 60 0 / 0) 80%
-  );
-  box-shadow: 0 0 10px 1px rgb(255 120 20 / 0.35);
+  width: 26px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgb(255 230 150 / 0.95) 0%, rgb(255 150 40 / 0.6) 40%, rgb(255 90 0 / 0) 72%);
   opacity: 0;
   will-change: transform, opacity;
 }
 
+// Chispita: punto brillante con halo
 .flareSpark {
   position: absolute;
   bottom: 0;
-  width: 3px;
-  height: 3px;
   border-radius: 50%;
-  background: #ffd27a;
-  box-shadow: 0 0 6px 1px rgb(255 150 40 / 0.85);
+  background: #fff1b8;
+  box-shadow:
+    0 0 3px 1px rgb(255 200 90 / 0.95),
+    0 0 7px 2px rgb(255 120 20 / 0.6);
   will-change: transform, opacity;
 }
 
