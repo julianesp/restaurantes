@@ -358,7 +358,7 @@ export default function LegacyHome() {
               </p>
               <Link
                 href="/menu"
-                className="btn-press inline-flex items-center gap-2 rounded-full bg-[#fafaf9] px-7 py-3.5 font-semibold text-primary-800 hover:bg-primary-50 dark:hover:bg-[#fafaf9]/90"
+                className="btn-press inline-flex items-center gap-2 rounded-full bg-[#fafaf9] px-7 py-3.5 font-semibold text-[rgb(var(--primary-800))] hover:bg-primary-50 dark:hover:bg-[#fafaf9]/90"
               >
                 <Utensils className="h-5 w-5" />
                 Ver menú completo
