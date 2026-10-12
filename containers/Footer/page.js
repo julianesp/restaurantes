@@ -4,6 +4,9 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import SuggestionBox from "../../components/SuggestionBox";
+import BrandLogo from "../../components/BrandLogo";
+import { ResFoodMark } from "../../components/ResFoodLogo";
+import { useBranding } from "../../context/TenantContext";
 import styles from "../../styles/Footer.module.scss";
 
 const PhoneIcon = () => (
@@ -87,6 +90,7 @@ const navLinks = [
 ];
 
 const Footer = () => {
+  const branding = useBranding();
   const [isSuggestionOpen, setIsSuggestionOpen] = useState(false);
 
   return (
@@ -96,13 +100,12 @@ const Footer = () => {
         className="w-full h-1"
         style={{
           background:
-            "linear-gradient(90deg, #DE780D 50%, #F7A32A 10%, #DE780D 100%)",
+            "rgb(var(--primary-400))",
         }}
       />
 
       <div
         className="w-full px-4 sm:px-6 lg:px-8 py-16"
-        style={{ backgroundColor: "#1a0a00" }}
       >
         <div className="max-w-7xl mx-auto">
           {/* Grid principal */}
@@ -112,37 +115,31 @@ const Footer = () => {
               <div className="flex items-center gap-3">
                 <div
                   className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
-                  style={{ backgroundColor: "#DE780D" }}
+                  style={{ backgroundColor: "rgb(255 255 255 / 0.12)" }}
                 >
-                  <Image
-                    src="https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/restaurants/logo_temporal.png"
-                    alt="Logo"
-                    width={32}
-                    height={32}
-                    className="object-contain"
-                  />
+                  <BrandLogo size={32} className="object-contain" />
                 </div>
                 <span className="text-white font-bold text-xl tracking-wide text-center">
-                  Restaurante
+                  {branding.name}
                 </span>
               </div>
 
-              <p className="text-gray-400 text-sm leading-relaxed p-4 text-center">
-                Gastronomía tradicional del Valle de Sibundoy, Putumayo.
-                Ingredientes frescos, recetas auténticas y el sabor de nuestra
-                tierra en cada plato.
-              </p>
+              {branding.tagline && (
+                <p className="text-white/75 text-sm leading-relaxed p-4 text-center">
+                  {branding.tagline}
+                </p>
+              )}
 
               {/* Redes sociales */}
               <div className="flex gap-3 mt-1 justify-center">
                 <a
                   href="#"
                   aria-label="Facebook"
-                  className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-125"
+                  className="w-9 h-9 rounded-full flex items-center justify-center transition-[transform,background-color] duration-200 ease-out hover:scale-110 hover:!bg-white/20"
                   style={{
-                    backgroundColor: "#2a1200",
-                    color: "#DE780D",
-                    border: "1px solid #DE780D33",
+                    backgroundColor: "rgb(255 255 255 / 0.10)",
+                    color: "#ffffff",
+                    border: "1px solid rgb(255 255 255 / 0.18)",
                   }}
                 >
                   <FacebookIcon />
@@ -150,11 +147,11 @@ const Footer = () => {
                 <a
                   href="#"
                   aria-label="Instagram"
-                  className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-125"
+                  className="w-9 h-9 rounded-full flex items-center justify-center transition-[transform,background-color] duration-200 ease-out hover:scale-110 hover:!bg-white/20"
                   style={{
-                    backgroundColor: "#2a1200",
-                    color: "#DE780D",
-                    border: "1px solid #DE780D33",
+                    backgroundColor: "rgb(255 255 255 / 0.10)",
+                    color: "#ffffff",
+                    border: "1px solid rgb(255 255 255 / 0.18)",
                   }}
                   
                 >
@@ -163,11 +160,11 @@ const Footer = () => {
                 <a
                   href="#"
                   aria-label="WhatsApp"
-                  className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-125"
+                  className="w-9 h-9 rounded-full flex items-center justify-center transition-[transform,background-color] duration-200 ease-out hover:scale-110 hover:!bg-white/20"
                   style={{
-                    backgroundColor: "#2a1200",
-                    color: "#DE780D",
-                    border: "1px solid #DE780D33",
+                    backgroundColor: "rgb(255 255 255 / 0.10)",
+                    color: "#ffffff",
+                    border: "1px solid rgb(255 255 255 / 0.18)",
                   }}
                   
                 >
@@ -180,7 +177,7 @@ const Footer = () => {
             <div className="flex flex-col items-center text-center">
               <h4
                 className="font-semibold text-base mb-5 uppercase tracking-widest"
-                style={{ color: "#DE780D" }}
+                style={{ color: "rgb(var(--primary-200))" }}
               >
                 Explorar
               </h4>
@@ -189,11 +186,11 @@ const Footer = () => {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-gray-400 text-sm hover:text-white transition-colors duration-200 flex items-center justify-center gap-2 group"
+                      className="text-white/75 text-sm hover:text-white transition-colors duration-200 flex items-center justify-center gap-2 group"
                     >
                       <span
                         className="w-1.5 h-1.5 rounded-full shrink-0 transition-all duration-200 group-hover:scale-150"
-                        style={{ backgroundColor: "#DE780D" }}
+                        style={{ backgroundColor: "rgb(var(--primary-300))" }}
                       />
                       {link.label}
                     </Link>
@@ -206,45 +203,53 @@ const Footer = () => {
             <div className="flex flex-col items-center text-center">
               <h4
                 className="font-semibold text-base mb-5 uppercase tracking-widest"
-                style={{ color: "#DE780D" }}
+                style={{ color: "rgb(var(--primary-200))" }}
               >
                 Contacto
               </h4>
               <ul className="space-y-4 w-full">
                 <li className="flex flex-col items-center gap-1">
-                  <span style={{ color: "#DE780D" }}>
+                  <span style={{ color: "rgb(var(--primary-200))" }}>
                     <PhoneIcon />
                   </span>
                   <p className="text-white text-sm font-medium">Teléfono</p>
-                  <a
-                    href="tel:+573000000000"
-                    className="text-gray-400 text-sm hover:text-white transition-colors"
-                  >
-                    +57 300 000 0000
-                  </a>
+                  {branding.phone ? (
+                    <a
+                      href={`tel:${branding.phone.replace(/\s/g, "")}`}
+                      className="text-white/75 text-sm hover:text-white transition-colors"
+                    >
+                      {branding.phone}
+                    </a>
+                  ) : (
+                    <p className="text-white/50 text-sm">—</p>
+                  )}
                 </li>
                 <li className="flex flex-col items-center gap-1">
-                  <span style={{ color: "#DE780D" }}>
+                  <span style={{ color: "rgb(var(--primary-200))" }}>
                     <MapPinIcon />
                   </span>
                   <p className="text-white text-sm font-medium">Dirección</p>
-                  <a
-                    href="https://www.google.com/maps/search/?api=1&query=Valle+de+Sibundoy+Putumayo"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-gray-400 text-sm hover:text-white transition-colors"
-                  >
-                    Valle de Sibundoy, Putumayo
-                  </a>
+                  {branding.address ? (
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                        [branding.address, branding.city].filter(Boolean).join(", ")
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-white/75 text-sm hover:text-white transition-colors"
+                    >
+                      {branding.address}
+                    </a>
+                  ) : (
+                    <p className="text-white/50 text-sm">—</p>
+                  )}
                 </li>
                 <li className="flex flex-col items-center gap-1">
-                  <span style={{ color: "#DE780D" }}>
+                  <span style={{ color: "rgb(var(--primary-200))" }}>
                     <ClockIcon />
                   </span>
                   <p className="text-white text-sm font-medium">Horario</p>
-                  <p className="text-gray-400 text-sm">
-                    Lun–Dom: 11:00 am – 6:00 pm
-                  </p>
+                  <p className="text-white/75 text-sm">{branding.hours || "—"}</p>
                 </li>
               </ul>
             </div>
@@ -253,18 +258,18 @@ const Footer = () => {
             <div className="mb-12 flex flex-col items-center text-center">
               <h4
                 className="font-semibold text-base mb-5 uppercase tracking-widest"
-                style={{ color: "#DE780D" }}
+                style={{ color: "rgb(var(--primary-200))" }}
               >
                 Participa
               </h4>
-              <p className="text-gray-400 text-sm mb-5 leading-relaxed pt-4 pb-4">
+              <p className="text-white/75 text-sm mb-5 leading-relaxed pt-4 pb-4">
                 ¿Tienes una sugerencia o comentario? Nos encanta saber tu
                 opinión para mejorar tu experiencia.
               </p>
               <button
                 onClick={() => setIsSuggestionOpen(true)}
-                className="w-full py-3 px-5 rounded-lg text-sm font-semibold text-white transition-all duration-300 hover:brightness-110 hover:scale-[1.02] active:scale-100 flex items-center justify-center gap-2"
-                style={{ backgroundColor: "#DE780D" }}
+                className="w-full py-3 px-5 rounded-full text-sm font-semibold hover:brightness-95 flex items-center justify-center gap-2"
+                style={{ backgroundColor: "#fafaf9", color: "rgb(var(--primary-800))" }}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -283,11 +288,10 @@ const Footer = () => {
 
               <Link
                 href="/menu"
-                className="mt-3 w-full py-3 px-5 rounded-lg text-sm font-semibold transition-all duration-300 hover:brightness-110 hover:scale-[1.02] active:scale-100 flex items-center justify-center gap-2"
+                className="btn-press mt-3 w-full py-3 px-5 rounded-full text-sm font-semibold transition-colors duration-200 hover:bg-white/10 flex items-center justify-center gap-2"
                 style={{
-                  backgroundColor: "#2a1200",
-                  color: "#DE780D",
-                  border: "1px solid #DE780D55",
+                  color: "#ffffff",
+                  border: "1px solid rgb(255 255 255 / 0.35)",
                 }}
               >
                 Ver Menú Completo
@@ -296,12 +300,15 @@ const Footer = () => {
           </div>
 
           {/* Separador */}
-          <div className="border-t border-white/10 pt-12">
+          <div className="border-t border-white/15 pt-12">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <p className="text-gray-500 text-xs text-center md:text-left">
-                © {new Date().getFullYear()} Restaurante — Valle de Sibundoy,
-                Putumayo. Todos los derechos reservados.
+              <p className="text-white/60 text-xs text-center md:text-left">
+                © {new Date().getFullYear()} {branding.name}. Todos los derechos reservados.
               </p>
+              <span className="inline-flex items-center gap-2 text-xs text-white/60">
+                <ResFoodMark size={18} />
+                Hecho con ResFood
+              </span>
             </div>
           </div>
         </div>

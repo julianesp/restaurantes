@@ -7,10 +7,12 @@
   padding: 0;
   width: 100%;
   height: auto;
-  background-color: #1a0a00;
+  // Verde de marca: más claro en modo claro y más profundo en oscuro (sigue el color de cada restaurante)
+  background-color: rgb(var(--primary-700));
+  color: #fff;
 
   :global(.dark) & {
-    background-color: #0f0600;
+    background-color: rgb(var(--primary-900));
   }
 }
 
