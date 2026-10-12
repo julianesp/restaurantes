@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight, Play, Pause } from "lucide-react";
 import Image from "next/image";
-import { useParallax } from "@/utils/useParallax";
 
 interface FoodItem {
   id: number;
@@ -24,38 +23,7 @@ export default function FoodSlider({
 }: FoodSliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const scrollY = useParallax();
-
-  // Array de colores para la barra de progreso
-  const progressColors = [
-    "bg-blue-500",      // Azul
-    "bg-purple-500",    // Morado
-    "bg-pink-500",      // Rosa
-    "bg-red-500",       // Rojo
-    "bg-orange-500",    // Naranja
-    "bg-yellow-500",    // Amarillo
-    "bg-green-500",     // Verde
-    "bg-teal-500",      // Turquesa
-    "bg-cyan-500",      // Cian
-    "bg-indigo-500",    // Índigo
-  ];
-
-  // Obtener el color actual basado en el índice
-  const currentProgressColor = progressColors[currentIndex % progressColors.length];
-
-  // Detectar si es móvil
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   const goToPrevious = () => {
     setCurrentIndex((prevIndex) =>
@@ -94,87 +62,78 @@ export default function FoodSlider({
     };
   }, [currentIndex, isAutoPlaying, autoplayInterval, foods.length]);
 
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
   if (!foods || foods.length === 0) {
     return null;
   }
 
-  // Calcular el desplazamiento parallax
-  // Usamos un efecto inverso para que la imagen se mueva más lento que el scroll
-  // En móvil usamos un factor mayor para que sea más visible
-  const parallaxFactor = isMobile ? 0.5 : 0.3;
-  const parallaxOffset = scrollY * parallaxFactor;
-
   return (
     <div className="absolute top-0 left-0 w-full h-full z-0">
-      {/* Main Slider Container */}
       <div className="relative overflow-hidden h-full shadow-none">
-        {/* Image Section */}
-        <div className="relative h-screen">
-          {foods.map((food, index) => (
-            <div
-              key={food.id}
-              className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-                index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
-              }`}
-            >
-              {/* Background Image with Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent z-10"></div>
+        <div className="relative h-[100dvh]">
+          {foods.map((food, index) => {
+            const active = index === currentIndex;
+            return (
+              <div
+                key={food.id}
+                aria-hidden={!active}
+                className={`absolute inset-0 transition-opacity duration-700 ease-out ${
+                  active ? "opacity-100 z-10" : "opacity-0 z-0"
+                }`}
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-black/10 z-10"></div>
 
-              {food.image ? (
-                <div
-                  className="absolute inset-0 overflow-hidden"
-                  style={{
-                    transform: `translateY(-${parallaxOffset}px) scale(1.1)`,
-                    transition: "transform 0.1s ease-out",
-                  }}
-                >
-                  <Image
-                    src={food.image}
-                    alt={food.name}
-                    fill
-                    className="object-cover"
-                    priority={index === 0}
-                  />
-                </div>
-              ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
-                  <div className="text-white text-6xl font-bold opacity-20">
-                    {food.name.charAt(0)}
+                {food.image ? (
+                  // Zoom lento mientras la foto está activa (sustituye al parallax por scroll)
+                  <div
+                    className={`absolute inset-0 overflow-hidden transition-transform ease-linear motion-reduce:transition-none ${
+                      active ? "scale-100" : "scale-[1.08]"
+                    }`}
+                    style={{ transitionDuration: active ? `${autoplayInterval + 1500}ms` : "0ms" }}
+                  >
+                    <Image
+                      src={food.image}
+                      alt={food.name}
+                      fill
+                      className="object-cover"
+                      priority={index === 0}
+                    />
                   </div>
-                </div>
-              )}
-
-              {/* Content Overlay */}
-              <div className="absolute bottom-48 md:top-2/4 md:bottom-auto left-0 right-0 md:right-auto z-20 p-8 md:p-6 lg:p-8 text-white text-center md:text-left backdrop-blur-md md:backdrop-blur-none mx-auto md:mx-0 w-3/4 md:w-auto md:max-w-2xl rounded-3xl md:rounded-none">
-                <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 drop-shadow-lg">
-                  {food.name}
-                </h3>
-                <p className="text-sm md:text-base lg:text-lg mb-3 max-w-2xl drop-shadow-md line-clamp-2 mx-auto md:mx-0">
-                  {food.description}
-                </p>
-                {food.price && (
-                  <div className="inline-block bg-primary-500 dark:bg-primary-600 px-4 md:px-6 py-1.5 md:py-2 rounded-full">
-                    <span className="text-xl md:text-2xl font-bold">
-                      {food.price}
-                    </span>
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary-600 to-primary-900 flex items-center justify-center">
+                    <div className="text-white text-6xl font-bold opacity-20">
+                      {food.name.charAt(0)}
+                    </div>
                   </div>
                 )}
-              </div>
-            </div>
-          ))}
 
-          {/* Navigation Arrows */}
+                {/* Texto: el saliente se va rápido y el entrante llega después, así nunca se encima */}
+                <div
+                  className={`absolute bottom-40 md:top-1/2 md:bottom-auto left-0 right-0 md:right-auto z-20 mx-auto md:mx-0 w-[min(88%,28rem)] md:w-auto md:max-w-2xl rounded-3xl md:rounded-none bg-black/35 md:bg-transparent backdrop-blur-md md:backdrop-blur-none p-6 lg:p-10 text-white text-center md:text-left transition-[opacity,transform,filter] motion-reduce:transition-opacity ${
+                    active
+                      ? "opacity-100 translate-y-0 blur-0 duration-500 delay-300 ease-out"
+                      : "opacity-0 translate-y-2 blur-[4px] duration-150 delay-0 ease-out"
+                  }`}
+                >
+                  <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-2 drop-shadow-lg">
+                    {food.name}
+                  </h3>
+                  <p className="text-sm md:text-base lg:text-lg mb-4 max-w-xl text-white/85 drop-shadow-md line-clamp-2 mx-auto md:mx-0">
+                    {food.description}
+                  </p>
+                  {food.price && (
+                    <div className="inline-block bg-primary-600 px-5 py-2 rounded-full">
+                      <span className="text-xl md:text-2xl font-bold tabular-nums">{food.price}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Navegación */}
           <button
             onClick={goToPrevious}
-            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-30 bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-700 text-gray-900 dark:text-white p-2 md:p-3 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-110"
+            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-30 bg-white/90 dark:bg-gray-900/90 hover:bg-white dark:hover:bg-gray-800 text-gray-900 dark:text-white p-2 md:p-3 rounded-full shadow-lg"
             aria-label="Anterior"
           >
             <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
@@ -182,16 +141,15 @@ export default function FoodSlider({
 
           <button
             onClick={goToNext}
-            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-30 bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-700 text-gray-900 dark:text-white p-2 md:p-3 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-110"
+            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-30 bg-white/90 dark:bg-gray-900/90 hover:bg-white dark:hover:bg-gray-800 text-gray-900 dark:text-white p-2 md:p-3 rounded-full shadow-lg"
             aria-label="Siguiente"
           >
             <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
           </button>
 
-          {/* Play/Pause Button */}
           <button
             onClick={toggleAutoplay}
-            className="absolute bottom-4  right-2 md:right-4 z-30 bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-700 text-gray-900 dark:text-white p-2 md:p-3 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl"
+            className="absolute bottom-4 right-2 md:right-4 z-30 bg-white/90 dark:bg-gray-900/90 hover:bg-white dark:hover:bg-gray-800 text-gray-900 dark:text-white p-2 md:p-3 rounded-full shadow-lg"
             aria-label={isAutoPlaying ? "Pausar" : "Reproducir"}
           >
             {isAutoPlaying ? (
@@ -202,29 +160,25 @@ export default function FoodSlider({
           </button>
         </div>
 
-
-        {/* Progress Bar */}
+        {/* Barra de progreso: un solo color, animada con transform (no con width) */}
         {isAutoPlaying && (
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200/50 dark:bg-gray-700/50 z-20">
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20 z-20 overflow-hidden">
             <div
               key={currentIndex}
-              className={`h-full ${currentProgressColor} transition-colors duration-500`}
-              style={{
-                animation: `progress ${autoplayInterval}ms linear`,
-                animationPlayState: isAutoPlaying ? "running" : "paused",
-              }}
+              className="h-full w-full origin-left bg-primary-400"
+              style={{ animation: `slider-progress ${autoplayInterval}ms linear forwards` }}
             />
           </div>
         )}
       </div>
 
       <style jsx>{`
-        @keyframes progress {
+        @keyframes slider-progress {
           from {
-            width: 0%;
+            transform: scaleX(0);
           }
           to {
-            width: 100%;
+            transform: scaleX(1);
           }
         }
       `}</style>
