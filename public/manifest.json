@@ -1,13 +1,17 @@
 {
-  "name": "Tu Restaurante - Gastronomía de Calidad",
-  "short_name": "Restaurante",
-  "description": "Los mejores platos con ingredientes frescos y recetas tradicionales",
+  "name": "ResFood",
+  "short_name": "ResFood",
+  "description": "Menú digital, pedidos por QR y gestión para restaurantes.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#dc2626",
+  "background_color": "#fafaf9",
+  "theme_color": "#1F8150",
   "orientation": "portrait",
-  "icons": [],
+  "icons": [
+    { "src": "/brand/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/brand/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/brand/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
   "categories": ["food", "restaurant"],
   "lang": "es",
   "dir": "ltr"

@@ -35,7 +35,7 @@ const LEGACY_DEFAULTS: Partial<Branding> = {
   hours: "Lun–Dom: 11:00 am – 6:00 pm",
   phone: "+57 300 000 0000",
   whatsapp: "573174503604",
-  logoUrl: "https://0dwas2ied3dcs14f.public.blob.vercel-storage.com/restaurants/logo_temporal.png",
+  logoUrl: "/brand/resfood-mark.svg",
 };
 
 const str = (v: unknown): string => (typeof v === "string" ? v.trim() : "");
