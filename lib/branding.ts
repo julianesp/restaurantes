@@ -26,6 +26,8 @@ export const EDITABLE_SETTINGS = [
   "tagline", "about", "city", "address", "hours", "phone", "whatsapp",
   "logo_url", "primary_color", "instagram_url", "facebook_url", "tiktok_url",
   "telegram_chat_id",
+  // Número que recibe los avisos de Brasaya por WhatsApp (pedidos, pagos). Llenarlo = consentimiento.
+  "whatsapp_alerts",
 ] as const;
 
 // El restaurante original conserva los valores que antes estaban fijos en el código.

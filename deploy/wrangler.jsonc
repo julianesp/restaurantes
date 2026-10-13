@@ -25,7 +25,7 @@
   ],
   "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "restaurantes-media" }],
   // Lunes 05:00 UTC: plato ganador de la semana anterior (ver worker/index.ts)
-  "triggers": { "crons": ["0 5 * * 1"] },
+  "triggers": { "crons": ["0 5 * * 1", "0 14 * * *"] },
   // Dominio de la plataforma: brasaya.com (landing) y <slug>.brasaya.com (un restaurante por subdominio).
   // Mantener en sincronía con NEXT_PUBLIC_ROOT_DOMAIN del script "deploy" (package.json) y cloudflare.config.ts.
   // Los subdominios necesitan en la zona un registro DNS comodín "*" proxied (p. ej. AAAA 100::).

@@ -31,6 +31,8 @@ export default defineConfig({
     triggers: [
       // Lunes 05:00 UTC: publica el plato ganador de la semana anterior de cada restaurante
       triggers.scheduled({ schedule: "0 5 * * 1" }),
+      // Todos los días 14:00 UTC (9:00 en Colombia): recordatorios de pago por WhatsApp
+      triggers.scheduled({ schedule: "0 14 * * *" }),
       ...(rootDomain
         ? [
             triggers.fetch({ pattern: `${rootDomain}/*`, zone: rootDomain }),

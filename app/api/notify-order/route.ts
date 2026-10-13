@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { notifyNewOrder, targetFor } from '../../../lib/notificationService';
 import { publicCtx } from '@/lib/tenant';
+import { whatsappNewOrder } from '@/lib/whatsapp';
 
 export async function POST(request: Request) {
   try {
@@ -28,6 +29,15 @@ export async function POST(request: Request) {
       notes,
       transactionId,
     }, targetFor(ctx.tenant));
+
+    // Aviso por WhatsApp al restaurante (si lo activó). Se envía una vez por referencia aunque
+    // también llegue por el webhook de ePayco.
+    await whatsappNewOrder(ctx.tenant, {
+      reference,
+      customerName: customerName || 'Cliente',
+      total: Number(total) || 0,
+      serviceType,
+    }).catch((error) => console.error('[WHATSAPP] aviso de pedido:', error));
 
     return NextResponse.json({ success: true });
   } catch (error) {

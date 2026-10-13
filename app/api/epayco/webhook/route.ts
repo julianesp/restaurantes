@@ -3,6 +3,7 @@ import { notifyNewOrder, notifyNewReservation, notifyPaymentError, targetFor } f
 import { getTenantBySlug } from '@/lib/tenant';
 import { readWebhookBody } from '@/lib/epayco';
 import { applySubscriptionPayment, SUBSCRIPTION_KIND } from '@/lib/subscriptions';
+import { whatsappNewOrder } from '@/lib/whatsapp';
 
 export async function POST(request: Request) {
   try {
@@ -71,6 +72,13 @@ export async function POST(request: Request) {
           total: amountNumber,
           transactionId: x_transaction_id,
         }, target).catch(() => {}); // No bloquear si falla
+
+        // WhatsApp: una sola vez por referencia (también puede llegar desde /api/notify-order)
+        await whatsappNewOrder(tenant, {
+          reference: String(x_invoice || ''),
+          customerName: x_customer_name || 'Cliente',
+          total: amountNumber,
+        }).catch((error) => console.error('[WHATSAPP] aviso de pedido:', error));
       }
 
     } else if (x_transaction_state === 'Rechazada') {

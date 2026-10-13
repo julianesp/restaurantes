@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { adminCtx, invalidateTenantCache } from "@/lib/tenant";
 import { EDITABLE_SETTINGS, validHex } from "@/lib/branding";
 import { run, nowIso } from "@/lib/db";
+import { normalizePhone, whatsappAvailable } from "@/lib/whatsapp";
 
 const MAX_LEN: Record<string, number> = { about: 2000, tagline: 160, hours: 200, address: 200 };
 const URL_KEYS = ["logo_url", "instagram_url", "facebook_url", "tiktok_url"];
@@ -25,6 +26,8 @@ export async function GET() {
     settings,
     // El bot lo aporta la plataforma; el restaurante solo necesita su chat
     telegram_bot_available: !!process.env.TELEGRAM_BOT_TOKEN,
+    // El número de WhatsApp que envía los avisos también lo aporta la plataforma
+    whatsapp_available: whatsappAvailable(),
   });
 }
 
@@ -54,6 +57,9 @@ export async function PATCH(request: Request) {
     }
     if (key === "whatsapp" && value && !/^\+?\d[\d\s-]{6,18}$/.test(value)) {
       return NextResponse.json({ error: "WhatsApp: solo dígitos con indicativo, p. ej. 573001234567" }, { status: 400 });
+    }
+    if (key === "whatsapp_alerts" && value && !normalizePhone(value)) {
+      return NextResponse.json({ error: "WhatsApp para alertas: celular con indicativo, p. ej. 573001234567" }, { status: 400 });
     }
     if (key === "telegram_chat_id" && value && !/^-?\d{5,20}$/.test(value)) {
       return NextResponse.json({ error: "El ID de chat de Telegram es un número (puede empezar con -)" }, { status: 400 });

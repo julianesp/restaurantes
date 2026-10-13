@@ -13,6 +13,7 @@ interface Loaded {
   trial_ends_at: string | null;
   settings: Settings;
   telegram_bot_available: boolean;
+  whatsapp_available: boolean;
 }
 
 const FIELDS: Array<{ key: string; label: string; placeholder?: string; multiline?: boolean; hint?: string }> = [
@@ -38,6 +39,7 @@ export default function ConfiguracionPage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: "ok" | "error"; text: string } | null>(null);
   const [testing, setTesting] = useState(false);
+  const [testingWhatsapp, setTestingWhatsapp] = useState(false);
 
   useEffect(() => {
     fetch("/api/tenant/settings")
@@ -82,6 +84,20 @@ export default function ConfiguracionPage() {
       setMessage(body.success ? { type: "ok", text: "Mensaje de prueba enviado a Telegram" } : { type: "error", text: body.error || "No se pudo enviar" });
     } finally {
       setTesting(false);
+    }
+  };
+
+  const sendWhatsappTest = async () => {
+    setTestingWhatsapp(true);
+    setMessage(null);
+    try {
+      const res = await fetch("/api/whatsapp/test", { method: "POST" });
+      const body = await res.json();
+      setMessage(body.success ? { type: "ok", text: "Mensaje de prueba enviado por WhatsApp" } : { type: "error", text: body.error || "No se pudo enviar" });
+    } catch {
+      setMessage({ type: "error", text: "Error de conexión" });
+    } finally {
+      setTestingWhatsapp(false);
     }
   };
 
@@ -150,6 +166,24 @@ export default function ConfiguracionPage() {
           <button type="button" onClick={sendTest} disabled={testing || !settings.telegram_chat_id}
             className="rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 text-sm disabled:opacity-50">
             {testing ? "Enviando…" : "Enviar mensaje de prueba"}
+          </button>
+          <p className="text-xs text-gray-500">Guarda los cambios antes de enviar la prueba.</p>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="font-semibold text-gray-900 dark:text-white">Alertas por WhatsApp</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            Brasaya te escribe por WhatsApp cuando entra un pedido pagado y cuando tu mensualidad está por vencer.
+            Escribe el celular que debe recibir los avisos; déjalo vacío si no los quieres.
+          </p>
+          {!data.whatsapp_available && (
+            <p className="text-sm text-yellow-700 dark:text-yellow-400">Las alertas por WhatsApp de la plataforma aún no están activadas.</p>
+          )}
+          <input value={settings.whatsapp_alerts || ""} placeholder="Celular, p. ej. 3001234567" inputMode="tel"
+            onChange={(e) => set("whatsapp_alerts", e.target.value)} className={input} aria-label="Celular para alertas por WhatsApp" />
+          <button type="button" onClick={sendWhatsappTest} disabled={testingWhatsapp || !settings.whatsapp_alerts || !data.whatsapp_available}
+            className="rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 text-sm disabled:opacity-50">
+            {testingWhatsapp ? "Enviando…" : "Enviar mensaje de prueba"}
           </button>
           <p className="text-xs text-gray-500">Guarda los cambios antes de enviar la prueba.</p>
         </section>

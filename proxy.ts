@@ -29,6 +29,7 @@ const isPublicRoute = createRouteMatcher([
   "/api/featured-dishes(.*)", // Platos destacados (lectura pública; las escrituras exigen admin en la ruta)
   "/media/(.*)", // Imágenes públicas de los restaurantes (R2)
   "/api/epayco/(.*)",
+  "/api/whatsapp/webhook", // Webhook de Meta (WhatsApp Cloud); valida su propia firma
   "/api/menu/(.*)",
   "/api/orders/(.*)",
   "/api/weekly-dishes(.*)",
