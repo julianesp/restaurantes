@@ -287,7 +287,7 @@ export default function PlataformaPage() {
               <h3 className="mb-4 text-sm font-semibold text-white">Para restaurantes</h3>
               <ul className="space-y-2.5 text-sm text-white/75">
                 <li><Link href="/registro" className="hover:text-white">Crear mi restaurante</Link></li>
-                <li><Link href="/sign-in" className="hover:text-white">Iniciar sesión</Link></li>
+                <li><Link href="/sign-in?redirect_url=/panel" className="hover:text-white">Iniciar sesión</Link></li>
                 <li><a href={tenantUrl("restaurante")} className="hover:text-white">Ver un restaurante de ejemplo</a></li>
               </ul>
             </nav>

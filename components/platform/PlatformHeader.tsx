@@ -31,7 +31,7 @@ export default function PlatformHeader() {
         </nav>
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Link href="/sign-in" className={`hidden text-sm font-semibold sm:inline-flex ${link}`}>
+          <Link href="/sign-in?redirect_url=/panel" className={`hidden text-sm font-semibold sm:inline-flex ${link}`}>
             Iniciar sesión
           </Link>
           <Link href="/registro" className="btn-press rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">

@@ -1,7 +1,7 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import AdminShell from "@/components/admin/AdminShell";
-import { getTenant, getTenantRole, getVerifiedEmails } from "@/lib/tenant";
+import { getTenant, getTenantRole, getVerifiedEmails, isPlatformAdmin } from "@/lib/tenant";
 import { tenantUrl } from "@/lib/tenant-host";
 import { first } from "@/lib/db";
 import { billingState } from "@/lib/billing";
@@ -20,7 +20,9 @@ export default async function AdminLayout({
   const tenant = await getTenant();
 
   if (!tenant) {
-    // Dominio raíz de la plataforma: llevar al usuario a su restaurante o al registro
+    // Dominio raíz de la plataforma: los administradores de Brasaya van al panel de la plataforma;
+    // los demás, a su restaurante o al registro
+    if (await isPlatformAdmin()) redirect("/panel");
     const emails = await getVerifiedEmails();
     const owned = emails.length
       ? await first<{ slug: string }>(

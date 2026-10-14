@@ -23,6 +23,7 @@ export default function CartButton() {
     pathname.startsWith("/admin") ||
     pathname.startsWith("/plataforma") ||
     pathname.startsWith("/registro") ||
+    pathname.startsWith("/panel") ||
     onPlatform
   )
     return null;
