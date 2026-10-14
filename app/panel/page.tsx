@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { currentUser } from "@clerk/nextjs/server";
 import { ExternalLink, Settings } from "lucide-react";
 import BrasayaLogo from "@/components/BrasayaLogo";
+import SignOutButton from "@/components/SignOutButton";
 import { all } from "@/lib/db";
 import { isPlatformAdmin } from "@/lib/tenant";
 import { tenantUrl } from "@/lib/tenant-host";
@@ -80,9 +81,12 @@ export default async function PlatformPanelPage() {
             </Link>
             <h1 className="text-2xl font-bold text-stone-900 dark:text-white">Panel de la plataforma</h1>
           </div>
-          <p className="text-sm text-stone-500 dark:text-stone-400">
-            {user.emailAddresses[0]?.emailAddress}
-          </p>
+          <div className="flex items-center gap-3">
+            <p className="text-sm text-stone-500 dark:text-stone-400">
+              {user.emailAddresses[0]?.emailAddress}
+            </p>
+            <SignOutButton className="rounded-lg border border-stone-200 px-3 py-1.5 text-sm font-medium text-stone-700 hover:bg-stone-100 dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-800" />
+          </div>
         </header>
 
         <section className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-5">

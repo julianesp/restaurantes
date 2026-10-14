@@ -9,6 +9,7 @@ import OrderModal from "../OrderModal";
 import FloatingActionButtons from "../FloatingActionButtons";
 import ThemeToggle from "../ThemeToggle";
 import { UserButton, useUser } from "@clerk/nextjs";
+import SignOutButton from "@/components/SignOutButton";
 import { useBranding } from "@/context/TenantContext";
 import { useNavOverDark } from "../useNavOverDark";
 import { ROOT_DOMAIN } from "@/lib/tenant-host";
@@ -273,6 +274,9 @@ const Navbar = () => {
                   Iniciar sesión
                 </Link>
               )
+            )}
+            {isSignedIn && (
+              <SignOutButton className="mt-1 w-full justify-center rounded-2xl px-4 py-3 font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/[0.06]" />
             )}
           </div>
         </div>

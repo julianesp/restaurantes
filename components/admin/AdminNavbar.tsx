@@ -25,6 +25,7 @@ import {
 import { useState } from "react";
 import { UserButton } from "@clerk/nextjs";
 import AdminThemeToggle from "@/components/admin/AdminThemeToggle";
+import SignOutButton from "@/components/SignOutButton";
 
 interface AdminNavbarProps {
   user: {
@@ -143,16 +144,19 @@ export default function AdminNavbar({ user, sidebarHidden, onToggleSidebar }: Ad
     item.external ? { target: "_blank", rel: "noopener noreferrer" } : {};
 
   const userBlock = (
-    <div className="flex items-center gap-3 px-4 py-1">
-      <UserButton afterSignOutUrl="/" />
-      <div className="min-w-0">
-        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-          {user.firstName} {user.lastName}
-        </p>
-        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-          {user.emailAddresses[0]?.emailAddress}
-        </p>
+    <div className="px-4 py-1">
+      <div className="flex items-center gap-3">
+        <UserButton afterSignOutUrl="/" />
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+            {user.firstName} {user.lastName}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+            {user.emailAddresses[0]?.emailAddress}
+          </p>
+        </div>
       </div>
+      <SignOutButton className="mt-3 w-full justify-center rounded-lg border border-gray-200 dark:border-gray-700 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" />
     </div>
   );
 
