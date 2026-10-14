@@ -65,6 +65,27 @@ const styledJsxEsmForDevClient = {
   },
 };
 
+// Vite sirve los archivos de node_modules que NO pre-empaqueta (p. ej. los shims de vinext) con
+// `?v=<hash del paquete>` y caché inmutable de un año. Ese hash no cambia cuando Vite vuelve a
+// optimizar dependencias, pero el contenido sí (importa react.js?v=<hash nuevo>): el navegador se
+// queda con la copia vieja, carga dos Reacts y la página muere con "Invalid hook call" / "reading
+// 'useContext'" incluso tras recargar. En desarrollo esos archivos se revalidan siempre (ETag).
+const revalidateUnbundledNodeModules = {
+  name: "revalidate-unbundled-node-modules",
+  apply: "serve" as const,
+  configureServer(server: { middlewares: { use: (fn: (req: { url?: string }, res: { setHeader: (k: string, v: unknown) => unknown }, next: () => void) => void) => void } }) {
+    server.middlewares.use((req, res, next) => {
+      const url = req.url ?? "";
+      if (url.includes("/node_modules/") && !url.includes("/.vite/deps")) {
+        const setHeader = res.setHeader.bind(res);
+        res.setHeader = (key, value) =>
+          setHeader(key, key.toLowerCase() === "cache-control" ? "no-cache" : value);
+      }
+      next();
+    });
+  },
+};
+
 export default defineConfig({
   resolve: {
     alias: [
@@ -75,6 +96,7 @@ export default defineConfig({
   plugins: [
     fixClerkRequires,
     styledJsxEsmForDevClient,
+    revalidateUnbundledNodeModules,
     patchCssModules({ exportMode: "default" }),
     vinext(),
     cloudflare({
