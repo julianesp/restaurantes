@@ -37,7 +37,7 @@
     { "pattern": "*.brasaya.com/*", "zone_name": "brasaya.com" }
   ],
   "vars": {
-    "ADMIN_EMAILS": "julii1295@gmail.com,admin@neurai.dev",
+    "ADMIN_EMAILS": "admin@neurai.dev",
     "DEFAULT_TENANT_SLUG": "restaurante"
   },
   // Secretos (wrangler secret put -c deploy/wrangler.jsonc <NOMBRE>):
