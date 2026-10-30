@@ -7,6 +7,7 @@ allowBuilds:
   '@clerk/shared': false   # solo muestra un aviso de telemetría
   core-js: false           # solo muestra un mensaje de donación
   unrs-resolver: false     # usa binarios precompilados; el script es solo un respaldo
+  '@swc/core': false       # usa el binario nativo de optionalDependencies; el script es solo un respaldo (Jest)
 minimumReleaseAgeExclude:
   - '@cloudflare/build-output-utils@0.8.5'
   - '@cloudflare/config@0.23.0'
