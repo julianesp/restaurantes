@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { adminCtx } from "@/lib/tenant";
 import { all, insert, updateOwned, deleteOwned, isUniqueViolation } from "@/lib/db";
+import { isValidPin, PIN_RULE_TEXT } from "@/lib/waiter-pin";
 
 export async function GET() {
   const ctx = await adminCtx();
@@ -18,6 +19,7 @@ export async function POST(request: Request) {
   const { name, email, pin } = await request.json();
   if (!name || !email || !pin)
     return NextResponse.json({ error: "Nombre, email y PIN son requeridos" }, { status: 400 });
+  if (!isValidPin(String(pin))) return NextResponse.json({ error: PIN_RULE_TEXT }, { status: 400 });
 
   try {
     const data = await insert("waiters", {
@@ -41,6 +43,8 @@ export async function PATCH(request: Request) {
 
   const { id, active, pin } = await request.json();
   if (!id) return NextResponse.json({ error: "id es requerido" }, { status: 400 });
+  if (pin !== undefined && !isValidPin(String(pin)))
+    return NextResponse.json({ error: PIN_RULE_TEXT }, { status: 400 });
 
   const update: Record<string, string | boolean> = {};
   if (active !== undefined) update.active = !!active;

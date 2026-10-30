@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Plus, Trash2, UserCheck, UserX, KeyRound, RefreshCw } from "lucide-react";
 import Swal from "sweetalert2";
+import { isValidPin, PIN_MAX_LENGTH, PIN_MIN_LENGTH, PIN_RULE_TEXT } from "@/lib/waiter-pin";
 
 interface Waiter {
   id: string;
@@ -36,8 +37,8 @@ export default function MeserosAdminPage() {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (form.pin.length < 4) {
-      Swal.fire({ icon: "warning", title: "PIN muy corto", text: "El PIN debe tener al menos 4 dígitos.", confirmButtonColor: "rgb(var(--primary-500))" });
+    if (!isValidPin(form.pin)) {
+      Swal.fire({ icon: "warning", title: "PIN muy corto", text: `${PIN_RULE_TEXT}.`, confirmButtonColor: "rgb(var(--primary-500))" });
       return;
     }
     setSaving(true);
@@ -73,20 +74,25 @@ export default function MeserosAdminPage() {
     const { value: newPin } = await Swal.fire({
       title: `Cambiar PIN de ${w.name}`,
       input: "text",
-      inputLabel: "Nuevo PIN (mínimo 4 dígitos)",
-      inputAttributes: { maxlength: "8", pattern: "[0-9]*", inputmode: "numeric" },
+      inputLabel: `Nuevo PIN (${PIN_MIN_LENGTH}-${PIN_MAX_LENGTH} dígitos)`,
+      inputAttributes: { maxlength: String(PIN_MAX_LENGTH), pattern: "[0-9]*", inputmode: "numeric" },
       showCancelButton: true,
       confirmButtonColor: "rgb(var(--primary-500))",
       cancelButtonText: "Cancelar",
       confirmButtonText: "Guardar",
-      inputValidator: (v) => (!v || v.length < 4 ? "El PIN debe tener al menos 4 dígitos" : null),
+      inputValidator: (v) => (isValidPin(v) ? null : PIN_RULE_TEXT),
     });
     if (!newPin) return;
-    await fetch("/api/waiters", {
+    const res = await fetch("/api/waiters", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: w.id, pin: newPin }),
     });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      Swal.fire({ icon: "error", title: "Error", text: data.error || "No se pudo cambiar el PIN", confirmButtonColor: "rgb(var(--primary-500))" });
+      return;
+    }
     Swal.fire({ icon: "success", title: "PIN actualizado", timer: 1500, showConfirmButton: false });
     await load();
   };
@@ -159,12 +165,12 @@ export default function MeserosAdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">PIN (4-8 dígitos) *</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">PIN ({PIN_MIN_LENGTH}-{PIN_MAX_LENGTH} dígitos) *</label>
                 <input
-                  required value={form.pin} maxLength={8} inputMode="numeric"
+                  required value={form.pin} maxLength={PIN_MAX_LENGTH} inputMode="numeric"
                   onChange={e => setForm({ ...form, pin: e.target.value.replace(/\D/g, "") })}
                   className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:outline-none tracking-widest font-mono"
-                  placeholder="1234"
+                  placeholder="123456"
                 />
               </div>
             </div>
