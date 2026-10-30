@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
-import { publicCtx } from "@/lib/tenant";
+import { adminCtx } from "@/lib/tenant";
 import { all, insert } from "@/lib/db";
 
+// Chat interno entre meseros y cocina: solo miembros del restaurante (desde /admin/chat).
+
 export async function GET(request: Request) {
-  const ctx = await publicCtx();
+  const ctx = await adminCtx();
   if (!ctx.ok) return ctx.res;
 
   const { searchParams } = new URL(request.url);
@@ -23,7 +25,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const ctx = await publicCtx();
+  const ctx = await adminCtx();
   if (!ctx.ok) return ctx.res;
 
   const { sender_role, sender_name, message, order_ref } = await request.json();

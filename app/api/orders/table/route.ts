@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { publicCtx } from "@/lib/tenant";
+import { adminCtx, publicCtx } from "@/lib/tenant";
 import { all, first, batch, newId, nowIso, type Row } from "@/lib/db";
 
 const STATUSES = ["pending", "preparing", "ready", "delivered", "cancelled"];
@@ -65,9 +65,10 @@ export async function POST(request: Request) {
   }
 }
 
+// GET: pedidos del restaurante (solo el panel; contienen notas de los clientes)
 export async function GET(request: Request) {
   try {
-    const ctx = await publicCtx();
+    const ctx = await adminCtx();
     if (!ctx.ok) return ctx.res;
     const { tenant } = ctx;
 
@@ -101,10 +102,10 @@ export async function GET(request: Request) {
   }
 }
 
-// PATCH para actualizar el estado de un pedido
+// PATCH para actualizar el estado de un pedido (solo el panel)
 export async function PATCH(request: Request) {
   try {
-    const ctx = await publicCtx();
+    const ctx = await adminCtx();
     if (!ctx.ok) return ctx.res;
     const { tenant } = ctx;
 
