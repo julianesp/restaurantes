@@ -64,7 +64,7 @@ const included = [
   "Pedidos por QR en todas tus mesas",
   "Panel de cocina y meseros",
   "Domicilios por WhatsApp",
-  "Pagos en línea con ePayco",
+  "Pagos en línea a tu cuenta de ePayco",
   "Tiqueteras y fidelización",
   "Estadísticas de ventas",
 ];
@@ -73,7 +73,7 @@ const services = [
   { icon: QrCode, title: "Pedidos por QR", text: "Cada mesa tiene su código: el cliente pide y paga desde el celular." },
   { icon: ChefHat, title: "Cocina y meseros conectados", text: "Los pedidos llegan al panel de cocina y a Telegram, con chat entre el equipo." },
   { icon: Bike, title: "Domicilios por WhatsApp", text: "Tus clientes arman el pedido en tu sitio y te llega listo por WhatsApp." },
-  { icon: CreditCard, title: "Pagos en línea", text: "Cobra con ePayco y entrega la factura al instante." },
+  { icon: CreditCard, title: "Pagos en línea", text: "Conecta tu cuenta de ePayco: el dinero llega directo a ti, sin comisión de Brasaya." },
   { icon: Ticket, title: "Tiqueteras", text: "Vende paquetes de almuerzos y lleva el saldo de cada cliente." },
   { icon: BarChart3, title: "Estadísticas", text: "Ventas por día, semana y mes, y el plato estrella de cada semana." },
 ];
@@ -312,7 +312,10 @@ export default function PlataformaPage() {
 
           <div className="mt-12 flex flex-col items-start justify-between gap-2 border-t border-white/15 pt-6 text-sm text-white/60 sm:flex-row sm:items-center">
             <span>© {new Date().getFullYear()} Brasaya. Hecho en Colombia.</span>
-            <span>brasaya.com</span>
+            <span className="flex flex-wrap gap-4">
+              <Link href="/terminos" className="hover:text-white">Términos</Link>
+              <Link href="/privacidad" className="hover:text-white">Tratamiento de datos</Link>
+            </span>
           </div>
         </div>
       </footer>

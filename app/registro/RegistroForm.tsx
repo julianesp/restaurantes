@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 type SlugState =
   | { status: "idle" }
@@ -26,6 +27,7 @@ export default function RegistroForm({ suffix }: { suffix: string }) {
   const [slugState, setSlugState] = useState<SlugState>({ status: "idle" });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [acceptTerms, setAcceptTerms] = useState(false);
 
   // El subdominio se propone a partir del nombre mientras el usuario no lo edite
   useEffect(() => {
@@ -69,7 +71,7 @@ export default function RegistroForm({ suffix }: { suffix: string }) {
       const res = await fetch("/api/platform/restaurants", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, slug, city, phone }),
+        body: JSON.stringify({ name, slug, city, phone, acceptTerms }),
       });
       const data = await res.json();
       if ((res.ok || res.status === 409) && data.url) {
@@ -130,7 +132,17 @@ export default function RegistroForm({ suffix }: { suffix: string }) {
 
       {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
 
-      <button type="submit" disabled={submitting || slugState.status === "taken" || slugState.status === "checking"}
+      <label className="flex items-start gap-3 text-sm text-gray-700 dark:text-gray-300">
+        <input type="checkbox" required checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)}
+          className="mt-0.5 h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
+        <span>
+          Acepto los <Link href="/terminos" target="_blank" className="text-primary-600 underline">términos y condiciones</Link> y
+          autorizo el tratamiento de mis datos según la{" "}
+          <Link href="/privacidad" target="_blank" className="text-primary-600 underline">política de tratamiento de datos</Link>.
+        </span>
+      </label>
+
+      <button type="submit" disabled={submitting || !acceptTerms || slugState.status === "taken" || slugState.status === "checking"}
         className="w-full rounded-xl bg-primary-500 hover:bg-primary-600 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-3 transition-colors">
         {submitting ? "Creando…" : "Crear mi restaurante"}
       </button>

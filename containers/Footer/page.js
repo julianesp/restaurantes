@@ -300,9 +300,13 @@ const Footer = () => {
               <p className="text-white/60 text-xs text-center md:text-left">
                 © {new Date().getFullYear()} {branding.name}. Todos los derechos reservados.
               </p>
-              <span className="inline-flex items-center gap-2 text-xs text-white/60">
-                <BrasayaMark size={18} />
-                Hecho con Brasaya
+              <span className="flex flex-wrap items-center justify-center gap-4 text-xs text-white/60">
+                <Link href="/privacidad" className="hover:text-white">Tratamiento de datos</Link>
+                <Link href="/terminos" className="hover:text-white">Términos</Link>
+                <span className="inline-flex items-center gap-2">
+                  <BrasayaMark size={18} />
+                  Hecho con Brasaya
+                </span>
               </span>
             </div>
           </div>

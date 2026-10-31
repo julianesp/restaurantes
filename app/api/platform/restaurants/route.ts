@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { first, batch, newId, nowIso, isUniqueViolation } from "@/lib/db";
 import { RESERVED_SLUGS, SLUG_REGEX, tenantUrl } from "@/lib/tenant-host";
-
+import { LEGAL } from "@/lib/legal";
 
 // Categorías iniciales para que el menú no empiece vacío
 const DEFAULT_CATEGORIES = [
@@ -37,6 +37,9 @@ export async function POST(request: Request) {
   if (!SLUG_REGEX.test(slug) || RESERVED_SLUGS.has(slug)) {
     return NextResponse.json({ error: "Subdominio no válido" }, { status: 400 });
   }
+  if (body.acceptTerms !== true) {
+    return NextResponse.json({ error: "Debes aceptar los términos y la política de tratamiento de datos" }, { status: 400 });
+  }
 
   // Un correo solo puede ser dueño de un restaurante en la prueba gratuita
   const owned = await first<{ slug: string }>(
@@ -57,6 +60,10 @@ export async function POST(request: Request) {
   const settings: Record<string, string> = {};
   if (phone) settings.phone = phone;
   if (city) settings.city = city;
+  // Prueba de la autorización (Ley 1581): quién aceptó, qué versión y cuándo
+  settings.terms_version = LEGAL.version;
+  settings.terms_accepted_at = now;
+  settings.terms_accepted_by = email;
 
   try {
     // Restaurante + dueño + categorías iniciales en una sola transacción:
