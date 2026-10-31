@@ -1,11 +1,16 @@
 import { NextResponse } from 'next/server';
 import { notifyNewReservation, targetFor } from '../../../lib/notificationService';
 import { publicCtx } from '@/lib/tenant';
+import { limitRequest } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
   try {
     const ctx = await publicCtx();
     if (!ctx.ok) return ctx.res;
+
+    // Avisa al restaurante por Telegram: 5 reservas por IP cada 15 minutos
+    const limited = await limitRequest(request, 'reservation', ctx.tenant.id, 5, 15 * 60_000);
+    if (limited) return limited;
 
     const body = await request.json();
 

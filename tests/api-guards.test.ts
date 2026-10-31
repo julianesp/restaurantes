@@ -13,16 +13,20 @@ const API_DIR = join(ROOT, "app/api");
 
 /** Escrituras públicas intencionales: "ruta METODO" → qué la protege. */
 const PUBLIC_WRITES: Record<string, string> = {
-  "app/api/epayco/create-payment POST": "pago del cliente en el checkout (el monto lo valida ePayco)",
   "app/api/epayco/webhook POST": "solo confía en validateTransaction() contra la API de ePayco",
   "app/api/whatsapp/webhook POST": "firma HMAC verifySignature()",
   "app/api/notify-order POST": "aviso de pedido del cliente; tope de 60/h en lib/whatsapp.ts",
-  "app/api/notify-reservation POST": "reserva hecha por el cliente",
+  "app/api/notify-reservation POST": "reserva hecha por el cliente; límite de envíos",
   "app/api/orders/table POST": "pedido desde la mesa por QR",
-  "app/api/suggestions POST": "buzón público de sugerencias",
+  "app/api/suggestions POST": "buzón público de sugerencias; límite de envíos",
   "app/api/waiters/verify POST": "PIN del mesero, con límite de intentos (lib/rate-limit.ts)",
+  "app/api/waiters/verify DELETE": "solo cierra la sesión del token que se envía",
+  "app/api/epayco/create-payment POST": "pago del cliente con la cuenta ePayco del restaurante; límite de envíos",
   "app/api/platform/restaurants POST": "registro de restaurante: exige currentUser() de Clerk",
 };
+
+/** Rutas del personal (panel o mesero con sesión): staffCtx() en lugar de adminCtx(). */
+const STAFF_ROUTES = ["app/api/kitchen-chat GET", "app/api/kitchen-chat POST"];
 
 /** Lecturas con datos internos del restaurante: también deben exigir adminCtx(). */
 const ADMIN_ONLY_READS = [
@@ -31,6 +35,7 @@ const ADMIN_ONLY_READS = [
   "app/api/waiters GET", // incluye los PIN de los meseros
   "app/api/suggestions GET",
   "app/api/statistics GET",
+  "app/api/tenant/payments GET", // estado de la cuenta de ePayco
 ];
 
 const HANDLER = /export\s+(?:async\s+)?function\s+(GET|POST|PUT|PATCH|DELETE)\b|export\s+const\s+(GET|POST|PUT|PATCH|DELETE)\b/g;
@@ -56,23 +61,24 @@ function routeHandlers(file: string) {
 }
 
 const all = routeFiles(API_DIR).flatMap(routeHandlers);
-const handlers = all.filter((h) => isWrite(h.key) || ADMIN_ONLY_READS.includes(h.key));
+const handlers = all.filter((h) => isWrite(h.key) || ADMIN_ONLY_READS.includes(h.key) || STAFF_ROUTES.includes(h.key));
 
 it("encuentra las rutas de escritura", () => {
   expect(handlers.length).toBeGreaterThan(20);
 });
 
 describe.each(handlers.map((h) => [h.key, h.body]))("%s", (key, body) => {
-  it(PUBLIC_WRITES[key] ? `pública: ${PUBLIC_WRITES[key]}` : "exige adminCtx()", () => {
+  const staff = STAFF_ROUTES.includes(key);
+  it(PUBLIC_WRITES[key] ? `pública: ${PUBLIC_WRITES[key]}` : staff ? "exige staffCtx()" : "exige adminCtx()", () => {
     if (PUBLIC_WRITES[key]) return;
-    expect(body).toMatch(/await\s+adminCtx\(/);
+    expect(body).toMatch(staff ? /await\s+staffCtx\(request\)/ : /await\s+adminCtx\(/);
     expect(body).toMatch(/if\s*\(\s*!ctx\.ok\s*\)\s*return\s+ctx\.res/);
   });
 });
 
 it("las listas no tienen rutas que ya no existen", () => {
   const keys = new Set(all.map((h) => h.key));
-  expect([...Object.keys(PUBLIC_WRITES), ...ADMIN_ONLY_READS].filter((k) => !keys.has(k))).toEqual([]);
+  expect([...Object.keys(PUBLIC_WRITES), ...ADMIN_ONLY_READS, ...STAFF_ROUTES].filter((k) => !keys.has(k))).toEqual([]);
 });
 
 it("las rutas cron (fuera de Clerk) exigen CRON_SECRET", () => {

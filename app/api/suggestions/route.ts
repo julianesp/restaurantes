@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { publicCtx, adminCtx } from '@/lib/tenant';
 import { all, insert } from '@/lib/db';
+import { limitRequest } from '@/lib/rate-limit';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,6 +12,10 @@ export async function POST(request: NextRequest) {
   try {
     const ctx = await publicCtx();
     if (!ctx.ok) return ctx.res;
+
+    // Buzón público: 5 sugerencias por IP cada 15 minutos
+    const limited = await limitRequest(request, 'suggestion', ctx.tenant.id, 5, 15 * 60_000);
+    if (limited) return limited;
 
     const { name, email, phone, message, rating, suggestion_type } = await request.json();
 

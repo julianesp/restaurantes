@@ -65,6 +65,20 @@ const styledJsxEsmForDevClient = {
   },
 };
 
+// Lo mismo con use-sync-external-store/shim (CommonJS), que importa swr desde @clerk/shared: el
+// navegador falla con "does not provide an export named 'useSyncExternalStore'" y la página no
+// hidrata. React 19 ya trae useSyncExternalStore, así que en desarrollo el shim lo re-exporta.
+const useSyncExternalStoreShimForDevClient = {
+  name: "use-sync-external-store-shim-dev-client",
+  apply: "serve" as const,
+  enforce: "pre" as const,
+  load(this: { environment?: { name?: string } }, id: string) {
+    if (!/node_modules[\\/]use-sync-external-store[\\/]shim[\\/]index\.js$/.test(id.split("?")[0])) return null;
+    if (this.environment?.name !== "client") return null;
+    return 'export { useSyncExternalStore } from "react";';
+  },
+};
+
 // Vite sirve los archivos de node_modules que NO pre-empaqueta (p. ej. los shims de vinext) con
 // `?v=<hash del paquete>` y caché inmutable de un año. Ese hash no cambia cuando Vite vuelve a
 // optimizar dependencias, pero el contenido sí (importa react.js?v=<hash nuevo>): el navegador se
@@ -96,6 +110,7 @@ export default defineConfig({
   plugins: [
     fixClerkRequires,
     styledJsxEsmForDevClient,
+    useSyncExternalStoreShimForDevClient,
     revalidateUnbundledNodeModules,
     patchCssModules({ exportMode: "default" }),
     vinext(),
