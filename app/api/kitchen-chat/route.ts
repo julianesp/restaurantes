@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
-import { adminCtx } from "@/lib/tenant";
 import { all, insert } from "@/lib/db";
+import { staffCtx } from "@/lib/waiter-session";
 
-// Chat interno entre meseros y cocina: solo miembros del restaurante (desde /admin/chat).
+// Chat interno entre meseros y cocina: solo personal del restaurante, sea un miembro del panel
+// (/admin/chat, Clerk) o un mesero con la sesión de su PIN (/mesero/chat, cabecera X-Waiter-Token).
 
 export async function GET(request: Request) {
-  const ctx = await adminCtx();
+  const ctx = await staffCtx(request);
   if (!ctx.ok) return ctx.res;
 
   const { searchParams } = new URL(request.url);
@@ -25,12 +26,16 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const ctx = await adminCtx();
+  const ctx = await staffCtx(request);
   if (!ctx.ok) return ctx.res;
 
-  const { sender_role, sender_name, message, order_ref } = await request.json();
+  const body = await request.json();
+  const { message, order_ref } = body;
+  // Un mesero escribe siempre como mesero y con su nombre: no puede hacerse pasar por la cocina
+  const sender_role = ctx.kind === "waiter" ? "waiter" : body.sender_role;
+  const sender_name = ctx.kind === "waiter" ? ctx.waiter.name : String(body.sender_name ?? "").trim();
 
-  if (!sender_role || !sender_name || !message?.trim()) {
+  if (!sender_role || !sender_name || typeof message !== "string" || !message.trim()) {
     return NextResponse.json({ error: "sender_role, sender_name y message son requeridos" }, { status: 400 });
   }
   if (!["waiter", "chef"].includes(sender_role)) {
@@ -41,8 +46,8 @@ export async function POST(request: Request) {
     restaurant_id: ctx.tenant.id,
     sender_role,
     sender_name,
-    message: message.trim(),
-    order_ref: order_ref || null,
+    message: message.trim().slice(0, 1000),
+    order_ref: order_ref ? String(order_ref).slice(0, 60) : null,
   });
   return NextResponse.json(data, { status: 201 });
 }

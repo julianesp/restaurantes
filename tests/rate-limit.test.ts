@@ -8,6 +8,7 @@ import { join } from "node:path";
 import { DatabaseSync, type SQLInputValue } from "node:sqlite";
 import { fakeD1, type FakeCall } from "./mocks/cloudflare-workers";
 import { hit, purgeRateLimits, release } from "@/lib/rate-limit";
+import { hashPin } from "@/lib/waiter-session";
 
 jest.mock("@/lib/tenant", () => ({
   publicCtx: async () => ({ ok: true, tenant: { id: "rest-pizza", slug: "pizza" } }),
@@ -16,12 +17,15 @@ jest.mock("@/lib/tenant", () => ({
 const WINDOW = 15 * 60_000;
 let sqlite: DatabaseSync;
 
-/** Responde las consultas con SQLite; la tabla waiters es solo para la ruta. */
-function useSqlite() {
+/** Responde las consultas con SQLite; las tablas waiters y waiter_sessions son para la ruta. */
+async function useSqlite() {
   sqlite = new DatabaseSync(":memory:");
   sqlite.exec(readFileSync(join(__dirname, "../migrations/0004_rate_limits.sql"), "utf8"));
-  sqlite.exec(`CREATE TABLE waiters (id TEXT, restaurant_id TEXT, name TEXT, email TEXT, pin TEXT, active INTEGER);
-               INSERT INTO waiters VALUES ('w1', 'rest-pizza', 'Ana', 'ana@pizza.co', '4821', 1);`);
+  sqlite.exec(readFileSync(join(__dirname, "../migrations/0005_payments_waiter_sessions.sql"), "utf8"));
+  sqlite.exec(`CREATE TABLE restaurants (id TEXT PRIMARY KEY);
+               INSERT INTO restaurants VALUES ('rest-pizza');
+               CREATE TABLE waiters (id TEXT PRIMARY KEY, restaurant_id TEXT, name TEXT, email TEXT, pin TEXT, active INTEGER)`);
+  sqlite.prepare("INSERT INTO waiters VALUES ('w1', 'rest-pizza', 'Ana', 'ana@pizza.co', ?, 1)").run(await hashPin("rest-pizza", "4821"));
   fakeD1.respond = (c: FakeCall) => {
     const stmt = sqlite.prepare(c.sql);
     const params = c.params as SQLInputValue[];
@@ -34,9 +38,9 @@ function useSqlite() {
 const countOf = (key: string) =>
   (sqlite.prepare("SELECT count FROM rate_limits WHERE key = ?").get(key) as { count: number } | undefined)?.count;
 
-beforeEach(() => {
+beforeEach(async () => {
   fakeD1.reset();
-  useSqlite();
+  await useSqlite();
 });
 
 describe("hit / release", () => {

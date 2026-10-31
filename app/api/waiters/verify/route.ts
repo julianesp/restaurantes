@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { publicCtx } from "@/lib/tenant";
-import { first } from "@/lib/db";
 import { clientIp, hit, release } from "@/lib/rate-limit";
+import { createWaiterSession, endWaiterSession, findWaiterByPin } from "@/lib/waiter-session";
 
 // Límite de intentos fallidos de PIN (ventana de 15 minutos):
 // por IP dentro del restaurante, y por restaurante en total (frena ataques desde muchas IPs).
@@ -32,13 +32,19 @@ export async function POST(request: Request) {
     );
   }
 
-  const waiter = await first(
-    "SELECT id, name, email, active FROM waiters WHERE restaurant_id = ? AND pin = ? AND active = 1",
-    ctx.tenant.id,
-    String(pin)
-  );
-
+  const waiter = await findWaiterByPin(ctx.tenant.id, String(pin));
   if (!waiter) return NextResponse.json({ error: "PIN incorrecto o mesero inactivo" }, { status: 401 });
+
   await Promise.all(keys.map(release));
-  return NextResponse.json({ ok: true, waiter });
+  // El token va en la cabecera X-Waiter-Token de las peticiones del mesero (p. ej. el chat de cocina)
+  const token = await createWaiterSession(ctx.tenant.id, waiter.id);
+  return NextResponse.json({ ok: true, waiter, token });
+}
+
+// DELETE: cerrar la sesión del mesero (la del token que envía)
+export async function DELETE(request: Request) {
+  const ctx = await publicCtx();
+  if (!ctx.ok) return ctx.res;
+  await endWaiterSession(request, ctx.tenant);
+  return NextResponse.json({ ok: true });
 }

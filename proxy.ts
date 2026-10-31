@@ -38,6 +38,9 @@ const isPublicRoute = createRouteMatcher([
   "/api/permanent-dishes(.*)", // Platos permanentes (lectura pública para el modal)
   "/mesero(.*)", // Panel del mesero (protegido por PIN propio)
   "/api/waiters/verify", // Verificación de PIN de mesero
+  "/api/kitchen-chat", // Chat de cocina: lo autoriza staffCtx() (sesión de mesero o miembro del panel)
+  "/terminos", // Términos y condiciones de Brasaya
+  "/privacidad", // Política de tratamiento de datos personales
 ]);
 
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);

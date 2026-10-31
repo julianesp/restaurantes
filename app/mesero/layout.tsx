@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { UtensilsCrossed, KeyRound, Loader2 } from "lucide-react";
-
-const SESSION_KEY = "mesero_session";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { UtensilsCrossed, KeyRound, Loader2, MessageSquare, LayoutGrid } from "lucide-react";
+import { WAITER_SESSION_KEY as SESSION_KEY, WaiterSessionContext, type WaiterSession } from "@/components/mesero/WaiterSession";
 
 export default function MeseroLayout({ children }: { children: React.ReactNode }) {
   const [authed, setAuthed] = useState(false);
@@ -11,18 +12,26 @@ export default function MeseroLayout({ children }: { children: React.ReactNode }
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [waiterName, setWaiterName] = useState("");
+  const [session, setSession] = useState<WaiterSession | null>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
-    const saved = sessionStorage.getItem(SESSION_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed.name) { setWaiterName(parsed.name); setAuthed(true); }
-      } catch {}
-    }
+    try {
+      const parsed = JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null");
+      // Las sesiones anteriores al token del servidor no sirven: se pide el PIN de nuevo
+      if (parsed?.name && parsed?.token) { setSession(parsed); setAuthed(true); }
+    } catch {}
     setChecking(false);
   }, []);
+
+  const logout = () => {
+    const token = session?.token;
+    if (token) fetch("/api/waiters/verify", { method: "DELETE", headers: { "X-Waiter-Token": token } }).catch(() => {});
+    try { sessionStorage.removeItem(SESSION_KEY); } catch {}
+    setSession(null);
+    setAuthed(false);
+    setPin("");
+  };
 
   const handlePin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,8 +45,10 @@ export default function MeseroLayout({ children }: { children: React.ReactNode }
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || "PIN incorrecto"); return; }
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify(data.waiter));
-      setWaiterName(data.waiter.name);
+      const next: WaiterSession = { name: data.waiter.name, token: data.token };
+      try { sessionStorage.setItem(SESSION_KEY, JSON.stringify(next)); } catch {}
+      setSession(next);
+      setPin("");
       setAuthed(true);
     } catch {
       setError("Error de conexión. Intenta de nuevo.");
@@ -109,17 +120,34 @@ export default function MeseroLayout({ children }: { children: React.ReactNode }
     </div>
   );
 
+  if (!session) return null;
+
+  const tab = (href: string, label: string, Icon: typeof LayoutGrid) => {
+    const active = href === "/mesero" ? pathname === "/mesero" || pathname.startsWith("/mesero/mesa") : pathname.startsWith(href);
+    return (
+      <Link href={href} aria-current={active ? "page" : undefined}
+        className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition-colors ${active ? "bg-white text-primary-700" : "text-white/90 hover:bg-white/15"}`}>
+        <Icon className="w-3.5 h-3.5" />
+        {label}
+      </Link>
+    );
+  };
+
   return (
-    <div>
-      <div className="bg-primary-500 text-white px-4 py-2 flex items-center justify-between text-sm">
-        <span className="font-semibold">Mesero: {waiterName}</span>
-        <button onClick={() => { sessionStorage.removeItem(SESSION_KEY); setAuthed(false); setPin(""); }}
-          className="text-white/80 hover:text-white underline text-xs">
+    <WaiterSessionContext.Provider value={{ session, logout }}>
+      {/* pr-16: deja libre el botón flotante de tema (FloatingThemeToggle) en la esquina */}
+      <div className="bg-primary-500 text-white pl-4 pr-16 py-2 flex flex-wrap items-center justify-between gap-2 text-sm">
+        <span className="font-semibold">Mesero: {session.name}</span>
+        <nav className="flex items-center gap-1">
+          {tab("/mesero", "Mesas", LayoutGrid)}
+          {tab("/mesero/chat", "Chat de cocina", MessageSquare)}
+        </nav>
+        <button onClick={logout} className="text-white/80 hover:text-white underline text-xs">
           Cerrar sesión
         </button>
       </div>
       {children}
-    </div>
+    </WaiterSessionContext.Provider>
   );
 }
 
