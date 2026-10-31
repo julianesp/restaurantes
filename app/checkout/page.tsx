@@ -6,6 +6,9 @@ import Navbar from "../../components/Navbar/page";
 import Footer from "../../containers/Footer/page";
 import { useCart } from "../../context/CartContext";
 import { createPaymentLink, generatePaymentReference } from "../../utils/epayco";
+import { createOrderMessage } from "../../utils/whatsapp";
+import { useBranding } from "@/context/TenantContext";
+import Link from "next/link";
 import {
   CreditCard,
   Building2,
@@ -43,6 +46,8 @@ const paymentMethods: PaymentMethod[] = [
 export default function CheckoutPage() {
   const router = useRouter();
   const { cart, getCartTotal, clearCart } = useCart();
+  // Sin cuenta de ePayco conectada, el pedido se envía por WhatsApp y se paga al recibir
+  const { onlinePayments, whatsapp } = useBranding();
   const [selectedPayment, setSelectedPayment] = useState<string>("credit-card");
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -84,6 +89,32 @@ export default function CheckoutPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!onlinePayments) {
+      if (!formData.name.trim() || !formData.phone.trim() || !formData.address.trim()) {
+        alert("Escribe tu nombre, teléfono y dirección para enviar el pedido.");
+        return;
+      }
+      if (!whatsapp) {
+        alert("Este restaurante aún no recibe pedidos en línea. Comunícate directamente con ellos.");
+        return;
+      }
+      const url = createOrderMessage(whatsapp, {
+        name: formData.name.trim(),
+        phone: formData.phone.trim(),
+        service: "Domicilio",
+        address: [formData.address, formData.city].filter((v) => v.trim()).join(", "),
+        notes: formData.notes.trim() || undefined,
+        items: [
+          ...cart.map((item) => ({ name: item.name, quantity: item.quantity, price: parseFloat(String(item.price).replace(/[$.,]/g, "")) })),
+          { name: "Envío", quantity: 1, price: deliveryCost },
+        ],
+        total,
+      });
+      window.open(url, "_blank", "noopener,noreferrer");
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
@@ -310,7 +341,8 @@ export default function CheckoutPage() {
                 </form>
               </div>
 
-              {/* Método de Pago */}
+              {/* Método de Pago (o pago al recibir si el restaurante no conectó ePayco) */}
+              {onlinePayments ? (
               <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
                   Método de Pago
@@ -362,6 +394,16 @@ export default function CheckoutPage() {
                   })}
                 </div>
               </div>
+              ) : (
+                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                    Pago al recibir
+                  </h2>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    Tu pedido se envía al WhatsApp del restaurante y pagas al recibirlo (o como acuerdes con ellos).
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Resumen del Pedido */}
@@ -412,11 +454,12 @@ export default function CheckoutPage() {
                   disabled={isProcessing}
                   className="w-full mt-6 bg-primary-500 hover:bg-primary-600 disabled:bg-gray-400 text-white px-6 py-4 rounded-lg font-bold text-lg transition-all shadow-lg disabled:cursor-not-allowed"
                 >
-                  {isProcessing ? "Procesando..." : "Confirmar Pedido"}
+                  {isProcessing ? "Procesando..." : onlinePayments ? "Confirmar Pedido" : "Enviar pedido por WhatsApp"}
                 </button>
 
                 <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-4">
-                  Al confirmar aceptas nuestros términos y condiciones
+                  Al confirmar aceptas la{" "}
+                  <Link href="/privacidad" className="underline hover:text-primary-600">política de tratamiento de datos</Link>
                 </p>
               </div>
             </div>

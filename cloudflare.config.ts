@@ -27,6 +27,8 @@ export default defineConfig({
       CLERK_SECRET_KEY: bindings.secret(),
       CRON_SECRET: bindings.secret(),
       EPAYCO_PRIVATE_KEY: bindings.secret(),
+      // Cifra las llaves de ePayco de cada restaurante y protege PIN y sesiones (lib/crypto.ts)
+      APP_SECRET: bindings.secret(),
     },
     triggers: [
       // Lunes 05:00 UTC: publica el plato ganador de la semana anterior de cada restaurante

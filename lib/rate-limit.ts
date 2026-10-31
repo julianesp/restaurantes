@@ -5,6 +5,7 @@
  * Uso: `hit()` ANTES de la operación (cuenta el intento de forma atómica, así que peticiones en
  * paralelo no se saltan el límite) y `release()` si salió bien, para que solo cuenten los fallos.
  */
+import { NextResponse } from "next/server";
 import { first, run } from "@/lib/db";
 
 export interface LimitResult {
@@ -48,4 +49,24 @@ export async function purgeRateLimits(olderThanMs = 24 * 3600_000, now = Date.no
 /** IP del cliente según Cloudflare (en desarrollo no viene: todos comparten "local"). */
 export function clientIp(request: Request): string {
   return request.headers.get("cf-connecting-ip") || "local";
+}
+
+/**
+ * Para rutas públicas que crean cosas (sugerencias, avisos, pagos): cuenta el envío y devuelve una
+ * respuesta 429 lista si se pasó del límite, o null si puede continuar.
+ */
+export async function limitRequest(
+  request: Request,
+  scope: string,
+  restaurantId: string,
+  max: number,
+  windowMs: number
+): Promise<NextResponse | null> {
+  const result = await hit(`${scope}:${restaurantId}:${clientIp(request)}`, max, windowMs);
+  if (result.allowed) return null;
+  const minutes = Math.ceil(result.retryAfter / 60);
+  return NextResponse.json(
+    { error: `Demasiados envíos seguidos. Intenta de nuevo en ${minutes} ${minutes === 1 ? "minuto" : "minutos"}.` },
+    { status: 429, headers: { "Retry-After": String(result.retryAfter) } }
+  );
 }

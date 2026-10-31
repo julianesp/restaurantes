@@ -25,6 +25,8 @@ import {
   formatCOP,
 } from "../utils/epayco";
 import Swal from "sweetalert2";
+import { useBranding } from "@/context/TenantContext";
+import { createOrderMessage } from "../utils/whatsapp";
 
 interface OrderModalProps {
   isOpen: boolean;
@@ -66,6 +68,8 @@ const CATEGORY_META: Record<string, { icon: typeof Coffee; color: string }> = {
 };
 
 const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
+  // Sin cuenta de ePayco conectada, el pedido se envía por WhatsApp y se paga al recibir
+  const { onlinePayments, whatsapp } = useBranding();
   const [step, setStep] = useState<"menu" | "form">("menu");
   const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
   const [loadingMenu, setLoadingMenu] = useState(true);
@@ -257,6 +261,23 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
     e.preventDefault();
 
     if (!validateForm()) {
+      return;
+    }
+
+    if (!onlinePayments) {
+      if (!whatsapp) {
+        await Swal.fire({ icon: "info", title: "Pedidos por teléfono", text: "Este restaurante aún no recibe pedidos en línea. Comunícate directamente con ellos.", confirmButtonColor: "rgb(var(--primary-500))" });
+        return;
+      }
+      const url = createOrderMessage(whatsapp, {
+        name: formData.nombre,
+        phone: formData.telefono,
+        service: formData.tipoServicio === "domicilio" ? "Domicilio" : "Recoger en el restaurante",
+        address: formData.tipoServicio === "domicilio" ? `${formData.direccion}, ${formData.barrio}` : undefined,
+        items: cart.map((item) => ({ name: item.name, quantity: item.quantity, price: parseFloat(item.price.replace(/[$.,]/g, "")) })),
+        total: getCartTotal(),
+      });
+      window.open(url, "_blank", "noopener,noreferrer");
       return;
     }
 
@@ -786,16 +807,20 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
                 <p className="font-semibold text-secondary-700 dark:text-secondary-400 mb-2">
                   Información importante:
                 </p>
-                <ul className="space-y-1 list-disc list-inside">
-                  <li>Pago 100% seguro a través de ePayco</li>
-                  <li>
-                    Puedes pagar con PSE, tarjetas débito/crédito, efectivo
-                  </li>
-                  <li>
-                    Te confirmaremos tu pedido por WhatsApp después del pago
-                  </li>
-                  <li>El costo de domicilio puede variar según tu ubicación</li>
-                </ul>
+                {onlinePayments ? (
+                  <ul className="space-y-1 list-disc list-inside">
+                    <li>Pago 100% seguro a través de ePayco</li>
+                    <li>Puedes pagar con PSE o tarjetas débito/crédito</li>
+                    <li>Te confirmaremos tu pedido por WhatsApp después del pago</li>
+                    <li>El costo de domicilio puede variar según tu ubicación</li>
+                  </ul>
+                ) : (
+                  <ul className="space-y-1 list-disc list-inside">
+                    <li>Tu pedido se envía al WhatsApp del restaurante</li>
+                    <li>Pagas al recibir (o como acuerdes con el restaurante)</li>
+                    <li>El costo de domicilio puede variar según tu ubicación</li>
+                  </ul>
+                )}
               </div>
             </div>
 
@@ -819,7 +844,7 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
                     Procesando...
                   </>
                 ) : (
-                  <>Pagar {formatCOP(getCartTotal())}</>
+                  <>{onlinePayments ? "Pagar" : "Pedir por WhatsApp"} {formatCOP(getCartTotal())}</>
                 )}
               </button>
             </div>

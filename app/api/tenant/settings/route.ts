@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { adminCtx, invalidateTenantCache } from "@/lib/tenant";
 import { EDITABLE_SETTINGS, validHex } from "@/lib/branding";
-import { run, nowIso } from "@/lib/db";
+import { first, run, nowIso } from "@/lib/db";
 import { normalizePhone, whatsappAvailable } from "@/lib/whatsapp";
 
 const MAX_LEN: Record<string, number> = { about: 2000, tagline: 160, hours: 200, address: 200 };
@@ -38,7 +38,10 @@ export async function PATCH(request: Request) {
 
   const body = await request.json().catch(() => ({}));
   const incoming = (body.settings ?? {}) as Record<string, unknown>;
-  const next: Record<string, unknown> = { ...ctx.tenant.settings };
+  // Ajustes frescos de la base (no la copia en caché): no pisar claves que gestiona el sistema,
+  // como online_payments (lib/payment-accounts.ts)
+  const fresh = await first<{ settings: Record<string, unknown> }>("SELECT settings FROM restaurants WHERE id = ?", ctx.tenant.id);
+  const next: Record<string, unknown> = { ...(fresh?.settings ?? ctx.tenant.settings) };
 
   for (const key of EDITABLE_SETTINGS) {
     if (!(key in incoming)) continue;

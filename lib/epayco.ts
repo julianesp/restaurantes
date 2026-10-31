@@ -19,25 +19,48 @@ export interface CheckoutSessionInput {
   confirmationUrl: string;
   extras: { extra1?: string; extra2?: string; extra3?: string };
   billing?: { email?: string; name?: string; phone?: string };
+  /** Cuenta que cobra. Sin ella se usa la de Brasaya (solo para la mensualidad de la plataforma). */
+  credentials?: EpaycoCredentials;
+}
+
+/** Llaves de API (Apify) de una cuenta de ePayco. */
+export interface EpaycoCredentials {
+  publicKey: string;
+  privateKey: string;
+}
+
+/** Cuenta de ePayco de Brasaya: cobra SOLO la mensualidad de la plataforma. */
+export function platformCredentials(): EpaycoCredentials {
+  const publicKey = process.env.NEXT_PUBLIC_EPAYCO_PUBLIC_KEY;
+  const privateKey = process.env.EPAYCO_PRIVATE_KEY;
+  if (!publicKey || !privateKey) throw new Error("Faltan las llaves de ePayco de la plataforma");
+  return { publicKey, privateKey };
+}
+
+/** Inicia sesión en la API de ePayco con unas llaves. Devuelve el token o null si no son válidas. */
+export async function epaycoLogin({ publicKey, privateKey }: EpaycoCredentials): Promise<string | null> {
+  const basicAuth = btoa(`${publicKey}:${privateKey}`);
+  try {
+    const res = await fetch("https://apify.epayco.co/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Basic ${basicAuth}` },
+      body: JSON.stringify({ public_key: publicKey }),
+    });
+    const auth = (await res.json().catch(() => ({}))) as { token?: string };
+    return auth.token || null;
+  } catch (error) {
+    console.error("[epayco] Error iniciando sesión:", error);
+    return null;
+  }
 }
 
 const isTest = () => process.env.NEXT_PUBLIC_EPAYCO_TEST_MODE === "true";
 
 /** Crea una sesión de ePayco Checkout v2 y devuelve su sessionId. */
 export async function createCheckoutSession(input: CheckoutSessionInput): Promise<{ sessionId: string; token?: string }> {
-  const publicKey = process.env.NEXT_PUBLIC_EPAYCO_PUBLIC_KEY;
-  const privateKey = process.env.EPAYCO_PRIVATE_KEY;
-  if (!publicKey || !privateKey) throw new Error("Faltan las llaves de ePayco");
-
-  // 1) Autenticación (Apify)
-  const basicAuth = Buffer.from(`${publicKey}:${privateKey}`).toString("base64");
-  const authResponse = await fetch("https://apify.epayco.co/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Basic ${basicAuth}` },
-    body: JSON.stringify({ public_key: publicKey }),
-  });
-  const auth = (await authResponse.json()) as { token?: string };
-  if (!auth.token) throw new Error("No se pudo autenticar con ePayco");
+  // 1) Autenticación (Apify) con la cuenta que cobra
+  const token = await epaycoLogin(input.credentials ?? platformCredentials());
+  if (!token) throw new Error("No se pudo autenticar con ePayco");
 
   // 2) Sesión de pago. ePayco exige taxBase + tax == amount: se envía sin IVA desglosado.
   const amount = Math.round(input.amount);
@@ -72,7 +95,7 @@ export async function createCheckoutSession(input: CheckoutSessionInput): Promis
 
   const res = await fetch("https://apify.epayco.co/payment/session/create", {
     method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
     body: JSON.stringify(session),
   });
   const result = (await res.json()) as {

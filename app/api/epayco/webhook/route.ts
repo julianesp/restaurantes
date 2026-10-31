@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { notifyNewOrder, notifyNewReservation, notifyPaymentError, targetFor } from '../../../../lib/notificationService';
 import { getTenantBySlug } from '@/lib/tenant';
-import { readWebhookBody } from '@/lib/epayco';
+import { readWebhookBody, validateTransaction } from '@/lib/epayco';
 import { applySubscriptionPayment, SUBSCRIPTION_KIND } from '@/lib/subscriptions';
 import { whatsappNewOrder } from '@/lib/whatsapp';
 
@@ -19,28 +19,33 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true });
     }
 
-    const {
-      x_ref_payco,
-      x_transaction_id,
-      x_amount,
-      x_transaction_state,
-      x_invoice,
-      x_approval_code,
-      x_extra1,
-      x_extra2,
-      x_extra3,
-      x_customer_name,
-      x_customer_phone,
-      x_customer_email,
-    } = body;
+    // Pedido o reserva de un cliente: solo se cree a la API de validación de ePayco (un webhook
+    // falsificado no dispara avisos de "pedido pagado"). El restaurante viaja en extra3.
+    const tx = await validateTransaction(String(body.x_ref_payco || ''));
+    if (!tx) {
+      console.error('ePayco webhook: transacción no encontrada en ePayco:', body.x_ref_payco);
+      return NextResponse.json({ success: true });
+    }
+    if (tx.isTest && process.env.NEXT_PUBLIC_EPAYCO_TEST_MODE !== 'true') {
+      console.error('ePayco webhook: transacción de prueba en producción ignorada:', tx.refPayco);
+      return NextResponse.json({ success: true });
+    }
 
-    // El restaurante viaja en extra3 (lo puso create-payment). Sin él no se sabe a quién avisar.
-    const tenant = x_extra3 ? await getTenantBySlug(String(x_extra3)) : null;
+    const tenant = tx.extra3 ? await getTenantBySlug(tx.extra3) : null;
     if (!tenant) {
-      console.error('ePayco webhook sin restaurante identificable (x_extra3):', x_extra3);
+      console.error('ePayco webhook sin restaurante identificable (x_extra3):', tx.extra3);
       return NextResponse.json({ success: true });
     }
     const target = targetFor(tenant);
+
+    // Datos verificados (monto, estado, referencia); nombre y teléfono solo sirven para el aviso
+    const x_ref_payco = tx.refPayco;
+    const x_transaction_id = String(body.x_transaction_id || tx.refPayco);
+    const x_amount = String(tx.amount);
+    const x_transaction_state = tx.codResponse === 1 ? 'Aceptada' : tx.codResponse === 2 || tx.codResponse === 4 ? 'Rechazada' : 'Pendiente';
+    const x_invoice = tx.invoice || tx.extra1;
+    const x_extra2 = tx.extra2;
+    const { x_customer_name, x_customer_phone, x_customer_email } = body;
 
     if (x_transaction_state === 'Aceptada') {
       console.log(`✅ Pago exitoso - Referencia: ${x_invoice}, ePayco Ref: ${x_ref_payco}`);

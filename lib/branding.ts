@@ -19,6 +19,8 @@ export interface Branding {
   tiktokUrl: string;
   /** Restaurante de demostración de la plataforma (settings.demo): muestra un aviso y un enlace para crear uno. */
   isDemo: boolean;
+  /** El restaurante conectó su cuenta de ePayco (lib/payment-accounts.ts). Si no, se pide por WhatsApp. */
+  onlinePayments: boolean;
 }
 
 /** Claves de `restaurants.settings` que el restaurante puede editar. */
@@ -65,6 +67,7 @@ export function brandingFor(tenant: Tenant): Branding {
     facebookUrl: pick("facebook_url"),
     tiktokUrl: pick("tiktok_url"),
     isDemo: s.demo === true,
+    onlinePayments: s.online_payments === true,
   };
 }
 

@@ -41,6 +41,8 @@
     "DEFAULT_TENANT_SLUG": "restaurante"
   },
   // Secretos (wrangler secret put -c deploy/wrangler.jsonc <NOMBRE>):
-  //   CLERK_SECRET_KEY, CRON_SECRET, EPAYCO_PRIVATE_KEY, TELEGRAM_BOT_TOKEN
+  //   CLERK_SECRET_KEY, CRON_SECRET, EPAYCO_PRIVATE_KEY, TELEGRAM_BOT_TOKEN,
+  //   APP_SECRET (cifra las llaves de ePayco de los restaurantes y protege PIN y sesiones;
+  //   no cambiarlo: las llaves guardadas y los PIN dejarían de servir)
   "observability": { "enabled": true }
 }

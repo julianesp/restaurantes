@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { X, Calendar, Users, Clock, User, Phone, CreditCard, Loader2 } from "lucide-react";
 import { createPaymentLink, generatePaymentReference, formatCOP } from "../utils/epayco";
+import { createReservationDetailsMessage } from "../utils/whatsapp";
+import { useBranding } from "@/context/TenantContext";
 
 interface ReservationModalProps {
   isOpen: boolean;
@@ -10,6 +12,8 @@ interface ReservationModalProps {
 }
 
 const ReservationModal = ({ isOpen, onClose }: ReservationModalProps) => {
+  // Sin cuenta de ePayco conectada no se cobra anticipo: la reserva se envía por WhatsApp
+  const { onlinePayments, whatsapp } = useBranding();
   const [formData, setFormData] = useState({
     nombre: "",
     telefono: "",
@@ -94,6 +98,23 @@ const ReservationModal = ({ isOpen, onClose }: ReservationModalProps) => {
     e.preventDefault();
 
     if (!validateForm()) {
+      return;
+    }
+
+    if (!onlinePayments) {
+      if (!whatsapp) {
+        alert("Este restaurante aún no recibe reservas en línea. Comunícate directamente con ellos.");
+        return;
+      }
+      const url = createReservationDetailsMessage(whatsapp, {
+        name: formData.nombre,
+        phone: formData.telefono,
+        date: formData.fecha,
+        time: formData.hora,
+        people: formData.personas,
+        notes: formData.comentarios || undefined,
+      });
+      window.open(url, "_blank", "noopener,noreferrer");
       return;
     }
 
@@ -318,11 +339,18 @@ const ReservationModal = ({ isOpen, onClose }: ReservationModalProps) => {
                 <p className="font-semibold text-primary-700 dark:text-primary-400 mb-1">
                   Información importante:
                 </p>
-                <ul className="space-y-1 list-disc list-inside">
-                  <li>Anticipo de $10.000 COP requerido</li>
-                  <li>Mesa reservada por 1 hora</li>
-                  <li>El anticipo se descuenta del total de tu cuenta</li>
-                </ul>
+                {onlinePayments ? (
+                  <ul className="space-y-1 list-disc list-inside">
+                    <li>Anticipo de {formatCOP(RESERVATION_FEE)} requerido</li>
+                    <li>Mesa reservada por 1 hora</li>
+                    <li>El anticipo se descuenta del total de tu cuenta</li>
+                  </ul>
+                ) : (
+                  <ul className="space-y-1 list-disc list-inside">
+                    <li>Tu solicitud se envía al WhatsApp del restaurante</li>
+                    <li>El restaurante te confirma la disponibilidad</li>
+                  </ul>
+                )}
               </div>
             </div>
           </div>
@@ -348,7 +376,7 @@ const ReservationModal = ({ isOpen, onClose }: ReservationModalProps) => {
                 </>
               ) : (
                 <>
-                  Pagar {formatCOP(RESERVATION_FEE)}
+                  {onlinePayments ? `Pagar ${formatCOP(RESERVATION_FEE)}` : "Reservar por WhatsApp"}
                 </>
               )}
             </button>

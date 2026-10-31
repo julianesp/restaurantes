@@ -1,125 +1,60 @@
 import { NextResponse } from 'next/server';
 import { publicCtx } from '@/lib/tenant';
+import { createCheckoutSession } from '@/lib/epayco';
+import { restaurantCredentials } from '@/lib/payment-accounts';
+import { limitRequest } from '@/lib/rate-limit';
 
+// POST: sesión de pago de un cliente. Cobra con la cuenta de ePayco DEL RESTAURANTE: el dinero
+// llega a su cuenta, nunca a la de Brasaya. Sin cuenta conectada no hay pago en línea.
 export async function POST(request: Request) {
   try {
     const ctx = await publicCtx();
     if (!ctx.ok) return ctx.res;
     const { tenant } = ctx;
 
-    const body = await request.json();
-    const {
-      amount,
-      reference,
-      description,
-      customerEmail,
-      customerName,
-      customerPhone,
-      redirectUrl,
-    } = body;
+    // 20 sesiones de pago por IP cada 10 minutos
+    const limited = await limitRequest(request, 'pay', tenant.id, 20, 10 * 60_000);
+    if (limited) return limited;
 
-    // Validaciones
-    if (!amount || !reference || !description) {
+    const credentials = await restaurantCredentials(tenant.id);
+    if (!credentials) {
       return NextResponse.json(
-        { error: 'Faltan parámetros requeridos' },
-        { status: 400 }
+        { error: 'Este restaurante todavía no recibe pagos en línea. Haz tu pedido por WhatsApp.' },
+        { status: 409 }
       );
     }
 
-    // ePayco requiere taxBase + tax == amount exactamente
-    // Para evitar problemas de redondeo, enviamos sin IVA desglosado
+    const { amount, reference, description, customerEmail, customerName, customerPhone, redirectUrl } = await request.json();
     const amountNum = Math.round(Number(amount));
-
-    // Paso 1: Autenticarse con ePayco Apify
-    const publicKey = process.env.NEXT_PUBLIC_EPAYCO_PUBLIC_KEY!;
-    const privateKey = process.env.EPAYCO_PRIVATE_KEY!;
-    const basicAuth = Buffer.from(`${publicKey}:${privateKey}`).toString('base64');
-
-    const authResponse = await fetch('https://apify.epayco.co/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Basic ${basicAuth}`,
-      },
-      body: JSON.stringify({ public_key: publicKey }),
-    });
-
-    const authResult = await authResponse.json();
-
-    if (!authResult.token) {
-      throw new Error('No se pudo autenticar con ePayco');
+    if (!amountNum || amountNum <= 0 || !reference || !description) {
+      return NextResponse.json({ error: 'Faltan parámetros requeridos' }, { status: 400 });
     }
 
-    const bearerToken = authResult.token;
-    const isTest = process.env.NEXT_PUBLIC_EPAYCO_TEST_MODE === 'true';
     // Cada restaurante tiene su propio subdominio: se usa el origen de la petición
     const baseUrl = new URL(request.url).origin;
+    // La vuelta solo puede ir al propio sitio del restaurante (evita redirecciones abiertas). En
+    // desarrollo los modales usan una URL pública configurada, porque ePayco rechaza localhost.
+    const allowedBases = [baseUrl, process.env.NEXT_PUBLIC_BASE_URL, process.env.NEXT_PUBLIC_APP_URL].filter(Boolean);
+    const response =
+      typeof redirectUrl === 'string' && allowedBases.some((b) => redirectUrl.startsWith(`${b}/`))
+        ? redirectUrl
+        : `${baseUrl}/payment/success`;
 
-    // Paso 2: Crear sesión de pago
-    const sessionData = {
-      checkout_version: "2",
+    const session = await createCheckoutSession({
       name: tenant.name,
-      currency: "COP",
       amount: amountNum,
-      description: description,
-      lang: "ES",
-      invoice: reference,
-      country: "CO",
-      taxBase: amountNum,
-      tax: 0,
-      taxIco: 0,
-      test: isTest,
-      response: redirectUrl || `${baseUrl}/payment/success`,
-      confirmation: `${baseUrl}/api/epayco/webhook`,
-      methodsDisable: ["SP", "CASH"],
-      method: "POST",
-      billing: {
-        email: customerEmail || "cliente@restaurante.com",
-        name: customerName || "Cliente",
-        address: "Restaurante",
-        typeDoc: "CC",
-        numberDoc: "0",
-        callingCode: "+57",
-        mobilePhone: customerPhone || "3000000000",
-      },
-      extras: {
-        extra1: reference,
-        extra2: "pedido",
-        extra3: tenant.slug,
-      },
-    };
-
-    const sessionResponse = await fetch('https://apify.epayco.co/payment/session/create', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${bearerToken}`,
-      },
-      body: JSON.stringify(sessionData),
+      description: String(description).slice(0, 250),
+      invoice: String(reference).slice(0, 60),
+      responseUrl: response,
+      confirmationUrl: `${baseUrl}/api/epayco/webhook`,
+      extras: { extra1: String(reference), extra2: 'pedido', extra3: tenant.slug },
+      billing: { email: customerEmail, name: customerName, phone: customerPhone },
+      credentials,
     });
 
-    const sessionResult = await sessionResponse.json();
-
-    if (!sessionResult.success || !sessionResult.data?.sessionId) {
-      console.error('ePayco session error:', JSON.stringify(sessionResult));
-      throw new Error(sessionResult.textResponse || sessionResult.message || JSON.stringify(sessionResult));
-    }
-
-    return NextResponse.json({
-      success: true,
-      sessionId: sessionResult.data.sessionId,
-      sessionToken: sessionResult.data.token,
-      reference: reference,
-    });
+    return NextResponse.json({ success: true, sessionId: session.sessionId, sessionToken: session.token, reference });
   } catch (error: unknown) {
     console.error('Error creating ePayco payment:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-    return NextResponse.json(
-      {
-        error: 'Error al crear el enlace de pago con ePayco',
-        details: errorMessage
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Error al crear el enlace de pago con ePayco' }, { status: 500 });
   }
 }

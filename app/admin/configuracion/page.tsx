@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ImageUploader from "@/components/admin/ImageUploader";
+import PaymentAccountSettings from "@/components/admin/PaymentAccountSettings";
 
 type Settings = Record<string, string>;
 
@@ -173,7 +174,7 @@ export default function ConfiguracionPage() {
         <section className="space-y-3">
           <h2 className="font-semibold text-gray-900 dark:text-white">Alertas por WhatsApp</h2>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            Brasaya te escribe por WhatsApp cuando entra un pedido pagado y cuando tu mensualidad está por vencer.
+            Brasaya te escribe por WhatsApp cuando entra un pedido pagado en línea y cuando tu mensualidad está por vencer.
             Escribe el celular que debe recibir los avisos; déjalo vacío si no los quieres.
           </p>
           {!data.whatsapp_available && (
@@ -196,6 +197,8 @@ export default function ConfiguracionPage() {
           {saving ? "Guardando…" : "Guardar cambios"}
         </button>
       </form>
+
+      <PaymentAccountSettings />
     </div>
   );
 }
