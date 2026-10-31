@@ -6,13 +6,13 @@
 export const LEGAL = {
   brand: "Brasaya",
   /** Razón social o nombre completo de la persona natural titular del negocio */
-  legalName: "",
+  legalName: "Julián España",
   /** NIT o cédula */
   taxId: "",
   /** Dirección de notificación */
-  address: "",
+  address: "Colón, Putumayo, Colombia",
   /** Correo para consultas y reclamos de datos personales */
-  email: "",
+  email: "admin@neurai.dev",
   whatsapp: "573174503604",
   whatsappLabel: "+57 317 450 3604",
   /** Versión vigente de los documentos (se guarda al aceptar los términos en /registro) */
