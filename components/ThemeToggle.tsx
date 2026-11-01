@@ -62,7 +62,8 @@ export function FloatingThemeToggle() {
   const [needed, setNeeded] = useState(false);
 
   useEffect(() => {
-    if (pathname?.startsWith("/admin")) {
+    // El admin de cada restaurante y el panel de la plataforma tienen su propio botón
+    if (pathname?.startsWith("/admin") || pathname?.startsWith("/panel")) {
       setNeeded(false);
       return;
     }

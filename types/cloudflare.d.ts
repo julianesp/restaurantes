@@ -39,7 +39,12 @@ interface R2ObjectBody {
 interface R2Bucket {
   get(key: string): Promise<R2ObjectBody | null>;
   put(key: string, value: ArrayBuffer | ReadableStream | string, options?: { httpMetadata?: R2HTTPMetadata }): Promise<unknown>;
-  delete(key: string): Promise<void>;
+  delete(keys: string | string[]): Promise<void>;
+  list(options?: { prefix?: string; cursor?: string; limit?: number }): Promise<{
+    objects: { key: string }[];
+    truncated: boolean;
+    cursor?: string;
+  }>;
 }
 
 interface ScheduledController {

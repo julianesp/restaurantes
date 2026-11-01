@@ -1,4 +1,5 @@
 import Link from "next/link";
+import VisitTracker from "@/components/platform/VisitTracker";
 import {
   ArrowRight,
   BookOpen,
@@ -90,6 +91,7 @@ export default function PlataformaPage() {
     <div data-platform-landing className="isolate min-h-[100dvh] bg-[rgb(var(--background))]">
       {/* Cabecera fija y transparente */}
       <PlatformHeader />
+      <VisitTracker path="/" />
 
       <main>
         {/* Presentación: beneficios de Brasaya */}

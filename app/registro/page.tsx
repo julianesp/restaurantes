@@ -1,6 +1,7 @@
 import RegistroForm from "./RegistroForm";
 import { ROOT_DOMAIN } from "@/lib/tenant-host";
 import Link from "next/link";
+import VisitTracker from "@/components/platform/VisitTracker";
 import BrasayaLogo from "@/components/BrasayaLogo";
 
 export const metadata = { title: "Crea tu restaurante en Brasaya" };
@@ -11,6 +12,7 @@ export default function RegistroPage() {
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-primary-50 dark:from-gray-900 dark:to-primary-950 p-4">
+      <VisitTracker path="/registro" />
       <div className="w-full max-w-lg bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 sm:p-8">
         <Link href="/" className="mb-6 inline-flex" aria-label="Brasaya, ir al inicio">
           <BrasayaLogo size={32} />

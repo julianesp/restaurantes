@@ -213,3 +213,18 @@ export async function adminCtx(opts: { allowUnpaid?: boolean } = {}): Promise<Ad
   if (!membership) return fail("No autorizado", 403);
   return { ...base, role: membership.role, email: membership.email };
 }
+
+export interface PlatformCtx {
+  ok: true;
+  email: string;
+}
+
+/** Contexto de las rutas de la plataforma (/api/platform/manage): solo ADMIN_EMAILS. */
+export async function platformCtx(): Promise<PlatformCtx | Fail> {
+  const emails = await getVerifiedEmails();
+  if (emails.length === 0) return fail("No autenticado", 401);
+  const platform = platformAdminEmails();
+  const email = emails.find((e) => platform.includes(e));
+  if (!email) return fail("No autorizado", 403);
+  return { ok: true, email };
+}

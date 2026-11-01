@@ -15,6 +15,7 @@ const isPublicRoute = createRouteMatcher([
   "/",
   "/plataforma(.*)", // Landing de la plataforma SaaS (dominio raíz)
   "/api/platform/slug-available", // Verificación de subdominio libre
+  "/api/platform/visit", // Contador anónimo de visitas a la landing (límite por IP)
   "/sign-in(.*)",
   "/sign-up(.*)",
   "/menu(.*)",
