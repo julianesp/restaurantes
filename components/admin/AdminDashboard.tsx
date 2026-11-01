@@ -14,7 +14,7 @@ interface Summary {
 const cop = new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", maximumFractionDigits: 0 });
 
 /** Indicadores del día. La navegación vive solo en AdminNavbar (no se repite aquí). */
-export default function AdminDashboard() {
+export default function AdminDashboard({ children }: { children?: React.ReactNode }) {
   const [summary, setSummary] = useState<Summary | null>(null);
   const [pending, setPending] = useState<number | null>(null);
   const [error, setError] = useState(false);
@@ -55,6 +55,9 @@ export default function AdminDashboard() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Administración</h1>
+
+      {/* Guía de primeros pasos (componente de servidor, ver app/admin/page.tsx) */}
+      {children}
 
       {error && (
         <p role="alert" className="mb-4 text-sm text-red-600">
