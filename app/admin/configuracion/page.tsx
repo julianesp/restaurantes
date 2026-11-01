@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 import ImageUploader from "@/components/admin/ImageUploader";
 import PaymentAccountSettings from "@/components/admin/PaymentAccountSettings";
+import ScheduleEditor from "@/components/admin/ScheduleEditor";
+import TelegramConnect from "@/components/admin/TelegramConnect";
+import { CreditCard } from "lucide-react";
+import { defaultSchedule, parseSchedule } from "@/lib/hours";
 
 type Settings = Record<string, string>;
 
@@ -15,6 +19,8 @@ interface Loaded {
   settings: Settings;
   telegram_bot_available: boolean;
   whatsapp_available: boolean;
+  can_configure_payments: boolean;
+  online_payments: boolean;
 }
 
 const FIELDS: Array<{ key: string; label: string; placeholder?: string; multiline?: boolean; hint?: string }> = [
@@ -22,7 +28,6 @@ const FIELDS: Array<{ key: string; label: string; placeholder?: string; multilin
   { key: "about", label: "Sobre nosotros", multiline: true, hint: "Se muestra en la página Nosotros." },
   { key: "city", label: "Ciudad", placeholder: "Medellín, Antioquia" },
   { key: "address", label: "Dirección", placeholder: "Calle 1 # 2-3" },
-  { key: "hours", label: "Horario", placeholder: "Lun–Dom: 11:00 am – 6:00 pm" },
   { key: "phone", label: "Teléfono", placeholder: "+57 300 000 0000" },
   { key: "whatsapp", label: "WhatsApp", placeholder: "573001234567", hint: "Con indicativo, solo números." },
   { key: "instagram_url", label: "Instagram", placeholder: "https://instagram.com/mirestaurante" },
@@ -39,7 +44,6 @@ export default function ConfiguracionPage() {
   const [settings, setSettings] = useState<Settings>({});
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: "ok" | "error"; text: string } | null>(null);
-  const [testing, setTesting] = useState(false);
   const [testingWhatsapp, setTestingWhatsapp] = useState(false);
 
   useEffect(() => {
@@ -76,18 +80,6 @@ export default function ConfiguracionPage() {
     }
   };
 
-  const sendTest = async () => {
-    setTesting(true);
-    setMessage(null);
-    try {
-      const res = await fetch("/api/test-notification");
-      const body = await res.json();
-      setMessage(body.success ? { type: "ok", text: "Mensaje de prueba enviado a Telegram" } : { type: "error", text: body.error || "No se pudo enviar" });
-    } finally {
-      setTesting(false);
-    }
-  };
-
   const sendWhatsappTest = async () => {
     setTestingWhatsapp(true);
     setMessage(null);
@@ -103,6 +95,8 @@ export default function ConfiguracionPage() {
   };
 
   if (!data) return <p className="p-8 text-gray-600 dark:text-gray-300">Cargando…</p>;
+
+  const schedule = parseSchedule(settings.hours_schedule) ?? defaultSchedule();
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
@@ -154,21 +148,29 @@ export default function ConfiguracionPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-semibold text-gray-900 dark:text-white">Notificaciones por Telegram</h2>
+          <h2 className="font-semibold text-gray-900 dark:text-white">Horario de atención</h2>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            Recibe en un chat de Telegram cada pedido, reserva o error de pago. Agrega el bot de la plataforma a tu chat o grupo
-            y pega aquí el ID del chat.
+            Activa los días que abres y toca las horas para cambiarlas: desliza los números hacia arriba o hacia abajo.
           </p>
-          {!data.telegram_bot_available && (
-            <p className="text-sm text-yellow-700 dark:text-yellow-400">El bot de Telegram de la plataforma aún no está activado.</p>
+          {!settings.hours_schedule && settings.hours && (
+            <p className="text-sm text-gray-500">Horario anterior: “{settings.hours}”. Ajústalo aquí por días y guarda.</p>
           )}
-          <input value={settings.telegram_chat_id || ""} placeholder="ID del chat, p. ej. -1001234567890"
-            onChange={(e) => set("telegram_chat_id", e.target.value)} className={input} aria-label="ID del chat de Telegram" />
-          <button type="button" onClick={sendTest} disabled={testing || !settings.telegram_chat_id}
-            className="rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 text-sm disabled:opacity-50">
-            {testing ? "Enviando…" : "Enviar mensaje de prueba"}
-          </button>
-          <p className="text-xs text-gray-500">Guarda los cambios antes de enviar la prueba.</p>
+          <ScheduleEditor value={schedule} onChange={(next) => set("hours_schedule", JSON.stringify(next))} />
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="font-semibold text-gray-900 dark:text-white">Avisos de pedidos por Telegram</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            Recibe en Telegram cada pedido, reserva o problema con un pago, al instante y gratis.
+          </p>
+          <TelegramConnect
+            chatId={settings.telegram_chat_id || ""}
+            available={data.telegram_bot_available}
+            onChange={(id) => set("telegram_chat_id", id)}
+          />
+          <p className="text-xs text-gray-500">
+            ¿No usas Telegram? Más abajo puedes recibir los avisos por WhatsApp escribiendo solo tu número de celular.
+          </p>
         </section>
 
         <section className="space-y-3">
@@ -198,7 +200,22 @@ export default function ConfiguracionPage() {
         </button>
       </form>
 
-      <PaymentAccountSettings />
+      {data.can_configure_payments ? (
+        <PaymentAccountSettings />
+      ) : (
+        <section className="mt-10 rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
+          <h2 className="mb-1 flex items-center gap-2 font-semibold text-gray-900 dark:text-white">
+            <CreditCard className="h-5 w-5 text-primary-600" /> Pagos en línea (ePayco)
+          </h2>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            Este proceso lo hace el equipo de Brasaya por ti. Escríbenos y dejamos tu cuenta de ePayco conectada para que
+            tus clientes paguen en línea. Mientras tanto, los pedidos te llegan por WhatsApp.
+          </p>
+          <p className="mt-2 text-sm font-medium text-gray-800 dark:text-gray-200">
+            Estado: {data.online_payments ? "conectado" : "sin conectar"}
+          </p>
+        </section>
+      )}
     </div>
   );
 }

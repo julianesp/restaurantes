@@ -3,8 +3,9 @@ import { adminCtx, invalidateTenantCache } from "@/lib/tenant";
 import { EDITABLE_SETTINGS, validHex } from "@/lib/branding";
 import { first, run, nowIso } from "@/lib/db";
 import { normalizePhone, whatsappAvailable } from "@/lib/whatsapp";
+import { parseSchedule, summarizeSchedule } from "@/lib/hours";
 
-const MAX_LEN: Record<string, number> = { about: 2000, tagline: 160, hours: 200, address: 200 };
+const MAX_LEN: Record<string, number> = { about: 2000, tagline: 160, hours: 200, hours_schedule: 1000, address: 200 };
 const URL_KEYS = ["logo_url", "instagram_url", "facebook_url", "tiktok_url"];
 
 // GET /api/tenant/settings — configuración editable del restaurante (admin)
@@ -26,6 +27,9 @@ export async function GET() {
     settings,
     // El bot lo aporta la plataforma; el restaurante solo necesita su chat
     telegram_bot_available: !!process.env.TELEGRAM_BOT_TOKEN,
+    // Las llaves de ePayco las configura el equipo de Brasaya, no el restaurante
+    can_configure_payments: ctx.role === "platform",
+    online_payments: ctx.tenant.settings?.online_payments === true,
     // El número de WhatsApp que envía los avisos también lo aporta la plataforma
     whatsapp_available: whatsappAvailable(),
   });
@@ -67,6 +71,9 @@ export async function PATCH(request: Request) {
     if (key === "telegram_chat_id" && value && !/^-?\d{5,20}$/.test(value)) {
       return NextResponse.json({ error: "El ID de chat de Telegram es un número (puede empezar con -)" }, { status: 400 });
     }
+    if (key === "hours_schedule" && value && !parseSchedule(value)) {
+      return NextResponse.json({ error: "Horario no válido" }, { status: 400 });
+    }
     if (value.length > (MAX_LEN[key] ?? 300)) {
       return NextResponse.json({ error: `${key} es demasiado largo` }, { status: 400 });
     }
@@ -74,6 +81,10 @@ export async function PATCH(request: Request) {
     if (value) next[key] = value;
     else delete next[key];
   }
+
+  // El horario por días manda: el texto de una línea (settings.hours) se genera a partir de él
+  const schedule = parseSchedule(next.hours_schedule);
+  if (schedule) next.hours = summarizeSchedule(schedule);
 
   const name = typeof body.name === "string" ? body.name.trim() : null;
   if (name !== null && (name.length < 2 || name.length > 60)) {

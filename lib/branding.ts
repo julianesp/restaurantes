@@ -25,7 +25,7 @@ export interface Branding {
 
 /** Claves de `restaurants.settings` que el restaurante puede editar. */
 export const EDITABLE_SETTINGS = [
-  "tagline", "about", "city", "address", "hours", "phone", "whatsapp",
+  "tagline", "about", "city", "address", "hours", "hours_schedule", "phone", "whatsapp",
   "logo_url", "primary_color", "instagram_url", "facebook_url", "tiktok_url",
   "telegram_chat_id",
   // Número que recibe los avisos de Brasaya por WhatsApp (pedidos, pagos). Llenarlo = consentimiento.

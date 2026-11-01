@@ -29,6 +29,11 @@ export default defineConfig({
       EPAYCO_PRIVATE_KEY: bindings.secret(),
       // Cifra las llaves de ePayco de cada restaurante y protege PIN y sesiones (lib/crypto.ts)
       APP_SECRET: bindings.secret(),
+      // Bot de Telegram de la plataforma (avisos de pedidos). Sin declararlo aquí, `pnpm dev` no lo
+      // pasa al Worker aunque esté en .env.local y el panel dice "el bot aún no está activado".
+      TELEGRAM_BOT_TOKEN: bindings.secret(),
+      // Chat de respaldo del restaurante de demostración (lib/notificationService.ts)
+      TELEGRAM_CHAT_ID: bindings.secret(),
     },
     triggers: [
       // Lunes 05:00 UTC: publica el plato ganador de la semana anterior de cada restaurante
