@@ -36,7 +36,6 @@ export const EDITABLE_SETTINGS = [
 const LEGACY_DEFAULTS: Partial<Branding> = {
   // Valores de ejemplo: cada restaurante pone los suyos en /admin/configuracion
   tagline: "Comida deliciosa, ingredientes frescos y atención de primera.",
-  city: "Bogotá, Colombia",
   address: "Carrera 7 # 32-16, Centro",
   hours: "Lun–Dom: 11:00 am – 6:00 pm",
   phone: "+57 300 000 0000",

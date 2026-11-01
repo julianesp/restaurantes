@@ -11,7 +11,7 @@ import CartButton from "@/components/CartButton";
 import { FloatingThemeToggle } from "@/components/ThemeToggle";
 import ThemeScheduler from "@/components/ThemeScheduler";
 import { colombiaPeriod, themeStorageKey } from "@/lib/theme-schedule";
-import { getTenant } from "@/lib/tenant";
+import { getTenant, isPlatformHost } from "@/lib/tenant";
 import { brandingFor, themeCss } from "@/lib/branding";
 import { TenantProvider } from "@/context/TenantContext";
 
@@ -41,7 +41,8 @@ const icons: Metadata["icons"] = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const tenant = await getTenant();
+  // En el dominio raíz getTenant() cae en el restaurante por defecto: ahí van los metadatos de Brasaya
+  const tenant = (await isPlatformHost()) ? null : await getTenant();
 
   // Dominio raíz: metadatos de la plataforma (la landing define su propio título)
   if (!tenant) {
@@ -58,7 +59,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const description =
     tagline || `Menú, pedidos y reservas en línea de ${tenant.name}${city ? ` en ${city}` : ""}.`;
   return {
-    title: city ? `${tenant.name} - ${city}` : tenant.name,
+    title: tenant.name,
     description,
     openGraph: { title: tenant.name, description, type: "website", locale: "es_CO" },
     icons,

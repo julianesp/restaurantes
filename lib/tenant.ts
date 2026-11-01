@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { first } from "@/lib/db";
-import { TENANT_SLUG_HEADER, TENANT_HOST_HEADER } from "@/lib/tenant-host";
+import { TENANT_SLUG_HEADER, TENANT_HOST_HEADER, parseHost as parseHostRaw } from "@/lib/tenant-host";
 import { billingState } from "@/lib/billing";
 
 // ---------------------------------------------------------------------------
@@ -93,6 +93,15 @@ export async function getTenant(): Promise<Tenant | null> {
     tenant = await lookup("slug", DEFAULT_TENANT_SLUG);
   }
   return tenant;
+}
+
+/**
+ * ¿La petición llega al dominio raíz de la plataforma (brasaya.com / www)? Ahí getTenant() devuelve
+ * el restaurante por defecto (DEFAULT_TENANT_SLUG), pero el login y /admin son los de Brasaya.
+ */
+export async function isPlatformHost(): Promise<boolean> {
+  const h = await headers();
+  return parseHostRaw(h.get("host")).kind === "platform";
 }
 
 /**
