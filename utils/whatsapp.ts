@@ -30,13 +30,15 @@ export interface WhatsAppOrder {
   service?: string;
   address?: string;
   notes?: string;
+  /** Cómo paga el cliente (lib/payment-options.ts paymentNote) */
+  payment?: string;
   items: Array<{ name: string; quantity: number; price: number }>;
   total: number;
 }
 
 const cop = (n: number) => `$${Math.round(n).toLocaleString("es-CO")}`;
 
-/** Pedido completo por WhatsApp (restaurantes sin pagos en línea: se paga al recibir). */
+/** Pedido completo por WhatsApp (pago al recibir o por Nequi directo). */
 export const createOrderMessage = (number: string, order: WhatsAppOrder) => {
   const lines = [
     "🛒 ¡Hola! Quiero hacer este pedido:",
@@ -50,6 +52,7 @@ export const createOrderMessage = (number: string, order: WhatsAppOrder) => {
   if (order.service) lines.push(`🚚 ${order.service}`);
   if (order.address) lines.push(`📍 ${order.address}`);
   if (order.notes) lines.push(`📝 ${order.notes}`);
+  if (order.payment) lines.push(`💳 ${order.payment}`);
   return link(number, lines.join("\n"));
 };
 

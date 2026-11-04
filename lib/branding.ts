@@ -1,4 +1,5 @@
 import type { Tenant } from "@/lib/tenant";
+import { normalizeNequi } from "@/lib/nequi";
 
 /** Marca y datos de contacto públicos de un restaurante. */
 export interface Branding {
@@ -21,6 +22,10 @@ export interface Branding {
   isDemo: boolean;
   /** El restaurante conectó su cuenta de ePayco (lib/payment-accounts.ts). Si no, se pide por WhatsApp. */
   onlinePayments: boolean;
+  /** Nequi del restaurante para transferencias directas (10 dígitos), o "" si no lo dio (lib/nequi.ts). */
+  nequi: string;
+  /** Titular de ese Nequi, para que el cliente confirme a quién le paga. */
+  nequiHolder: string;
 }
 
 /** Claves de `restaurants.settings` que el restaurante puede editar. */
@@ -30,6 +35,8 @@ export const EDITABLE_SETTINGS = [
   "telegram_chat_id",
   // Número que recibe los avisos de Brasaya por WhatsApp (pedidos, pagos). Llenarlo = consentimiento.
   "whatsapp_alerts",
+  // Nequi directo: el cliente transfiere y manda el comprobante por WhatsApp
+  "nequi_number", "nequi_holder",
 ] as const;
 
 // El restaurante original conserva los valores que antes estaban fijos en el código.
@@ -67,6 +74,8 @@ export function brandingFor(tenant: Tenant): Branding {
     tiktokUrl: pick("tiktok_url"),
     isDemo: s.demo === true,
     onlinePayments: s.online_payments === true,
+    nequi: normalizeNequi(pick("nequi_number")) ?? "",
+    nequiHolder: pick("nequi_holder"),
   };
 }
 

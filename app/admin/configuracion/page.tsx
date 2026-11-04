@@ -191,6 +191,32 @@ export default function ConfiguracionPage() {
           <p className="text-xs text-gray-500">Guarda los cambios antes de enviar la prueba.</p>
         </section>
 
+        <section className="space-y-3">
+          <h2 className="font-semibold text-gray-900 dark:text-white">Pagos por Nequi</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            Escribe tu número de Nequi y tus clientes podrán elegir <strong>Transferencia a Nequi</strong> al pedir: ven tu
+            número y el valor, te transfieren y el pedido te llega por WhatsApp para que revises el comprobante antes de
+            prepararlo. No tiene comisión. Déjalo vacío si no quieres ofrecerlo.
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label htmlFor="nequi_number" className="block text-sm font-medium mb-1 text-gray-800 dark:text-gray-200">Número de Nequi</label>
+              <input id="nequi_number" value={settings.nequi_number || ""} placeholder="3001234567" inputMode="tel"
+                onChange={(e) => set("nequi_number", e.target.value)} className={input} />
+            </div>
+            <div>
+              <label htmlFor="nequi_holder" className="block text-sm font-medium mb-1 text-gray-800 dark:text-gray-200">A nombre de</label>
+              <input id="nequi_holder" value={settings.nequi_holder || ""} placeholder="Nombre del titular" maxLength={60}
+                onChange={(e) => set("nequi_holder", e.target.value)} className={input} />
+            </div>
+          </div>
+          {!settings.whatsapp && (
+            <p className="text-sm text-yellow-700 dark:text-yellow-400">
+              Llena también tu WhatsApp (arriba): ahí te llegan los pedidos pagados por Nequi.
+            </p>
+          )}
+        </section>
+
         {message && (
           <p role="status" className={message.type === "ok" ? "text-green-700 text-sm" : "text-red-600 text-sm"}>{message.text}</p>
         )}
@@ -203,13 +229,12 @@ export default function ConfiguracionPage() {
       {data.can_configure_payments ? (
         <PaymentAccountSettings />
       ) : (
-        <section className="mt-10 rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
+        <section id="pagos" className="mt-10 rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-800">
           <h2 className="mb-1 flex items-center gap-2 font-semibold text-gray-900 dark:text-white">
             <CreditCard className="h-5 w-5 text-primary-600" /> Pagos en línea (ePayco)
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            Este proceso lo hace el equipo de Brasaya por ti. Escríbenos y dejamos tu cuenta de ePayco conectada para que
-            tus clientes paguen en línea. Mientras tanto, los pedidos te llegan por WhatsApp.
+            Solo el dueño del restaurante puede conectar o cambiar la cuenta de ePayco donde llegan los pagos.
           </p>
           <p className="mt-2 text-sm font-medium text-gray-800 dark:text-gray-200">
             Estado: {data.online_payments ? "conectado" : "sin conectar"}

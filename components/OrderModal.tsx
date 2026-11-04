@@ -24,6 +24,8 @@ import {
   generatePaymentReference,
   formatCOP,
 } from "../utils/epayco";
+import PaymentChoice from "@/components/PaymentChoice";
+import { paymentNote, paymentOptions, type PaymentOptionId } from "@/lib/payment-options";
 import Swal from "sweetalert2";
 import { useBranding } from "@/context/TenantContext";
 import { createOrderMessage } from "../utils/whatsapp";
@@ -68,8 +70,12 @@ const CATEGORY_META: Record<string, { icon: typeof Coffee; color: string }> = {
 };
 
 const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
-  // Sin cuenta de ePayco conectada, el pedido se envía por WhatsApp y se paga al recibir
-  const { onlinePayments, whatsapp } = useBranding();
+  // Pago en línea (ePayco del restaurante), transferencia a Nequi o pago al recibir: los dos
+  // últimos envían el pedido por WhatsApp
+  const branding = useBranding();
+  const { whatsapp, nequi } = branding;
+  const paymentChoices = paymentOptions(branding);
+  const [payment, setPayment] = useState<PaymentOptionId>(paymentChoices[0].id);
   const [step, setStep] = useState<"menu" | "form">("menu");
   const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
   const [loadingMenu, setLoadingMenu] = useState(true);
@@ -264,7 +270,7 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
       return;
     }
 
-    if (!onlinePayments) {
+    if (payment !== "online") {
       if (!whatsapp) {
         await Swal.fire({ icon: "info", title: "Pedidos por teléfono", text: "Este restaurante aún no recibe pedidos en línea. Comunícate directamente con ellos.", confirmButtonColor: "rgb(var(--primary-500))" });
         return;
@@ -274,6 +280,7 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
         phone: formData.telefono,
         service: formData.tipoServicio === "domicilio" ? "Domicilio" : "Recoger en el restaurante",
         address: formData.tipoServicio === "domicilio" ? `${formData.direccion}, ${formData.barrio}` : undefined,
+        payment: paymentNote(payment, nequi),
         items: cart.map((item) => ({ name: item.name, quantity: item.quantity, price: parseFloat(item.price.replace(/[$.,]/g, "")) })),
         total: getCartTotal(),
       });
@@ -801,23 +808,29 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
               </>
             )}
 
+            {/* Forma de pago (lib/payment-options.ts) */}
+            <div>
+              <p className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Forma de pago</p>
+              <PaymentChoice options={paymentChoices} value={payment} onChange={setPayment} total={getCartTotal()} />
+            </div>
+
             {/* Info importante */}
             <div className="bg-secondary-50 dark:bg-secondary-900/20 border border-secondary-200 dark:border-secondary-800 rounded-lg p-4">
               <div className="text-sm text-gray-700 dark:text-gray-300">
                 <p className="font-semibold text-secondary-700 dark:text-secondary-400 mb-2">
                   Información importante:
                 </p>
-                {onlinePayments ? (
+                {payment === "online" ? (
                   <ul className="space-y-1 list-disc list-inside">
                     <li>Pago 100% seguro a través de ePayco</li>
-                    <li>Puedes pagar con PSE o tarjetas débito/crédito</li>
+                    <li>Puedes pagar con tarjeta débito/crédito, PSE o Nequi</li>
                     <li>Te confirmaremos tu pedido por WhatsApp después del pago</li>
                     <li>El costo de domicilio puede variar según tu ubicación</li>
                   </ul>
                 ) : (
                   <ul className="space-y-1 list-disc list-inside">
                     <li>Tu pedido se envía al WhatsApp del restaurante</li>
-                    <li>Pagas al recibir (o como acuerdes con el restaurante)</li>
+                    <li>{payment === "nequi" ? "Envía el comprobante de Nequi en ese chat" : "Pagas al recibir (o como acuerdes con el restaurante)"}</li>
                     <li>El costo de domicilio puede variar según tu ubicación</li>
                   </ul>
                 )}
@@ -844,7 +857,7 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
                     Procesando...
                   </>
                 ) : (
-                  <>{onlinePayments ? "Pagar" : "Pedir por WhatsApp"} {formatCOP(getCartTotal())}</>
+                  <>{payment === "online" ? "Pagar" : "Pedir por WhatsApp"} {formatCOP(getCartTotal())}</>
                 )}
               </button>
             </div>

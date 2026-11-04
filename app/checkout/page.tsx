@@ -9,9 +9,9 @@ import { createPaymentLink, generatePaymentReference } from "../../utils/epayco"
 import { createOrderMessage } from "../../utils/whatsapp";
 import { useBranding } from "@/context/TenantContext";
 import Link from "next/link";
+import PaymentChoice from "@/components/PaymentChoice";
+import { paymentNote, paymentOptions, type PaymentOptionId } from "@/lib/payment-options";
 import {
-  CreditCard,
-  Building2,
   User,
   Mail,
   Phone,
@@ -21,34 +21,15 @@ import {
   CheckCircle,
 } from "lucide-react";
 
-interface PaymentMethod {
-  id: string;
-  name: string;
-  icon: React.ElementType;
-  description: string;
-}
-
-const paymentMethods: PaymentMethod[] = [
-  {
-    id: "credit-card",
-    name: "Tarjeta de Crédito/Débito",
-    icon: CreditCard,
-    description: "Visa, Mastercard, American Express",
-  },
-  {
-    id: "transfer",
-    name: "Transferencia Bancaria",
-    icon: Building2,
-    description: "PSE - Pago Seguro en Línea",
-  },
-];
-
 export default function CheckoutPage() {
   const router = useRouter();
   const { cart, getCartTotal, clearCart } = useCart();
-  // Sin cuenta de ePayco conectada, el pedido se envía por WhatsApp y se paga al recibir
-  const { onlinePayments, whatsapp } = useBranding();
-  const [selectedPayment, setSelectedPayment] = useState<string>("credit-card");
+  // Pago en línea (ePayco del restaurante), transferencia a Nequi o pago al recibir: los dos
+  // últimos envían el pedido por WhatsApp
+  const branding = useBranding();
+  const { whatsapp, nequi } = branding;
+  const options = paymentOptions(branding);
+  const [selectedPayment, setSelectedPayment] = useState<PaymentOptionId>(options[0].id);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -90,7 +71,7 @@ export default function CheckoutPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!onlinePayments) {
+    if (selectedPayment !== "online") {
       if (!formData.name.trim() || !formData.phone.trim() || !formData.address.trim()) {
         alert("Escribe tu nombre, teléfono y dirección para enviar el pedido.");
         return;
@@ -105,6 +86,7 @@ export default function CheckoutPage() {
         service: "Domicilio",
         address: [formData.address, formData.city].filter((v) => v.trim()).join(", "),
         notes: formData.notes.trim() || undefined,
+        payment: paymentNote(selectedPayment, nequi),
         items: [
           ...cart.map((item) => ({ name: item.name, quantity: item.quantity, price: parseFloat(String(item.price).replace(/[$.,]/g, "")) })),
           { name: "Envío", quantity: 1, price: deliveryCost },
@@ -341,69 +323,13 @@ export default function CheckoutPage() {
                 </form>
               </div>
 
-              {/* Método de Pago (o pago al recibir si el restaurante no conectó ePayco) */}
-              {onlinePayments ? (
+              {/* Forma de pago (lib/payment-options.ts) */}
               <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                  Método de Pago
+                  Forma de pago
                 </h2>
-                <div className="space-y-3">
-                  {paymentMethods.map((method) => {
-                    const Icon = method.icon;
-                    return (
-                      <button
-                        key={method.id}
-                        type="button"
-                        onClick={() => setSelectedPayment(method.id)}
-                        className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${
-                          selectedPayment === method.id
-                            ? "border-primary-500 bg-primary-50 dark:bg-primary-900/20"
-                            : "border-gray-200 dark:border-gray-700 hover:border-primary-300"
-                        }`}
-                      >
-                        <div
-                          className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                            selectedPayment === method.id
-                              ? "bg-primary-500 text-white"
-                              : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
-                          }`}
-                        >
-                          <Icon className="w-6 h-6" />
-                        </div>
-                        <div className="flex-1 text-left">
-                          <p className="font-bold text-gray-900 dark:text-white">
-                            {method.name}
-                          </p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {method.description}
-                          </p>
-                        </div>
-                        <div
-                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                            selectedPayment === method.id
-                              ? "border-primary-500 bg-primary-500"
-                              : "border-gray-300 dark:border-gray-600"
-                          }`}
-                        >
-                          {selectedPayment === method.id && (
-                            <div className="w-3 h-3 bg-white rounded-full"></div>
-                          )}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
+                <PaymentChoice options={options} value={selectedPayment} onChange={setSelectedPayment} total={total} />
               </div>
-              ) : (
-                <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                    Pago al recibir
-                  </h2>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    Tu pedido se envía al WhatsApp del restaurante y pagas al recibirlo (o como acuerdes con ellos).
-                  </p>
-                </div>
-              )}
             </div>
 
             {/* Resumen del Pedido */}
@@ -454,7 +380,7 @@ export default function CheckoutPage() {
                   disabled={isProcessing}
                   className="w-full mt-6 bg-primary-500 hover:bg-primary-600 disabled:bg-gray-400 text-white px-6 py-4 rounded-lg font-bold text-lg transition-all shadow-lg disabled:cursor-not-allowed"
                 >
-                  {isProcessing ? "Procesando..." : onlinePayments ? "Confirmar Pedido" : "Enviar pedido por WhatsApp"}
+                  {isProcessing ? "Procesando..." : selectedPayment === "online" ? "Pagar en línea" : "Enviar pedido por WhatsApp"}
                 </button>
 
                 <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-4">

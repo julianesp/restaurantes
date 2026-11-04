@@ -72,7 +72,7 @@ export default function PaymentAccountSettings() {
   };
 
   return (
-    <section className="mt-10 space-y-3 border-t border-gray-200 dark:border-gray-700 pt-8">
+    <section id="pagos" className="mt-10 space-y-3 border-t border-gray-200 dark:border-gray-700 pt-8">
       <h2 className="flex items-center gap-2 font-semibold text-gray-900 dark:text-white">
         <CreditCard className="w-5 h-5" /> Pagos en línea (ePayco)
       </h2>
@@ -119,6 +119,10 @@ export default function PaymentAccountSettings() {
             <li>Ve a <strong>Integraciones → Llaves API</strong> y copia la <code>PUBLIC_KEY</code> y la <code>PRIVATE_KEY</code>.</li>
             <li>Pégalas aquí. Las probamos con ePayco antes de guardarlas y la privada se guarda cifrada.</li>
           </ol>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            Para que tus clientes paguen con <strong>Nequi</strong> dentro de ePayco, revisa en tu panel de ePayco que Nequi
+            esté activo entre tus medios de pago (si no aparece, pídeselo al soporte de ePayco).
+          </p>
           <div>
             <label htmlFor="epayco-public" className="block text-sm font-medium mb-1 text-gray-800 dark:text-gray-200">PUBLIC_KEY</label>
             <input id="epayco-public" value={publicKey} onChange={(e) => setPublicKey(e.target.value)} required autoComplete="off" spellCheck={false} className={input} />

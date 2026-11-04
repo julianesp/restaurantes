@@ -16,6 +16,7 @@ export default function AdminThemeToggle({ className = "" }: { className?: strin
   return (
     <button
       type="button"
+      data-theme-toggle
       onClick={() => {
             setTheme(isDark ? "light" : "dark");
       }}

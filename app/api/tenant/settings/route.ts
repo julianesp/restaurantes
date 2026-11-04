@@ -4,8 +4,9 @@ import { EDITABLE_SETTINGS, validHex } from "@/lib/branding";
 import { first, run, nowIso } from "@/lib/db";
 import { normalizePhone, whatsappAvailable } from "@/lib/whatsapp";
 import { parseSchedule, summarizeSchedule } from "@/lib/hours";
+import { normalizeNequi } from "@/lib/nequi";
 
-const MAX_LEN: Record<string, number> = { about: 2000, tagline: 160, hours: 200, hours_schedule: 1000, address: 200 };
+const MAX_LEN: Record<string, number> = { about: 2000, tagline: 160, hours: 200, hours_schedule: 1000, address: 200, nequi_holder: 60 };
 const URL_KEYS = ["logo_url", "instagram_url", "facebook_url", "tiktok_url"];
 
 // GET /api/tenant/settings — configuración editable del restaurante (admin)
@@ -27,8 +28,8 @@ export async function GET() {
     settings,
     // El bot lo aporta la plataforma; el restaurante solo necesita su chat
     telegram_bot_available: !!process.env.TELEGRAM_BOT_TOKEN,
-    // Las llaves de ePayco las configura el equipo de Brasaya, no el restaurante
-    can_configure_payments: ctx.role === "platform",
+    // Las llaves de ePayco las conecta el dueño del restaurante (o el equipo de Brasaya por él)
+    can_configure_payments: ctx.role === "owner" || ctx.role === "platform",
     online_payments: ctx.tenant.settings?.online_payments === true,
     // El número de WhatsApp que envía los avisos también lo aporta la plataforma
     whatsapp_available: whatsappAvailable(),
@@ -53,7 +54,7 @@ export async function PATCH(request: Request) {
     if (raw !== null && typeof raw !== "string") {
       return NextResponse.json({ error: `Valor no válido para ${key}` }, { status: 400 });
     }
-    const value = (raw ?? "").trim();
+    let value = (raw ?? "").trim();
 
     if (key === "primary_color" && value && !validHex(value)) {
       return NextResponse.json({ error: "El color debe tener el formato #RRGGBB" }, { status: 400 });
@@ -70,6 +71,11 @@ export async function PATCH(request: Request) {
     }
     if (key === "telegram_chat_id" && value && !/^-?\d{5,20}$/.test(value)) {
       return NextResponse.json({ error: "El ID de chat de Telegram es un número (puede empezar con -)" }, { status: 400 });
+    }
+    if (key === "nequi_number" && value) {
+      const nequi = normalizeNequi(value);
+      if (!nequi) return NextResponse.json({ error: "Nequi: celular colombiano de 10 dígitos, p. ej. 3001234567" }, { status: 400 });
+      value = nequi;
     }
     if (key === "hours_schedule" && value && !parseSchedule(value)) {
       return NextResponse.json({ error: "Horario no válido" }, { status: 400 });

@@ -2,7 +2,6 @@ import Link from "next/link";
 import { CheckCircle2, Circle, ArrowRight } from "lucide-react";
 import { first } from "@/lib/db";
 import type { Tenant } from "@/lib/tenant";
-import { LEGAL } from "@/lib/legal";
 
 interface Step {
   title: string;
@@ -65,10 +64,10 @@ export default async function OnboardingChecklist({ tenant }: { tenant: Tenant }
     },
     {
       title: "Recibe pagos en línea",
-      description: "El equipo de Brasaya conecta tu cuenta de ePayco por ti. Mientras tanto, los pedidos llegan a tu WhatsApp.",
-      href: `https://wa.me/${LEGAL.whatsapp}?text=${encodeURIComponent("Hola, quiero activar los pagos en línea (ePayco) en mi restaurante de Brasaya.")}`,
-      cta: "Pedir la conexión por WhatsApp",
-      done: s.online_payments === true,
+      description: "Conecta tu propia cuenta de ePayco (tarjeta, PSE y Nequi) o escribe tu número de Nequi para recibir transferencias. Mientras tanto, los pedidos llegan a tu WhatsApp.",
+      href: "/admin/configuracion#pagos",
+      cta: "Conectar pagos",
+      done: s.online_payments === true || filled(s.nequi_number),
       optional: true,
     },
   ];

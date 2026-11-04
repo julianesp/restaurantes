@@ -35,7 +35,7 @@ export default function ScheduleEditor({ value, onChange }: { value: Schedule; o
                 }}
                 className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${d.open ? "bg-primary-600" : "bg-gray-300 dark:bg-gray-600"}`}
               >
-                <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-[#fafaf9] shadow transition-transform duration-200 ease-out ${d.open ? "translate-x-5" : "translate-x-0.5"}`} />
+                <span className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-[#fafaf9] shadow transition-transform duration-200 ease-out ${d.open ? "translate-x-5" : "translate-x-0"}`} />
               </button>
               {d.open ? (
                 <button
