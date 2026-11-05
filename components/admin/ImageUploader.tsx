@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Camera, Link as LinkIcon, X, Loader2 } from "lucide-react";
+import { uploadImage } from "@/lib/image-upload";
 
 interface ImageUploaderProps {
   value: string;
@@ -18,16 +19,14 @@ export default function ImageUploader({ value, onChange }: ImageUploaderProps) {
     setError("");
     setUploading(true);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/upload-image", { method: "POST", body: fd });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Error al subir");
-      onChange(data.url);
-    } catch (e: any) {
-      setError(e.message);
+      // Se reduce en el navegador antes de subir (lib/image-upload.ts)
+      onChange(await uploadImage(file));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "No se pudo subir la imagen");
     } finally {
       setUploading(false);
+      // Permite volver a elegir el mismo archivo tras un error
+      if (inputRef.current) inputRef.current.value = "";
     }
   };
 
@@ -93,7 +92,7 @@ export default function ImageUploader({ value, onChange }: ImageUploaderProps) {
               <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Toca para tomar foto o elegir del dispositivo
               </p>
-              <p className="text-xs text-gray-400">JPG, PNG, WebP · máx. 5MB</p>
+              <p className="text-xs text-gray-400">JPG, PNG o WebP · las fotos grandes se reducen solas</p>
             </div>
           )}
         </div>

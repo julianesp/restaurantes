@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { uploadImage } from "@/lib/image-upload";
 import {
   Plus,
   Edit,
@@ -369,73 +370,32 @@ export default function PlatosDestacadosPage() {
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const input = e.target;
+    const file = input.files?.[0];
     if (!file) return;
 
-    // Validar tamaño del archivo (5MB)
-    const maxSize = 5 * 1024 * 1024;
-    if (file.size > maxSize) {
-      Swal.fire({
-        icon: "error",
-        title: "Archivo muy grande",
-        text: "La imagen supera el tamaño máximo de 5MB",
-        confirmButtonColor: "#3b82f6",
-      });
-      return;
-    }
-
-    // Validar tipo de archivo
-    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
-    if (!allowedTypes.includes(file.type)) {
-      Swal.fire({
-        icon: "error",
-        title: "Tipo de archivo no permitido",
-        text: "Solo se aceptan imágenes (JPEG, PNG, WebP, GIF)",
-        confirmButtonColor: "#3b82f6",
-      });
-      return;
-    }
-
     setUploading(true);
-
     try {
-      const uploadFormData = new FormData();
-      uploadFormData.append("file", file);
-
-      const response = await fetch("/api/upload-image", {
-        method: "POST",
-        body: uploadFormData,
+      // Se reduce en el navegador antes de subir (lib/image-upload.ts)
+      const url = await uploadImage(file);
+      setFormData(prev => ({ ...prev, image_url: url }));
+      Swal.fire({
+        icon: "success",
+        title: "¡Imagen subida!",
+        text: "La imagen se subió exitosamente",
+        timer: 2000,
+        showConfirmButton: false,
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        setFormData(prev => ({ ...prev, image_url: data.url }));
-        Swal.fire({
-          icon: "success",
-          title: "¡Imagen subida!",
-          text: "La imagen se subió exitosamente",
-          timer: 2000,
-          showConfirmButton: false,
-        });
-      } else {
-        const errorData = await response.json();
-        Swal.fire({
-          icon: "error",
-          title: "Error al subir imagen",
-          text: errorData.error || "Ocurrió un error desconocido",
-          confirmButtonColor: "#3b82f6",
-        });
-      }
     } catch (error) {
-      console.error("Error:", error);
       Swal.fire({
         icon: "error",
-        title: "Error",
-        text: "Error al subir la imagen",
+        title: "Error al subir imagen",
+        text: error instanceof Error ? error.message : "No se pudo subir la imagen",
         confirmButtonColor: "#3b82f6",
       });
     } finally {
       setUploading(false);
+      input.value = "";
     }
   };
 
