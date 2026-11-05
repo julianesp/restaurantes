@@ -2,7 +2,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import AdminShell from "@/components/admin/AdminShell";
 import { getTenant, getTenantRole, getVerifiedEmails, isPlatformAdmin, isPlatformHost } from "@/lib/tenant";
-import { tenantUrl } from "@/lib/tenant-host";
+import { platformUrl, tenantUrl } from "@/lib/tenant-host";
 import { first } from "@/lib/db";
 import { billingState } from "@/lib/billing";
 
@@ -40,6 +40,10 @@ export default async function AdminLayout({
   const role = await getTenantRole(tenant);
   if (!role) {
     redirect("/?unauthorized=true");
+  }
+  // La cuenta de Brasaya no usa las opciones del restaurante: lo analiza desde su ficha en /panel
+  if (role.role === "platform") {
+    redirect(platformUrl(`/panel/restaurantes/${tenant.id}`));
   }
 
   // Serializar solo los datos necesarios para el Client Component

@@ -4,6 +4,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { first, batch, newId, nowIso, isUniqueViolation } from "@/lib/db";
 import { RESERVED_SLUGS, SLUG_REGEX, tenantUrl } from "@/lib/tenant-host";
 import { LEGAL } from "@/lib/legal";
+import { isPlatformAdminEmail } from "@/lib/tenant";
 
 // Categorías iniciales para que el menú no empiece vacío
 const DEFAULT_CATEGORIES = [
@@ -23,6 +24,14 @@ export async function POST(request: Request) {
     ?.emailAddress.toLowerCase();
   if (!email) {
     return NextResponse.json({ error: "Necesitas un correo verificado para crear un restaurante" }, { status: 403 });
+  }
+
+  // La cuenta de Brasaya analiza los restaurantes desde /panel: no es dueña de ninguno
+  if (isPlatformAdminEmail(email)) {
+    return NextResponse.json(
+      { error: "Esta es la cuenta de administración de Brasaya: no puede registrar restaurantes. Usa el panel de la plataforma." },
+      { status: 403 }
+    );
   }
 
   const body = await request.json().catch(() => ({}));

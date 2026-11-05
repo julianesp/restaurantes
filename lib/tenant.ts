@@ -123,6 +123,11 @@ function platformAdminEmails(): string[] {
     .filter(Boolean);
 }
 
+/** ¿Es un correo de administración de Brasaya? Esas cuentas analizan restaurantes, no los administran. */
+export function isPlatformAdminEmail(email: string): boolean {
+  return platformAdminEmails().includes(email.trim().toLowerCase());
+}
+
 export type TenantRole = "owner" | "admin" | "platform";
 
 /** Correos verificados del usuario autenticado (en minúsculas). */

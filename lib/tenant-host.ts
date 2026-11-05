@@ -54,6 +54,12 @@ export function parseHost(rawHost: string | null): HostKind {
   return { kind: "custom", host };
 }
 
+/** URL del dominio raíz de la plataforma (landing y /panel), según el entorno. */
+export function platformUrl(path = "/"): string {
+  if (ROOT_DOMAIN) return `https://${ROOT_DOMAIN}${path}`;
+  return `http://localhost:3000${path}`;
+}
+
 /** URL pública de un restaurante, según el entorno. */
 export function tenantUrl(slug: string, path = "/"): string {
   if (ROOT_DOMAIN) return `https://${slug}.${ROOT_DOMAIN}${path}`;

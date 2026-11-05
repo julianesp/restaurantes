@@ -1,4 +1,5 @@
-import { ExternalLink, Settings, Store } from "lucide-react";
+import Link from "next/link";
+import { BarChart3, ExternalLink, Store } from "lucide-react";
 import RestaurantManager from "@/components/platform/RestaurantManager";
 import { requirePlatformAdmin, loadRestaurants, money } from "@/lib/platform-stats";
 import { tenantUrl } from "@/lib/tenant-host";
@@ -29,7 +30,7 @@ export default async function RestaurantesPage({ searchParams }: { searchParams:
 
   return (
     <>
-      <PageTitle icon={Store} title="Restaurantes" subtitle="Todos los restaurantes registrados, su uso del sistema y sus opciones." />
+      <PageTitle icon={Store} title="Restaurantes" subtitle="Todos los restaurantes registrados. Toque un nombre para ver su ficha de análisis." />
       <div className="mb-3 flex justify-end"><ExportButton tipo="restaurantes" /></div>
       <SearchForm
         q={q}
@@ -60,7 +61,7 @@ export default async function RestaurantesPage({ searchParams }: { searchParams:
               {rows.map((r) => (
                 <tr key={r.id}>
                   <td className={td}>
-                    <p className="font-medium text-stone-900 dark:text-white">{r.name}</p>
+                    <Link href={`/panel/restaurantes/${r.id}`} className="font-medium text-stone-900 hover:text-primary-600 hover:underline dark:text-white">{r.name}</Link>
                     <p className="text-xs text-stone-500">{r.custom_domain || r.slug}</p>
                   </td>
                   <td className={td}>{r.owner_email}</td>
@@ -83,9 +84,9 @@ export default async function RestaurantesPage({ searchParams }: { searchParams:
                       <a href={tenantUrl(r.slug)} target="_blank" rel="noreferrer" className={iconLink} aria-label={`Ver el sitio de ${r.name}`} title="Ver sitio">
                         <ExternalLink className="h-4 w-4" />
                       </a>
-                      <a href={tenantUrl(r.slug, "/admin")} target="_blank" rel="noreferrer" className={iconLink} aria-label={`Entrar a la administración de ${r.name}`} title="Administrar">
-                        <Settings className="h-4 w-4" />
-                      </a>
+                      <Link href={`/panel/restaurantes/${r.id}`} className={iconLink} aria-label={`Analizar ${r.name}`} title="Analizar">
+                        <BarChart3 className="h-4 w-4" />
+                      </Link>
                       <RestaurantManager
                         restaurant={{ id: r.id, slug: r.slug, name: r.name, plan: r.plan, status: r.status }}
                         accessUntil={formatDay(r.billing.accessUntil)}

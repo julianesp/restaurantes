@@ -150,6 +150,12 @@ describe("miembros", () => {
     expect(sqls[2]).toContain("UPDATE restaurants SET owner_email");
     expect(writes().every((c) => c.params.includes("rest-pizza"))).toBe(true);
   });
+
+  it("la cuenta de Brasaya (ADMIN_EMAILS) nunca queda como miembro ni dueña de un restaurante", async () => {
+    expect(await addMember(pizza, " Admin@Neurai.dev ")).toMatchObject({ ok: false, status: 400 });
+    expect(await transferOwnership(pizza, "admin@neurai.dev")).toMatchObject({ ok: false });
+    expect(writes()).toHaveLength(0);
+  });
 });
 
 describe("un pago reactiva solo una cuenta vencida", () => {

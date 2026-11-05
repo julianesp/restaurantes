@@ -3,10 +3,15 @@ import { ROOT_DOMAIN } from "@/lib/tenant-host";
 import Link from "next/link";
 import VisitTracker from "@/components/platform/VisitTracker";
 import BrasayaLogo from "@/components/BrasayaLogo";
+import { redirect } from "next/navigation";
+import { isPlatformAdmin } from "@/lib/tenant";
 
 export const metadata = { title: "Crea tu restaurante en Brasaya" };
 
-export default function RegistroPage() {
+export default async function RegistroPage() {
+  // La cuenta de Brasaya no registra restaurantes: su lugar es el panel de la plataforma
+  if (await isPlatformAdmin()) redirect("/panel");
+
   // Se muestra en el campo de subdominio, p. ej. ".tusaas.com"
   const suffix = ROOT_DOMAIN ? `.${ROOT_DOMAIN}` : ".localhost:3000";
 

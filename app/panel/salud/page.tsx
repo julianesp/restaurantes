@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { HeartPulse, AlertOctagon, AlertTriangle, Info, MessageCircle, Settings } from "lucide-react";
+import { HeartPulse, AlertOctagon, AlertTriangle, Info, MessageCircle, BarChart3 } from "lucide-react";
 import { requirePlatformAdmin, loadRestaurants, restaurantHealth, whatsappLink, money, type IssueLevel } from "@/lib/platform-stats";
-import { tenantUrl } from "@/lib/tenant-host";
 import { PageTitle, StatusBadge, formatDay } from "@/components/platform/ui";
 
 const LEVEL_ICON: Record<IssueLevel, { icon: typeof Info; className: string }> = {
@@ -116,9 +115,9 @@ export default async function SaludPage({ searchParams }: { searchParams: Promis
                     <MessageCircle className="h-4 w-4" /> Escribir por WhatsApp
                   </a>
                 )}
-                <a href={tenantUrl(r.slug, "/admin")} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-stone-700 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800">
-                  <Settings className="h-4 w-4" /> Entrar a su panel
-                </a>
+                <Link href={`/panel/restaurantes/${r.id}`} className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs font-medium text-stone-700 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800">
+                  <BarChart3 className="h-4 w-4" /> Ver ficha
+                </Link>
               </footer>
             </article>
           );

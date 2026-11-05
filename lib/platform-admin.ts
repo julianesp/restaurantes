@@ -1,6 +1,6 @@
 import { env } from "cloudflare:workers";
 import { first, run, batch, all, nowIso } from "@/lib/db";
-import { invalidateTenantCache } from "@/lib/tenant";
+import { invalidateTenantCache, isPlatformAdminEmail } from "@/lib/tenant";
 import { MONTHLY_PRICE_COP, nextPeriod } from "@/lib/billing";
 
 /**
@@ -115,11 +115,15 @@ export const listMembers = (restaurantId: string) =>
     restaurantId
   );
 
+// La cuenta de Brasaya analiza todos los restaurantes desde /panel: nunca es dueña ni miembro de uno
+const PLATFORM_EMAIL_ERROR = "Ese correo es de administración de Brasaya: analiza los restaurantes desde el panel, no puede ser miembro";
+
 const normalizeEmail = (v: unknown) => (typeof v === "string" ? v.trim().toLowerCase() : "");
 
 export async function addMember(r: ManagedRestaurant, rawEmail: unknown): Promise<Result> {
   const email = normalizeEmail(rawEmail);
   if (!EMAIL_REGEX.test(email) || email.length > 254) return err("Correo no válido");
+  if (isPlatformAdminEmail(email)) return err(PLATFORM_EMAIL_ERROR);
   const exists = await first("SELECT 1 AS x FROM restaurant_members WHERE restaurant_id = ? AND email = ?", r.id, email);
   if (exists) return err("Ese correo ya es miembro del restaurante", 409);
   await run(
@@ -148,6 +152,7 @@ export async function transferOwnership(r: ManagedRestaurant, rawEmail: unknown)
     "SELECT email, role, created_at FROM restaurant_members WHERE restaurant_id = ? AND email = ?",
     r.id, email
   );
+  if (isPlatformAdminEmail(email)) return err(PLATFORM_EMAIL_ERROR);
   if (!member) return err("Primero agrega ese correo como miembro", 404);
   if (member.role === "owner") return { ok: true };
   const now = nowIso();

@@ -55,7 +55,8 @@ export interface PlatformRestaurant {
   billing: BillingState;
 }
 
-export async function loadRestaurants(): Promise<PlatformRestaurant[]> {
+/** Todos los restaurantes, o solo uno si se pasa su id (ficha de /panel/restaurantes/[id]). */
+export async function loadRestaurants(id?: string): Promise<PlatformRestaurant[]> {
   const since7 = new Date(Date.now() - 7 * DAY_MS).toISOString();
   const since30 = new Date(Date.now() - 30 * DAY_MS).toISOString();
   const rows = await all<Omit<PlatformRestaurant, "billing">>(
@@ -76,11 +77,59 @@ export async function loadRestaurants(): Promise<PlatformRestaurant[]> {
               WHERE p.restaurant_id = r.id AND p.status = 'approved') AS last_payment,
             (SELECT COUNT(*) FROM restaurant_members m WHERE m.restaurant_id = r.id) AS members
      FROM restaurants r
+     ${id ? "WHERE r.id = ?" : ""}
      ORDER BY r.created_at DESC`,
-    since7, since30, since30
+    ...[since7, since30, since30, ...(id ? [id] : [])]
   );
   return rows.map((r) => ({ ...r, settings: r.settings ?? {}, billing: billingState(r) }));
 }
+
+// ---------------------------------------------------------------------------
+// Ficha de un restaurante (/panel/restaurantes/[id])
+// ---------------------------------------------------------------------------
+
+export interface DaySales {
+  day: string;
+  orders: number;
+  sales: number;
+}
+
+/** Pedidos y ventas (sin cancelados) por día de Colombia, de los últimos `days` días, del más reciente al más antiguo. */
+export function salesByDay(restaurantId: string, days: number, now = new Date()) {
+  const since = new Date(now.getTime() - days * DAY_MS).toISOString();
+  return all<DaySales>(
+    `SELECT substr(datetime(created_at, '-5 hours'), 1, 10) AS day,
+            SUM(CASE WHEN status != 'cancelled' THEN 1 ELSE 0 END) AS orders,
+            COALESCE(SUM(CASE WHEN status != 'cancelled' THEN total ELSE 0 END), 0) AS sales
+     FROM table_orders WHERE restaurant_id = ? AND created_at >= ?
+     GROUP BY day ORDER BY day DESC`,
+    restaurantId, since
+  );
+}
+
+/** Cobros de la mensualidad de Brasaya a un restaurante. */
+export const restaurantPayments = (restaurantId: string, limit = 20) =>
+  all<Omit<PlatformPayment, "restaurant_name" | "slug">>(
+    `SELECT id, reference, amount, months, status, ref_payco, payment_method, period_start, period_end,
+            created_by, notes, created_at
+     FROM subscription_payments WHERE restaurant_id = ? ORDER BY created_at DESC LIMIT ?`,
+    restaurantId, limit
+  );
+
+export interface AuditEntry {
+  admin_email: string;
+  action: string;
+  detail: string | null;
+  created_at: string;
+}
+
+/** Lo que el equipo de Brasaya ha hecho con un restaurante (platform_audit). */
+export const restaurantAudit = (restaurantId: string, limit = 20) =>
+  all<AuditEntry>(
+    `SELECT admin_email, action, detail, created_at FROM platform_audit
+     WHERE restaurant_id = ? ORDER BY created_at DESC LIMIT ?`,
+    restaurantId, limit
+  );
 
 // ---------------------------------------------------------------------------
 // Métricas del negocio

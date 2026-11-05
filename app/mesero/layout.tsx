@@ -12,7 +12,8 @@ export default async function MeseroLayout({ children }: { children: React.React
   const [user, tenant] = await Promise.all([currentUser(), getTenant()]);
   const role = user && tenant ? await getTenantRole(tenant) : null;
 
-  if (!user || !tenant || !role) return <MeseroGate>{children}</MeseroGate>;
+  // La cuenta de Brasaya no tiene el panel del restaurante (app/admin/layout.tsx)
+  if (!user || !tenant || !role || role.role === "platform") return <MeseroGate>{children}</MeseroGate>;
 
   const serializedUser = {
     firstName: user.firstName,
