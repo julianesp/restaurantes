@@ -9,6 +9,7 @@ import AOSInit from "@/components/AOSInit";
 import { CartProvider } from "@/context/CartContext";
 import CartButton from "@/components/CartButton";
 import { FloatingThemeToggle } from "@/components/ThemeToggle";
+import UnauthorizedNotice from "@/components/UnauthorizedNotice";
 import ThemeScheduler from "@/components/ThemeScheduler";
 import { colombiaPeriod, themeStorageKey } from "@/lib/theme-schedule";
 import { getTenant, isPlatformHost } from "@/lib/tenant";
@@ -104,6 +105,7 @@ export default async function RootLayout({
                 {children}
                 <CartButton />
                 <FloatingThemeToggle />
+                <UnauthorizedNotice />
                 <ThemeScheduler periodId={period.id} />
                 <AOSInit />
                 <Analytics />
