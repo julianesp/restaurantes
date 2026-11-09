@@ -398,10 +398,10 @@ export default async function TenantHome({ tenant }: { tenant: Tenant }) {
                   {specials.length > 0 ? (
                     <div className="grid gap-4 sm:grid-cols-2">
                       {specials.map((dish) => (
-                        <article key={dish.id} className="flex gap-4 rounded-3xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900 sm:p-5">
+                        <article key={dish.id} className="group relative flex gap-4 rounded-3xl border border-gray-200 bg-white p-4 transition-[transform,box-shadow,border-color] duration-300 ease-out hover:z-10 hover:scale-[1.04] hover:border-primary-300 hover:shadow-2xl hover:shadow-black/20 motion-reduce:transition-none motion-reduce:hover:scale-100 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-primary-700 sm:p-5">
                           {dish.image ? (
                             // eslint-disable-next-line @next/next/no-img-element
-                            <img src={dish.image} alt={dish.name} loading="lazy" className="h-28 w-28 shrink-0 rounded-2xl object-cover sm:h-32 sm:w-32" />
+                            <img src={dish.image} alt={dish.name} loading="lazy" className="h-28 w-28 shrink-0 rounded-2xl object-cover transition-transform duration-300 ease-out group-hover:scale-105 motion-reduce:transition-none sm:h-32 sm:w-32" />
                           ) : (
                             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-50 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300">
                               <Sparkles className="h-5 w-5" />
