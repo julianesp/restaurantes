@@ -34,7 +34,7 @@ interface Category {
 
 /** Recuadros de "Platos estrella" y fotos máximas en el carrusel de portada. */
 const FEATURED_SLOTS = 3;
-const SLIDES = 5;
+const SLIDES = 12;
 
 /** Fondo de la franja final (igual que en la landing de Brasaya): el humo de las brasas se ve encima. */
 const NIGHT = "#141110";
@@ -43,7 +43,7 @@ const NIGHT = "#141110";
 async function loadFeatured(restaurantId: string) {
   const featured = await all<Featured>(
     `SELECT id, name, description, price, image_url AS image FROM featured_dishes
-     WHERE restaurant_id = ? AND is_active = 1 ORDER BY display_order LIMIT ?`,
+     WHERE restaurant_id = ? AND is_active = 1 ORDER BY created_at LIMIT ?`,
     restaurantId, SLIDES
   );
   if (featured.length) return featured;

@@ -11,8 +11,6 @@ import {
   Loader2,
   Image as ImageIcon,
   Star,
-  MoveUp,
-  MoveDown,
 } from "lucide-react";
 import Image from "next/image";
 import Swal from "sweetalert2";
@@ -23,7 +21,6 @@ interface FeaturedDish {
   description: string;
   price: string;
   image_url: string | null;
-  display_order: number;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -42,7 +39,6 @@ export default function PlatosDestacadosPage() {
     description: "",
     price: "",
     image_url: "",
-    display_order: 0,
   });
 
   useEffect(() => {
@@ -108,7 +104,6 @@ export default function PlatosDestacadosPage() {
           description: descriptionTrim,
           price: priceTrim,
           image_url: formData.image_url || null,
-          display_order: formData.display_order || dishes.length + 1,
         }),
       });
 
@@ -169,7 +164,6 @@ export default function PlatosDestacadosPage() {
           description: descriptionTrim,
           price: priceTrim,
           image_url: formData.image_url || null,
-          display_order: formData.display_order,
           is_active: editingDish.is_active,
         }),
       });
@@ -260,7 +254,6 @@ export default function PlatosDestacadosPage() {
       description: dish.description,
       price: formattedPrice,
       image_url: dish.image_url || "",
-      display_order: dish.display_order,
     });
     setIsCreating(false);
   };
@@ -298,72 +291,6 @@ export default function PlatosDestacadosPage() {
         icon: "error",
         title: "Error",
         text: "Error al actualizar el estado",
-        confirmButtonColor: "#3b82f6",
-      });
-    }
-  };
-
-  const handleMoveUp = async (dish: FeaturedDish, index: number) => {
-    if (index === 0) return;
-
-    const prevDish = dishes[index - 1];
-    const currentOrder = dish.display_order;
-    const prevOrder = prevDish.display_order;
-
-    try {
-      await Promise.all([
-        fetch(`/api/featured-dishes/${dish.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ display_order: prevOrder }),
-        }),
-        fetch(`/api/featured-dishes/${prevDish.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ display_order: currentOrder }),
-        }),
-      ]);
-
-      await loadDishes();
-    } catch (error) {
-      console.error("Error:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Error al cambiar el orden",
-        confirmButtonColor: "#3b82f6",
-      });
-    }
-  };
-
-  const handleMoveDown = async (dish: FeaturedDish, index: number) => {
-    if (index === dishes.length - 1) return;
-
-    const nextDish = dishes[index + 1];
-    const currentOrder = dish.display_order;
-    const nextOrder = nextDish.display_order;
-
-    try {
-      await Promise.all([
-        fetch(`/api/featured-dishes/${dish.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ display_order: nextOrder }),
-        }),
-        fetch(`/api/featured-dishes/${nextDish.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ display_order: currentOrder }),
-        }),
-      ]);
-
-      await loadDishes();
-    } catch (error) {
-      console.error("Error:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Error al cambiar el orden",
         confirmButtonColor: "#3b82f6",
       });
     }
@@ -425,7 +352,6 @@ export default function PlatosDestacadosPage() {
       description: "",
       price: "",
       image_url: "",
-      display_order: 0,
     });
     setEditingDish(null);
     setIsCreating(false);
@@ -482,7 +408,7 @@ export default function PlatosDestacadosPage() {
                   </p>
                 </div>
               ) : (
-                dishes.map((dish, index) => (
+                dishes.map((dish) => (
                   <div
                     key={dish.id}
                     className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 ${
@@ -515,9 +441,6 @@ export default function PlatosDestacadosPage() {
                             <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                               {dish.name}
                             </h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                              Orden: #{dish.display_order}
-                            </p>
                           </div>
                           <span className="text-2xl font-bold text-primary-500">
                             {dish.price}
@@ -529,26 +452,6 @@ export default function PlatosDestacadosPage() {
 
                         {/* Acciones */}
                         <div className="flex items-center gap-2">
-                          {/* Botones de orden */}
-                          <div className="flex gap-1">
-                            <button
-                              onClick={() => handleMoveUp(dish, index)}
-                              disabled={index === 0}
-                              className="p-1 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded disabled:opacity-30 disabled:cursor-not-allowed"
-                              title="Mover arriba"
-                            >
-                              <MoveUp className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleMoveDown(dish, index)}
-                              disabled={index === dishes.length - 1}
-                              className="p-1 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded disabled:opacity-30 disabled:cursor-not-allowed"
-                              title="Mover abajo"
-                            >
-                              <MoveDown className="w-4 h-4" />
-                            </button>
-                          </div>
-
                           <div className="flex-1" />
 
                           {/* Toggle activo */}
@@ -724,27 +627,6 @@ export default function PlatosDestacadosPage() {
                         placeholder="https://..."
                       />
                     </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Orden de Visualización
-                    </label>
-                    <input
-                      type="number"
-                      value={formData.display_order === 0 ? "" : formData.display_order}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          display_order: parseInt(e.target.value) || 0,
-                        })
-                      }
-                      placeholder="Ej: 1, 2, 3..."
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Menor número aparece primero
-                    </p>
                   </div>
 
                   <button

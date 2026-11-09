@@ -12,7 +12,7 @@ export async function GET() {
     if (!ctx.ok) return ctx.res;
 
     const data = await all(
-      'SELECT * FROM featured_dishes WHERE restaurant_id = ? AND is_active = 1 ORDER BY display_order',
+      'SELECT * FROM featured_dishes WHERE restaurant_id = ? AND is_active = 1 ORDER BY created_at',
       ctx.tenant.id
     );
     return NextResponse.json({ success: true, data });
