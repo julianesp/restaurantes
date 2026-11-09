@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { publicCtx, adminCtx } from "@/lib/tenant";
 import { all, insert, updateOwned, deleteOwned, pick } from "@/lib/db";
 
-const FIELDS = ["name", "description", "price", "category", "available"] as const;
+const FIELDS = ["name", "description", "price", "category", "available", "image"] as const;
 
 // GET - Platos del día del restaurante (público)
 export async function GET() {
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   const ctx = await adminCtx();
   if (!ctx.ok) return ctx.res;
 
-  const { name, description, price, category } = await request.json();
+  const { name, description, price, category, image } = await request.json();
 
   if (!name || !description || !price) {
     return NextResponse.json({ error: "Nombre, descripción y precio son requeridos" }, { status: 400 });
@@ -32,6 +32,7 @@ export async function POST(request: Request) {
     description,
     price,
     category: category || "Almuerzo",
+    image: typeof image === "string" && image.trim() ? image.trim() : null,
     available: true,
     created_by: ctx.email,
   });

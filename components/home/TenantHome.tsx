@@ -27,6 +27,7 @@ interface Special {
   name: string;
   description: string | null;
   price: string | null;
+  image: string | null;
 }
 interface Category {
   id: string;
@@ -126,7 +127,7 @@ export default async function TenantHome({ tenant }: { tenant: Tenant }) {
   const [featured, specials, categories, canEdit] = await Promise.all([
     loadFeatured(tenant.id),
     all<Special>(
-      `SELECT id, name, description, price FROM daily_specials
+      `SELECT id, name, description, price, image FROM daily_specials
        WHERE restaurant_id = ? AND available = 1 ORDER BY created_at DESC LIMIT 6`,
       tenant.id
     ),
@@ -397,10 +398,15 @@ export default async function TenantHome({ tenant }: { tenant: Tenant }) {
                   {specials.length > 0 ? (
                     <div className="grid gap-4 sm:grid-cols-2">
                       {specials.map((dish) => (
-                        <article key={dish.id} className="flex gap-4 rounded-3xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
-                          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-50 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300">
-                            <Sparkles className="h-5 w-5" />
-                          </span>
+                        <article key={dish.id} className="flex gap-4 rounded-3xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900 sm:p-5">
+                          {dish.image ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={dish.image} alt={dish.name} loading="lazy" className="h-28 w-28 shrink-0 rounded-2xl object-cover sm:h-32 sm:w-32" />
+                          ) : (
+                            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary-50 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300">
+                              <Sparkles className="h-5 w-5" />
+                            </span>
+                          )}
                           <div className="min-w-0 flex-1">
                             <div className="flex items-baseline justify-between gap-3">
                               <h3 className="font-semibold text-gray-950 dark:text-white">{dish.name}</h3>
