@@ -28,6 +28,7 @@ import Navbar from "@/components/Navbar/page";
 import Footer from "@/containers/Footer/page";
 import ScrollToTopButton from "@/components/ScrollToTopButton";
 import FoodSlider from "@/components/FoodSlider";
+import { createDishOrderMessage } from "@/utils/whatsapp";
 import LocationMap from "@/components/LocationMap";
 import OrderCTAModal from "@/components/OrderCTAModal";
 import TestimonialsSection from "@/components/TestimonialsSection";
@@ -228,7 +229,17 @@ export default function LegacyHome() {
 
       {/* Slider de especialidades */}
       <div id="especialidades" data-nav-dark className="relative h-[100dvh] w-full">
-        <FoodSlider foods={specialFoods} autoplayInterval={5000} />
+        <FoodSlider
+          foods={
+            branding.whatsapp
+              ? specialFoods.map((f) => ({
+                  ...f,
+                  orderUrl: createDishOrderMessage(branding.whatsapp, { name: f.name, price: f.price, restaurant: branding.name }),
+                }))
+              : specialFoods
+          }
+          autoplayInterval={5000}
+        />
       </div>
 
       <div className="relative z-10 bg-[rgb(var(--background))]">

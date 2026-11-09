@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ChevronLeft, ChevronRight, Play, Pause } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, Pause, MessageCircle } from "lucide-react";
 import Image from "next/image";
 
 interface FoodItem {
@@ -12,6 +12,8 @@ interface FoodItem {
   price?: string;
   // Encuadre de la imagen en pantallas estrechas (object-position), p. ej. "80% 50%"
   imagePosition?: string;
+  /** Enlace de WhatsApp con este plato ya escrito (botón "Pedir por WhatsApp" en la lámina). */
+  orderUrl?: string;
 }
 
 interface FoodSliderProps {
@@ -123,11 +125,25 @@ export default function FoodSlider({
                   <p className="text-sm md:text-base lg:text-lg mb-4 max-w-xl text-white/85 drop-shadow-md line-clamp-2 mx-auto md:mx-0">
                     {food.description}
                   </p>
-                  {food.price && (
-                    <div className="inline-block bg-primary-600 px-5 py-2 rounded-full">
-                      <span className="text-xl md:text-2xl font-bold tabular-nums">{food.price}</span>
-                    </div>
-                  )}
+                  <div className="flex flex-wrap items-center justify-center gap-3 md:justify-start">
+                    {food.price && (
+                      <div className="inline-block bg-primary-600 px-5 py-2 rounded-full">
+                        <span className="text-xl md:text-2xl font-bold tabular-nums">{food.price}</span>
+                      </div>
+                    )}
+                    {food.orderUrl && (
+                      <a
+                        href={food.orderUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        tabIndex={active ? 0 : -1}
+                        className="btn-press inline-flex items-center gap-2 rounded-full bg-[#25D366] px-5 py-2.5 font-semibold text-white shadow-lg shadow-black/25 hover:bg-[#1ebe5b]"
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                        Pedir por WhatsApp
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
             );

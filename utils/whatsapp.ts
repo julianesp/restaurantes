@@ -1,8 +1,31 @@
 // Enlaces de WhatsApp. El número (solo dígitos con indicativo, p. ej. 573001234567)
 // es el del restaurante actual: se obtiene con useBranding().whatsapp.
 
+/** wa.me exige el indicativo: un celular colombiano de 10 dígitos se completa con 57. */
+export const waNumber = (number: string) => {
+  const digits = number.replace(/\D/g, "");
+  return digits.length === 10 && digits.startsWith("3") ? `57${digits}` : digits;
+};
+
 const link = (number: string, message: string) =>
-  `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+  `https://wa.me/${waNumber(number)}?text=${encodeURIComponent(message)}`;
+
+/**
+ * Pedido de un plato concreto desde el sitio: el restaurante recibe el nombre, el precio y el
+ * enlace a su carta, así el mesero o el dueño sabe exactamente qué mandar a preparar.
+ */
+export const createDishOrderMessage = (
+  number: string,
+  dish: { name: string; price?: string | null; restaurant?: string; url?: string },
+) => {
+  const lines = [
+    `🍽️ ¡Hola${dish.restaurant ? ` ${dish.restaurant}` : ""}! Quiero pedir:`,
+    "",
+    `• 1 x *${dish.name}*${dish.price ? ` — ${dish.price}` : ""}`,
+  ];
+  if (dish.url) lines.push("", `Lo vi en ${dish.url}`);
+  return link(number, lines.join("\n"));
+};
 
 export const createWhatsAppMessage = (dishName: string, price: string, number: string) =>
   link(number, `¡Hola! Me interesa ordenar *${dishName}* (${price}). ¿Podrían ayudarme con el pedido?`);

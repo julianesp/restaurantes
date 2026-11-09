@@ -16,6 +16,7 @@ import {
 import Link from "next/link";
 import { useCart } from "../../context/CartContext";
 import { useBranding } from "@/context/TenantContext";
+import DishWhatsAppButton from "@/components/DishWhatsAppButton";
 
 // Tipos de datos
 interface MenuItem {
@@ -212,6 +213,7 @@ export default function MenuClient({ initialMenuData }: MenuClientProps) {
                       {item.price}
                     </span>
                     <div className="flex gap-2">
+                      <DishWhatsAppButton name={item.name} price={item.price} />
                       <button
                         onClick={() => handleAddToCart(item, selectedCategory)}
                         className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold transition-all ${

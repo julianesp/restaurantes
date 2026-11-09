@@ -7,7 +7,9 @@ import {
 import { all } from "@/lib/db";
 import { brandingFor } from "@/lib/branding";
 import { getTenantRole, type Tenant } from "@/lib/tenant";
-import { platformUrl } from "@/lib/tenant-host";
+import { headers } from "next/headers";
+import { platformUrl, TENANT_HOST_HEADER } from "@/lib/tenant-host";
+import { createDishOrderMessage, waNumber } from "@/utils/whatsapp";
 import { DAYS, colombiaDayKey, formatRange, parseSchedule } from "@/lib/hours";
 import FoodSlider from "@/components/FoodSlider";
 import EmberEdge from "@/components/EmberEdge";
@@ -98,8 +100,22 @@ function MissingText({ href, children, onDark = false }: { href: string; childre
 
 const CONFIG = "/admin/configuracion";
 
-/** wa.me exige el indicativo: un celular colombiano de 10 dígitos se completa con 57. */
-const waUrl = (digits: string) => `https://wa.me/${digits.length === 10 && digits.startsWith("3") ? `57${digits}` : digits}`;
+const waUrl = (digits: string) => `https://wa.me/${waNumber(digits)}`;
+
+/** Botón "Pedir por WhatsApp" de un plato: abre el chat del restaurante con ese plato ya escrito. */
+function DishWhatsApp({ href, className = "" }: { href: string; className?: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`btn-press inline-flex items-center gap-1.5 rounded-full bg-[#25D366] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#1ebe5b] ${className}`}
+    >
+      <MessageCircle className="h-4 w-4" />
+      Pedir por WhatsApp
+    </a>
+  );
+}
 
 /**
  * Portada de un restaurante, construida solo con sus propios datos. Sigue el diseño de la landing
@@ -143,12 +159,20 @@ export default async function TenantHome({ tenant }: { tenant: Tenant }) {
     { url: b.facebookUrl, label: "Facebook", icon: Facebook },
   ].filter((s): s is typeof s & { url: string } => !!s.url);
 
+  // Enlace de la carta que acompaña cada pedido por WhatsApp (dominio propio o subdominio)
+  const h = await headers();
+  const host = h.get(TENANT_HOST_HEADER) ?? h.get("x-forwarded-host") ?? h.get("host");
+  const menuUrl = host ? `${/^(localhost|127\.|\[::1\]|[^/]+\.localhost)(:|$)/.test(host) ? "http" : "https"}://${host}/menu` : undefined;
+  const orderUrl = (dish: { name: string; price: string | null }) =>
+    b.whatsapp ? createDishOrderMessage(b.whatsapp, { name: dish.name, price: dish.price, restaurant: b.name, url: menuUrl }) : undefined;
+
   const slides = withPhoto.map((f, i) => ({
     id: i + 1,
     name: f.name,
     description: f.description || b.tagline || "",
     image: f.image,
     price: f.price || undefined,
+    orderUrl: orderUrl(f),
   }));
 
   const whatsappButton = b.whatsapp && (
@@ -200,7 +224,7 @@ export default async function TenantHome({ tenant }: { tenant: Tenant }) {
                 Ver la carta
                 <ArrowRight className="h-4 w-4 transition-transform duration-200 ease-out group-hover:translate-x-0.5" />
               </Link>
-              {whatsappButton}
+              {slides.length === 0 && whatsappButton}
             </div>
           </div>
         </section>
@@ -329,19 +353,27 @@ export default async function TenantHome({ tenant }: { tenant: Tenant }) {
                     <p className="text-lg text-gray-600 dark:text-gray-300">Los que más piden nuestros clientes.</p>
                   </div>
                   <div className="mb-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {stars.map((dish) => (
-                      <Link key={dish.id} href="/menu" className="group relative block aspect-[4/3] overflow-hidden rounded-3xl bg-gray-200 dark:bg-gray-800">
+                    {stars.map((dish) => {
+                      const wa = orderUrl(dish);
+                      return (
+                      <article key={dish.id} className="group relative aspect-[4/3] overflow-hidden rounded-3xl bg-gray-200 dark:bg-gray-800">
                         {dish.image && (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={dish.image} alt={dish.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04] motion-reduce:transition-none" />
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                        <div className="absolute inset-x-0 bottom-0 p-5 text-white">
-                          <h3 className="text-xl font-bold leading-tight">{dish.name}</h3>
-                          {dish.price && <p className="mt-1 font-semibold tabular-nums">{dish.price}</p>}
+                        {/* Toda la tarjeta lleva a la carta; el botón de WhatsApp queda encima */}
+                        <Link href="/menu" aria-label={`Ver ${dish.name} en la carta`} className="absolute inset-0" />
+                        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-5 text-white">
+                          <div className="min-w-0">
+                            <h3 className="text-xl font-bold leading-tight">{dish.name}</h3>
+                            {dish.price && <p className="mt-1 font-semibold tabular-nums">{dish.price}</p>}
+                          </div>
+                          {wa && <DishWhatsApp href={wa} className="pointer-events-auto shrink-0 shadow-lg shadow-black/25" />}
                         </div>
-                      </Link>
-                    ))}
+                      </article>
+                      );
+                    })}
                     {canEdit &&
                       Array.from({ length: Math.max(FEATURED_SLOTS - stars.length, 0) }, (_, i) => (
                         <EmptySlot
@@ -375,6 +407,7 @@ export default async function TenantHome({ tenant }: { tenant: Tenant }) {
                               {dish.price && <p className="shrink-0 font-semibold tabular-nums text-primary-600 dark:text-primary-400">{dish.price}</p>}
                             </div>
                             {dish.description && <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{dish.description}</p>}
+                            {b.whatsapp && <DishWhatsApp href={orderUrl(dish)!} className="mt-4" />}
                           </div>
                         </article>
                       ))}

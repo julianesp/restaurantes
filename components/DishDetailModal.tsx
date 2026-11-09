@@ -3,6 +3,7 @@
 import { X } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useState } from "react";
+import DishWhatsAppButton from "./DishWhatsAppButton";
 
 interface DishDetailModalProps {
   isOpen: boolean;
@@ -242,6 +243,12 @@ export default function DishDetailModal({
                 </>
               )}
             </button>
+            <DishWhatsAppButton
+              name={dish.name}
+              price={dish.price}
+              label="Pedir por WhatsApp"
+              className="mt-3 w-full rounded-xl py-4 text-lg"
+            />
           </div>
         </div>
       </div>
