@@ -133,7 +133,9 @@ export default function FoodSlider({
             );
           })}
 
-          {/* Navegación */}
+          {/* Navegación (solo con más de una foto) */}
+          {foods.length > 1 && (
+            <>
           <button
             onClick={goToPrevious}
             className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-30 bg-white/90 dark:bg-gray-900/90 hover:bg-white dark:hover:bg-gray-800 text-gray-900 dark:text-white p-2 md:p-3 rounded-full shadow-lg"
@@ -161,10 +163,12 @@ export default function FoodSlider({
               <Play className="h-4 w-4 md:h-5 md:w-5" />
             )}
           </button>
+            </>
+          )}
         </div>
 
         {/* Barra de progreso: un solo color, animada con transform (no con width) */}
-        {isAutoPlaying && (
+        {isAutoPlaying && foods.length > 1 && (
           <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20 z-20 overflow-hidden">
             <div
               key={currentIndex}
