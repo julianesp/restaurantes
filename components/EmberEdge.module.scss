@@ -14,13 +14,11 @@
   overflow-x: clip;
   overflow-y: visible;
 
-  // Humo gris en claro (sobre fondo claro), blanco tenue en oscuro
-  --smoke: 120 113 108;
-  --smoke-alpha: 0.24;
+  // Humo casi blanco: sube sobre la banda oscura que hay encima del footer en ambos temas
+  --smoke: 245 245 244;
+  --smoke-alpha: 0.5;
 
-  // En oscuro el humo es casi blanco y algo más denso para que se distinga del fondo
   :global(.dark) & {
-    --smoke: 245 245 244;
     --smoke-alpha: 0.55;
   }
 

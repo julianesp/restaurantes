@@ -195,27 +195,32 @@ export default function PlataformaPage() {
         {/* Más características, por rol */}
         <FeatureTabs />
 
+        {/* Banda oscura desde "Cómo empezar" hasta las brasas del footer, para que el humo se vea.
+            El fondo va en una capa posicionada con z-index -2 (sin z-index en el contenedor, que no
+            crea contexto de apilamiento): así queda detrás del humo (-1) y del contenido. */}
+        <div className="relative pb-24">
+          <div aria-hidden className="absolute inset-0 -z-[2] bg-[#141110]" />
         {/* Cómo empezar */}
         <section id="empezar" className="scroll-mt-24 px-4 py-20 sm:px-6 md:py-28">
           <div className="mx-auto max-w-6xl">
-            <h2 className="mb-12 text-3xl font-bold text-gray-950 dark:text-white md:text-4xl">Empieza hoy mismo</h2>
+            <h2 className="mb-12 text-3xl font-bold text-white md:text-4xl">Empieza hoy mismo</h2>
             <ol className="relative grid gap-10 md:grid-cols-3 md:gap-8">
               {/* Línea que une las tres acciones (escritorio) */}
-              <span aria-hidden className="absolute left-0 right-0 top-6 hidden h-px bg-gray-200 dark:bg-gray-800 md:block" />
+              <span aria-hidden className="absolute left-0 right-0 top-6 hidden h-px bg-white/15 md:block" />
               {start.map((s) => (
                 <li key={s.title} className="relative">
-                  <span className="relative mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-primary-600 text-white ring-8 ring-[rgb(var(--background))]">
+                  <span className="relative mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-primary-600 text-white ring-8 ring-[#141110]">
                     <s.icon className="h-5 w-5" />
                   </span>
-                  <h3 className="mb-1.5 text-lg font-semibold text-gray-950 dark:text-white">{s.title}</h3>
-                  <p className="max-w-xs text-gray-600 dark:text-gray-400">{s.text}</p>
+                  <h3 className="mb-1.5 text-lg font-semibold text-white">{s.title}</h3>
+                  <p className="max-w-xs text-stone-300">{s.text}</p>
                 </li>
               ))}
             </ol>
           </div>
         </section>
         {/* Precio */}
-        <section id="precio" className="scroll-mt-24 px-4 pb-24 sm:px-6">
+        <section id="precio" className="scroll-mt-24 px-4 sm:px-6">
           <div className="mx-auto grid max-w-6xl items-center gap-10 rounded-[32px] border border-gray-200 bg-white p-7 dark:border-gray-800 dark:bg-gray-900 sm:p-10 md:grid-cols-[0.9fr_1.1fr]">
             <div>
               <h2 className="mb-3 text-3xl font-bold text-gray-950 dark:text-white md:text-4xl">Un solo plan, todo incluido</h2>
@@ -245,10 +250,11 @@ export default function PlataformaPage() {
             </ul>
           </div>
         </section>
+        </div>
       </main>
 
       {/* Cierre con el carbón encendido */}
-      <footer data-nav-dark className="relative mt-10 bg-primary-700 text-white dark:bg-primary-900">
+      <footer data-nav-dark className="relative bg-primary-700 text-white dark:bg-primary-900">
         <EmberEdge />
         <div className="mx-auto max-w-6xl px-4 pb-10 pt-20 sm:px-6">
           <div className="mb-16 flex flex-col items-start justify-between gap-8 md:flex-row md:items-end">
