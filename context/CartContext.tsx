@@ -52,7 +52,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         // Si el item ya existe, incrementar cantidad
         return prevCart.map((cartItem) =>
           cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
+            // Completa la foto si el plato se guardó antes sin ella
+            ? { ...cartItem, quantity: cartItem.quantity + 1, image: cartItem.image || item.image }
             : cartItem
         );
       } else {

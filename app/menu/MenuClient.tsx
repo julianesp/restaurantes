@@ -24,6 +24,7 @@ interface MenuItem {
   name: string;
   description: string;
   price: string;
+  image?: string | null;
   isVegetarian?: boolean;
   isSpicy?: boolean;
 }
@@ -70,6 +71,8 @@ export default function MenuClient({ initialMenuData }: MenuClientProps) {
       description: item.description,
       price: item.price,
       category: categoryId,
+      // La foto viaja al carrito para mostrarla junto al plato
+      image: item.image || undefined,
     });
 
     // Mostrar feedback visual
@@ -186,8 +189,19 @@ export default function MenuClient({ initialMenuData }: MenuClientProps) {
               {currentCategory.items.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-700"
+                  className="overflow-hidden bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-gray-200 dark:border-gray-700"
                 >
+                  {item.image && (
+                    <div className="-mx-6 -mt-6 mb-5 aspect-[16/10] overflow-hidden bg-gray-100 dark:bg-gray-900">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        loading="lazy"
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                  )}
                   <div className="flex justify-between items-start mb-3">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white">
                       {item.name}
