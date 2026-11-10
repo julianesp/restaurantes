@@ -17,25 +17,29 @@ interface ChatMessage {
 
 type KitchenChatProps =
   | { mode: "admin" }
-  | { mode: "waiter"; waiterName: string; token: string; onExpired: () => void };
+  // Mesero con la sesión de su PIN (token); si entró con su cuenta, el token va vacío
+  | { mode: "waiter"; waiterName: string; token: string; onExpired: () => void }
+  // Mesero o chef con su cuenta: rol y nombre fijos, sin elegirlos
+  | { mode: "staff"; role: "waiter" | "chef"; name: string };
 
 export default function KitchenChat(props: KitchenChatProps) {
-  const isWaiter = props.mode === "waiter";
+  // En "waiter" y "staff" la persona ya está identificada: no elige rol ni nombre
+  const isFixed = props.mode !== "admin";
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
-  const [role, setRole] = useState<"waiter" | "chef">(isWaiter ? "waiter" : "chef");
-  const [senderName, setSenderName] = useState(isWaiter ? props.waiterName : "");
+  const [role, setRole] = useState<"waiter" | "chef">(props.mode === "staff" ? props.role : props.mode === "waiter" ? "waiter" : "chef");
+  const [senderName, setSenderName] = useState(props.mode === "staff" ? props.name : props.mode === "waiter" ? props.waiterName : "");
   const [text, setText] = useState("");
   const [orderRef, setOrderRef] = useState("");
   const [lastTimestamp, setLastTimestamp] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // El mesero se identifica con el token de su PIN; el panel, con la sesión de Clerk (cookies)
-  const authHeaders: Record<string, string> = isWaiter ? { "X-Waiter-Token": props.token } : {};
+  const authHeaders: Record<string, string> = props.mode === "waiter" && props.token ? { "X-Waiter-Token": props.token } : {};
   const handleAuthError = (res: Response) => {
-    if (res.status === 401 && isWaiter) props.onExpired();
+    if (res.status === 401 && props.mode === "waiter") props.onExpired();
     else if (res.status === 401 || res.status === 403) setError("No tienes acceso al chat de este restaurante.");
   };
 
@@ -167,7 +171,7 @@ export default function KitchenChat(props: KitchenChatProps) {
         )}
 
         {/* Selector de rol y nombre (solo en el panel; el mesero ya está identificado) */}
-        {!isWaiter && (
+        {!isFixed && (
         <div className="bg-white dark:bg-gray-800 rounded-xl p-4 mb-4 shadow border border-gray-200 dark:border-gray-700">
           <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
             ¿Quién eres?

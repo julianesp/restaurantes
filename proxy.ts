@@ -44,7 +44,8 @@ const isPublicRoute = createRouteMatcher([
   "/privacidad", // Política de tratamiento de datos personales
 ]);
 
-const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
+// /cocina (vista del chef) exige sesión igual que /admin; su pertenencia se verifica en el layout de cada una
+const isAdminRoute = createRouteMatcher(["/admin(.*)", "/cocina(.*)"]);
 const isApiAdminRoute = createRouteMatcher([
   "/api/menu/categories(.*)",
   "/api/menu/items(.*)",

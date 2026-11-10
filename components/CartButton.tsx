@@ -21,6 +21,7 @@ export default function CartButton() {
   const btnRef = useRef<HTMLButtonElement>(null);
   const hidden =
     pathname.startsWith("/mesero") ||
+    pathname.startsWith("/cocina") ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/plataforma") ||
     pathname.startsWith("/registro") ||
@@ -78,7 +79,7 @@ export default function CartButton() {
     };
   }, [hidden, pathname]);
 
-  // No mostrar el carrito de clientes en el panel del mesero, en admin ni en las páginas de la plataforma
+  // No mostrar el carrito de clientes en el panel del mesero, en la cocina, en admin ni en las páginas de la plataforma
   if (hidden) return null;
 
   return (
