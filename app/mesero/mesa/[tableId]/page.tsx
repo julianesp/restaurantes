@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { flyToCart } from "@/lib/fly-to-cart";
 import { useState, useEffect } from "react";
 import { Plus, Minus, Send, Star, ArrowLeft, ChefHat, X, CheckCircle } from "lucide-react";
+import { useWaiterSession } from "@/components/mesero/WaiterSession";
 
 interface MenuItem {
   id: string;
@@ -30,6 +31,8 @@ export default function MeseroTablePage() {
   const params = useParams();
   const router = useRouter();
   const tableId = params.tableId as string;
+  const { session, logout } = useWaiterSession();
+  const [sendError, setSendError] = useState("");
 
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [dailySpecials, setDailySpecials] = useState<DailySpecial[]>([]);
@@ -42,6 +45,10 @@ export default function MeseroTablePage() {
   const [quickOptions, setQuickOptions] = useState<string[]>([]);
 
   const QUICK_OPTIONS = ["Sin arroz", "Con aromática", "Solo bandeja", "Con sopa"];
+
+  // Las comidas rápidas (categoría "Rápidas") no llevan sopa: la nota automática "Sin sopa" solo se
+  // agrega si el pedido tiene algún plato que no sea de comida rápida
+  const isFastFood = (item: MenuItem) => /r[aá]pid/i.test(item.category);
 
   const toggleOption = (opt: string) => {
     setQuickOptions((prev) =>
@@ -115,6 +122,7 @@ export default function MeseroTablePage() {
   const sendToKitchen = async () => {
     if (orderItems.length === 0) return;
     setSending(true);
+    setSendError("");
     try {
       const total = orderItems.reduce((sum, item) => {
         const price = parseFloat(item.price.replace(/[$.,]/g, "")) || 0;
@@ -123,7 +131,8 @@ export default function MeseroTablePage() {
 
       const res = await fetch("/api/orders/table", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        // El token identifica al mesero (el pedido queda a su nombre); con cuenta no hace falta
+        headers: { "Content-Type": "application/json", ...(session.token ? { "X-Waiter-Token": session.token } : {}) },
         body: JSON.stringify({
           tableId,
           items: orderItems,
@@ -131,12 +140,18 @@ export default function MeseroTablePage() {
           timestamp: new Date().toISOString(),
           customerNotes: [
             ...quickOptions,
-            ...(!quickOptions.includes("Con sopa") ? ["Sin sopa"] : []),
+            ...(orderItems.some((i) => !isFastFood(i)) && !quickOptions.includes("Con sopa") ? ["Sin sopa"] : []),
             ...(notes.trim() ? [notes.trim()] : []),
           ].join(" · ") || null,
         }),
       });
 
+      if (res.status === 401) return logout(); // sesión vencida: se vuelve a pedir el PIN
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setSendError(data.error || "No se pudo enviar el pedido. Inténtalo de nuevo.");
+        return;
+      }
       if (res.ok) {
         setSent(true);
         setTimeout(() => {
@@ -148,7 +163,7 @@ export default function MeseroTablePage() {
       }
     } catch (e) {
       console.error(e);
-      alert("Error al enviar el pedido.");
+      setSendError("Sin conexión: el pedido no se envió. Inténtalo de nuevo.");
     } finally {
       setSending(false);
     }
@@ -387,6 +402,12 @@ export default function MeseroTablePage() {
               onChange={(e) => setNotes(e.target.value)}
               className="w-full text-sm px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white mb-3 focus:ring-2 focus:ring-primary-500 focus:outline-none"
             />
+
+            {sendError && (
+              <p role="alert" className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-300">
+                {sendError}
+              </p>
+            )}
 
             {/* Botón enviar */}
             <button

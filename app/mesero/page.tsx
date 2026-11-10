@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { UtensilsCrossed, ArrowRight, ChefHat } from "lucide-react";
+import { UtensilsCrossed, ArrowRight } from "lucide-react";
+import MyOrders from "@/components/mesero/MyOrders";
 
 const NUM_TABLES = 12;
 
 export default function MeseroHomePage() {
   const router = useRouter();
   const [selected, setSelected] = useState<number | null>(null);
+  const [otherTable, setOtherTable] = useState("");
 
   const goToTable = (tableId: number) => {
     router.push(`/mesero/mesa/${tableId}`);
@@ -29,6 +31,9 @@ export default function MeseroHomePage() {
         </p>
       </div>
 
+      {/* Pedidos que este mesero envió a cocina y su estado */}
+      <MyOrders />
+
       {/* Grid de mesas */}
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-4 w-full max-w-lg mb-8">
         {Array.from({ length: NUM_TABLES }, (_, i) => i + 1).map((num) => (
@@ -47,6 +52,26 @@ export default function MeseroHomePage() {
         ))}
       </div>
 
+      {/* Mesas con otro número (más de 12, barra, terraza...) */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          const n = parseInt(otherTable, 10);
+          if (n >= 1 && n <= 999) goToTable(n);
+        }}
+        className="mb-8 flex items-center gap-2"
+      >
+        <input
+          type="number" min={1} max={999} value={otherTable} onChange={(e) => setOtherTable(e.target.value)}
+          placeholder="Otra mesa"
+          aria-label="Número de otra mesa"
+          className="w-32 rounded-xl border border-gray-300 bg-white px-3 py-2 text-center font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+        />
+        <button type="submit" disabled={!otherTable} className="rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-40 dark:bg-white dark:text-gray-900">
+          Ir
+        </button>
+      </form>
+
       {/* Botón ir */}
       {selected && (
         <button
@@ -59,14 +84,6 @@ export default function MeseroHomePage() {
         </button>
       )}
 
-      {/* Link a admin */}
-      <a
-        href="/admin"
-        className="mt-10 flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-primary-500 transition-colors"
-      >
-        <ChefHat className="w-4 h-4" />
-        Ir al panel de administración
-      </a>
     </div>
   );
 }

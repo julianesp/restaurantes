@@ -3,21 +3,25 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useClerk } from "@clerk/nextjs";
 import { UtensilsCrossed, KeyRound, Loader2, MessageSquare, LayoutGrid } from "lucide-react";
 import { PIN_MIN_LENGTH, PIN_MAX_LENGTH } from "@/lib/waiter-pin";
 import { WAITER_SESSION_KEY as SESSION_KEY, WaiterSessionContext, type WaiterSession } from "@/components/mesero/WaiterSession";
 
 /** Acceso por PIN del mesero y pestañas de su panel. */
-export default function MeseroGate({ children }: { children: React.ReactNode }) {
-  const [authed, setAuthed] = useState(false);
-  const [checking, setChecking] = useState(true);
+export default function MeseroGate({ children, account }: { children: React.ReactNode; account?: { name: string } }) {
+  const { signOut } = useClerk();
+  // Con cuenta (correo verificado) no hay PIN: la sesión de Clerk basta y las peticiones no llevan token
+  const [authed, setAuthed] = useState(!!account);
+  const [checking, setChecking] = useState(!account);
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [session, setSession] = useState<WaiterSession | null>(null);
+  const [session, setSession] = useState<WaiterSession | null>(account ? { name: account.name, token: "" } : null);
   const pathname = usePathname();
 
   useEffect(() => {
+    if (account) return;
     try {
       const parsed = JSON.parse(sessionStorage.getItem(SESSION_KEY) || "null");
       // Las sesiones anteriores al token del servidor no sirven: se pide el PIN de nuevo
@@ -27,6 +31,10 @@ export default function MeseroGate({ children }: { children: React.ReactNode }) 
   }, []);
 
   const logout = () => {
+    if (account) {
+      signOut({ redirectUrl: "/" }).catch(() => {});
+      return;
+    }
     const token = session?.token;
     if (token) fetch("/api/waiters/verify", { method: "DELETE", headers: { "X-Waiter-Token": token } }).catch(() => {});
     try { sessionStorage.removeItem(SESSION_KEY); } catch {}
@@ -118,6 +126,14 @@ export default function MeseroGate({ children }: { children: React.ReactNode }) 
             {loading ? "Verificando..." : "Ingresar"}
           </button>
         </form>
+
+        {/* Sin PIN: el dueño registró su correo en el equipo */}
+        <p className="mt-5 text-center text-sm text-gray-500 dark:text-gray-400">
+          ¿Tu dueño registró tu correo?{" "}
+          <a href="/sign-in?redirect_url=/mesero" className="font-semibold text-primary-600 hover:underline">
+            Entrar con mi correo
+          </a>
+        </p>
       </div>
     </div>
   );
