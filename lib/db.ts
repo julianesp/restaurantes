@@ -124,7 +124,10 @@ export async function deleteOwned(table: string, restaurantId: string, id: strin
 
 /** ¿El error es una violación de UNIQUE? */
 export function isUniqueViolation(error: unknown): boolean {
-  return error instanceof Error && /UNIQUE constraint failed/i.test(error.message);
+  // Sin `instanceof Error`: un error que viene de otro contexto de ejecución (p. ej. node:sqlite en
+  // las pruebas) no es instancia del Error de este, pero su mensaje es el mismo.
+  const message = error && typeof error === "object" ? (error as { message?: unknown }).message : undefined;
+  return typeof message === "string" && /UNIQUE constraint failed/i.test(message);
 }
 
 const TABLES_WITH_UPDATED_AT = new Set([

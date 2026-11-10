@@ -285,6 +285,7 @@ export const listAllMembers = () =>
   all<PlatformUser>(
     `SELECT m.email, m.role, m.created_at, r.id AS restaurant_id, r.name AS restaurant_name, r.slug
      FROM restaurant_members m JOIN restaurants r ON r.id = m.restaurant_id
+     WHERE m.role IN ('owner', 'admin')
      ORDER BY m.created_at DESC`
   );
 

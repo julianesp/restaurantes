@@ -128,7 +128,10 @@ export function isPlatformAdminEmail(email: string): boolean {
   return platformAdminEmails().includes(email.trim().toLowerCase());
 }
 
+/** Roles que ADMINISTRAN el restaurante. Los de personal ("waiter", "chef") van aparte: ver StaffRole. */
 export type TenantRole = "owner" | "admin" | "platform";
+/** Personal que entra con su propia cuenta pero NO administra: solo ve su parte del servicio. */
+export type StaffRole = "waiter" | "chef";
 
 /** Correos verificados del usuario autenticado (en minúsculas). */
 export async function getVerifiedEmails(): Promise<string[]> {
@@ -163,11 +166,37 @@ export async function getTenantRole(
 
   const placeholders = emails.map(() => "?").join(", ");
   const member = await first<{ email: string; role: TenantRole }>(
-    `SELECT email, role FROM restaurant_members WHERE restaurant_id = ? AND email IN (${placeholders}) LIMIT 1`,
+    // Solo owner/admin: un mesero o chef es miembro, pero nunca administrador (ver getStaffMember)
+    `SELECT email, role FROM restaurant_members WHERE restaurant_id = ? AND email IN (${placeholders}) AND role IN ('owner', 'admin') LIMIT 1`,
     tenant.id,
     ...emails
   );
   return member ? { role: member.role, email: member.email } : null;
+}
+
+export interface StaffMember {
+  id: string;
+  role: StaffRole;
+  email: string;
+  /** Nombre para mostrar: el que puso el dueño, o la parte local del correo. */
+  name: string;
+}
+
+/**
+ * Mesero o chef (con correo verificado) de ESTE restaurante, o null. Solo cuentan los activos.
+ * No da ningún permiso de administración: adminCtx() sigue usando getTenantRole().
+ */
+export async function getStaffMember(tenant: Pick<Tenant, "id">): Promise<StaffMember | null> {
+  const emails = await getVerifiedEmails();
+  if (emails.length === 0) return null;
+  const placeholders = emails.map(() => "?").join(", ");
+  const row = await first<{ id: string; email: string; role: StaffRole; name: string | null }>(
+    `SELECT id, email, role, name FROM restaurant_members
+     WHERE restaurant_id = ? AND email IN (${placeholders}) AND role IN ('waiter', 'chef') AND active = 1 LIMIT 1`,
+    tenant.id,
+    ...emails
+  );
+  return row ? { id: row.id, role: row.role, email: row.email, name: row.name?.trim() || row.email.split("@")[0] } : null;
 }
 
 // ---------------------------------------------------------------------------

@@ -9,22 +9,23 @@ import { createWaiterSession, findWaiterByPin, hashPin, WAITER_TOKEN_HEADER } fr
 
 let currentTenant = { id: "rest-pizza", slug: "pizza" };
 let adminAllowed = false;
-jest.mock("@/lib/tenant", () => {
-  const { NextResponse } = jest.requireActual("next/server");
-  return {
-    publicCtx: async () => ({ ok: true, tenant: currentTenant }),
-    adminCtx: async () =>
-      adminAllowed
-        ? { ok: true, tenant: currentTenant, role: "owner", email: "duena@pizza.co" }
-        : { ok: false, res: NextResponse.json({ error: "No autenticado" }, { status: 401 }) },
-  };
-});
+/** Mesero/chef con cuenta (restaurant_members); null = ninguno */
+let staffMember: { id: string; role: "waiter" | "chef"; email: string; name: string } | null = null;
+let signedIn = false;
+jest.mock("@clerk/nextjs/server", () => ({ currentUser: async () => (signedIn || adminAllowed ? { id: "u1" } : null) }));
+jest.mock("@/lib/tenant", () => ({
+  publicCtx: async () => ({ ok: true, tenant: currentTenant }),
+  getTenantRole: async () => (adminAllowed ? { role: "owner", email: "duena@pizza.co" } : null),
+  getStaffMember: async () => staffMember,
+}));
 
 let db: DatabaseSync;
 beforeEach(async () => {
   fakeD1.reset();
   currentTenant = { id: "rest-pizza", slug: "pizza" };
   adminAllowed = false;
+  staffMember = null;
+  signedIn = false;
   db = sqliteD1(["0005_payments_waiter_sessions.sql"]);
   db.exec("INSERT INTO restaurants (id, slug, name) VALUES ('rest-pizza', 'pizza', 'Pizza'), ('rest-otro', 'otro', 'Otro')");
   db.prepare("INSERT INTO waiters (id, restaurant_id, name, email, pin, active) VALUES ('w1', 'rest-pizza', 'Ana', 'ana@pizza.co', ?, 1)")
@@ -109,6 +110,26 @@ describe("chat de cocina para meseros", () => {
     const token = await createWaiterSession("rest-pizza", "w1");
     const rows = db.prepare("SELECT token_hash FROM waiter_sessions").all() as Array<{ token_hash: string }>;
     expect(rows.map((r) => r.token_hash)).not.toContain(token);
+  });
+
+  it("un chef con su cuenta escribe siempre como chef y con su nombre", async () => {
+    signedIn = true;
+    staffMember = { id: "m1", role: "chef", email: "chef@pizza.co", name: "Marta" };
+    const res = await chat.POST(req("POST", undefined, { sender_role: "waiter", sender_name: "Otro", message: "En 5 min" }));
+    expect(res.status).toBe(201);
+    await expect(res.json()).resolves.toMatchObject({ sender_role: "chef", sender_name: "Marta" });
+  });
+
+  it("un mesero con su cuenta escribe siempre como mesero y con su nombre", async () => {
+    signedIn = true;
+    staffMember = { id: "m2", role: "waiter", email: "mesero@pizza.co", name: "Luis" };
+    const res = await chat.POST(req("POST", undefined, { sender_role: "chef", sender_name: "Jefe", message: "Mesa 2 lista?" }));
+    await expect(res.json()).resolves.toMatchObject({ sender_role: "waiter", sender_name: "Luis" });
+  });
+
+  it("alguien con sesión que no es del equipo → 403", async () => {
+    signedIn = true;
+    expect((await chat.GET(req("GET"))).status).toBe(403);
   });
 
   it("un miembro del panel sigue pudiendo usar el chat como cocina", async () => {

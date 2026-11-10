@@ -10,7 +10,8 @@
  */
 import { first, nowIso, run } from "@/lib/db";
 import { hmacHex, randomToken } from "@/lib/crypto";
-import { adminCtx, publicCtx, type AdminCtx, type Fail, type Tenant } from "@/lib/tenant";
+import { currentUser } from "@clerk/nextjs/server";
+import { getStaffMember, getTenantRole, publicCtx, type AdminCtx, type Fail, type Tenant } from "@/lib/tenant";
 import { NextResponse } from "next/server";
 
 export const WAITER_TOKEN_HEADER = "x-waiter-token";
@@ -76,24 +77,51 @@ export async function endWaiterSession(request: Request, tenant: Pick<Tenant, "i
 }
 
 export type StaffCtx =
-  | { ok: true; tenant: Tenant; kind: "waiter"; waiter: Waiter }
+  // `via`: "pin" = sesión del PIN (X-Waiter-Token); "account" = su cuenta de Brasaya (correo verificado)
+  | { ok: true; tenant: Tenant; kind: "waiter"; waiter: Waiter; via: "pin" | "account" }
+  | { ok: true; tenant: Tenant; kind: "chef"; staff: { name: string; email: string } }
   | (AdminCtx & { kind: "admin" });
 
+const staffFail = (error: string, status: number): Fail => ({ ok: false, res: NextResponse.json({ error }, { status }) });
+
 /**
- * Personal del restaurante: un mesero con sesión (X-Waiter-Token) o un miembro del panel (Clerk).
- * Para lo que comparten ambos, como el chat de cocina.
+ * Personal del restaurante: un mesero con sesión de PIN (X-Waiter-Token), un mesero o chef con su
+ * cuenta (correo verificado, restaurant_members) o un miembro del panel (Clerk). Para lo que
+ * comparten, como el chat de cocina o los pedidos de mesa. NO da permisos de administración.
  */
 export async function staffCtx(request: Request): Promise<StaffCtx | Fail> {
   if (request.headers.get(WAITER_TOKEN_HEADER)) {
     const base = await publicCtx();
     if (!base.ok) return base;
     const waiter = await waiterFromRequest(request, base.tenant);
-    if (!waiter) {
-      return { ok: false, res: NextResponse.json({ error: "Sesión de mesero vencida. Ingresa tu PIN de nuevo." }, { status: 401 }) };
-    }
-    return { ok: true, tenant: base.tenant, kind: "waiter", waiter };
+    if (!waiter) return staffFail("Sesión de mesero vencida. Ingresa tu PIN de nuevo.", 401);
+    return { ok: true, tenant: base.tenant, kind: "waiter", waiter, via: "pin" };
   }
-  const admin = await adminCtx();
-  if (!admin.ok) return admin;
-  return { ...admin, kind: "admin" };
+
+  const base = await publicCtx();
+  if (!base.ok) return base;
+  if (!(await currentUser())) return staffFail("No autenticado", 401);
+
+  const admin = await getTenantRole(base.tenant);
+  if (admin) return { ...base, role: admin.role, email: admin.email, kind: "admin" };
+
+  const member = await getStaffMember(base.tenant);
+  if (!member) return staffFail("No autorizado", 403);
+  if (member.role === "chef") return { ok: true, tenant: base.tenant, kind: "chef", staff: { name: member.name, email: member.email } };
+  return { ok: true, tenant: base.tenant, kind: "waiter", waiter: { id: member.id, name: member.name, email: member.email }, via: "account" };
+}
+
+/**
+ * Mesero que hace la petición, si lo hay (para atribuirle un pedido de mesa público): por su token de
+ * PIN o por su cuenta. `expired`: mandó un token que ya no vale (la pantalla debe pedir el PIN otra vez).
+ */
+export async function optionalWaiter(request: Request, tenant: Pick<Tenant, "id">): Promise<{ waiter: Waiter | null; expired: boolean }> {
+  if (request.headers.get(WAITER_TOKEN_HEADER)) {
+    const waiter = await waiterFromRequest(request, tenant);
+    return { waiter, expired: !waiter };
+  }
+  if (!(await currentUser())) return { waiter: null, expired: false };
+  const member = await getStaffMember(tenant);
+  if (member?.role !== "waiter") return { waiter: null, expired: false };
+  return { waiter: { id: member.id, name: member.name, email: member.email }, expired: false };
 }

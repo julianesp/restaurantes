@@ -3,7 +3,7 @@ import { all, insert } from "@/lib/db";
 import { staffCtx } from "@/lib/waiter-session";
 
 // Chat interno entre meseros y cocina: solo personal del restaurante, sea un miembro del panel
-// (/admin/chat, Clerk) o un mesero con la sesión de su PIN (/mesero/chat, cabecera X-Waiter-Token).
+// (/admin/chat, Clerk), un mesero con la sesión de su PIN (cabecera X-Waiter-Token) o un mesero/chef con su cuenta.
 
 export async function GET(request: Request) {
   const ctx = await staffCtx(request);
@@ -31,9 +31,10 @@ export async function POST(request: Request) {
 
   const body = await request.json();
   const { message, order_ref } = body;
-  // Un mesero escribe siempre como mesero y con su nombre: no puede hacerse pasar por la cocina
-  const sender_role = ctx.kind === "waiter" ? "waiter" : body.sender_role;
-  const sender_name = ctx.kind === "waiter" ? ctx.waiter.name : String(body.sender_name ?? "").trim();
+  // Un mesero o un chef con sesión escriben siempre con su rol y su nombre: no pueden hacerse pasar por el otro
+  const sender_role = ctx.kind === "waiter" ? "waiter" : ctx.kind === "chef" ? "chef" : body.sender_role;
+  const sender_name =
+    ctx.kind === "waiter" ? ctx.waiter.name : ctx.kind === "chef" ? ctx.staff.name : String(body.sender_name ?? "").trim();
 
   if (!sender_role || !sender_name || typeof message !== "string" || !message.trim()) {
     return NextResponse.json({ error: "sender_role, sender_name y message son requeridos" }, { status: 400 });

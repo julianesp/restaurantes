@@ -111,7 +111,8 @@ export interface Member {
 
 export const listMembers = (restaurantId: string) =>
   all<Member>(
-    "SELECT email, role, created_at FROM restaurant_members WHERE restaurant_id = ? ORDER BY role DESC, created_at",
+    // Solo quienes administran: meseros y chefs (rol waiter/chef) son equipo, no miembros del panel
+    "SELECT email, role, created_at FROM restaurant_members WHERE restaurant_id = ? AND role IN ('owner', 'admin') ORDER BY role DESC, created_at",
     restaurantId
   );
 
@@ -155,6 +156,10 @@ export async function transferOwnership(r: ManagedRestaurant, rawEmail: unknown)
   if (isPlatformAdminEmail(email)) return err(PLATFORM_EMAIL_ERROR);
   if (!member) return err("Primero agrega ese correo como miembro", 404);
   if (member.role === "owner") return { ok: true };
+  // Un mesero o chef no puede heredar el restaurante sin pasar por administrador
+  if ((member.role as string) === "waiter" || (member.role as string) === "chef") {
+    return err("Esa persona es mesero o chef del equipo: quítala y agrégala como administrador primero");
+  }
   const now = nowIso();
   await batch([
     { sql: "UPDATE restaurant_members SET role = 'admin' WHERE restaurant_id = ? AND role = 'owner'", params: [r.id] },
