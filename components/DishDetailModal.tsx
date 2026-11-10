@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useState } from "react";
 import DishWhatsAppButton from "./DishWhatsAppButton";
+import { flyToCart } from "@/lib/fly-to-cart";
 
 interface DishDetailModalProps {
   isOpen: boolean;
@@ -199,7 +200,10 @@ export default function DishDetailModal({
           {/* Add to Cart Button */}
           <div className="pt-4">
             <button
-              onClick={handleAddToCart}
+              onClick={(e) => {
+                flyToCart(e.currentTarget, dish.image);
+                handleAddToCart();
+              }}
               disabled={addedToCart}
               className={`w-full py-4 px-6 text-lg font-bold rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-3 ${
                 addedToCart

@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import { flyToCart } from "@/lib/fly-to-cart";
 import { useState, useEffect } from "react";
 import { ShoppingCart, Plus, Minus, Send, Star } from "lucide-react";
 
@@ -180,6 +181,7 @@ export default function TableOrderPage() {
             </div>
             <button
               onClick={() => setShowCart(true)}
+              data-order-cart
               className="relative bg-primary-500 hover:bg-primary-600 text-white p-3 rounded-full shadow-lg transition-all"
             >
               <ShoppingCart className="w-6 h-6" />
@@ -256,7 +258,10 @@ export default function TableOrderPage() {
                       {item.price}
                     </span>
                     <button
-                      onClick={() => addToOrder(item as MenuItem)}
+                      onClick={(e) => {
+                        flyToCart(e.currentTarget, "image" in item ? item.image : null, "[data-order-cart]");
+                        addToOrder(item as MenuItem);
+                      }}
                       className={`text-white px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
                         isSpecial
                           ? "bg-yellow-400 hover:bg-yellow-500 !text-gray-950"

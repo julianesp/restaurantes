@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
+import { flyToCart } from "@/lib/fly-to-cart";
 import { useState, useEffect } from "react";
 import { Plus, Minus, Send, Star, ArrowLeft, ChefHat, X, CheckCircle } from "lucide-react";
 
@@ -292,7 +293,10 @@ export default function MeseroTablePage() {
                 <div className="pr-3 flex-shrink-0">
                 {qty === 0 ? (
                   <button
-                    onClick={() => addItem(item)}
+                    onClick={(e) => {
+                      flyToCart(e.currentTarget, "image" in item ? (item.image as string | null | undefined) : null, "[data-order-cart]");
+                      addItem(item);
+                    }}
                     className={`flex items-center gap-1 px-4 py-2 rounded-lg text-white font-semibold text-sm transition-all ${
                       isSpecial ? "bg-yellow-400 hover:bg-yellow-500 !text-gray-950" : "bg-primary-500 hover:bg-primary-600"
                     }`}
@@ -330,7 +334,7 @@ export default function MeseroTablePage() {
 
       {/* Panel inferior — resumen y enviar */}
       {orderItems.length > 0 && (
-        <div className="sticky bottom-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-2xl">
+        <div data-order-cart className="sticky bottom-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-2xl">
           <div className="max-w-4xl mx-auto px-4 py-3">
             {/* Resumen de items */}
             <div className="space-y-1 mb-3 max-h-32 overflow-y-auto">

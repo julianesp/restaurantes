@@ -29,6 +29,7 @@ import { paymentNote, paymentOptions, type PaymentOptionId } from "@/lib/payment
 import Swal from "sweetalert2";
 import { useBranding } from "@/context/TenantContext";
 import { createOrderMessage } from "../utils/whatsapp";
+import { flyToCart } from "@/lib/fly-to-cart";
 
 interface OrderModalProps {
   isOpen: boolean;
@@ -495,9 +496,10 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
                             </span>
                             {quantity === 0 ? (
                               <button
-                                onClick={() =>
-                                  addToCart(item, selectedCategory)
-                                }
+                                onClick={(e) => {
+                                  flyToCart(e.currentTarget, item.image, "[data-order-cart]");
+                                  addToCart(item, selectedCategory);
+                                }}
                                 className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors text-sm font-medium flex items-center gap-1"
                               >
                                 <Plus className="w-4 h-4" />
@@ -552,7 +554,7 @@ const OrderModal = ({ isOpen, onClose }: OrderModalProps) => {
                 {/* Resumen del carrito */}
                 {cart.length > 0 && (
                   <div className="sticky bottom-0 bg-white dark:bg-gray-800 border-t-2 border-primary-500 pt-4 pb-2">
-                    <div className="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-4">
+                    <div data-order-cart className="bg-primary-50 dark:bg-primary-900/20 rounded-lg p-4">
                       <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                         <ShoppingBag className="w-5 h-5" />
                         Tu Pedido ({cart.length}{" "}

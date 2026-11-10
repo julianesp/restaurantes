@@ -5,6 +5,9 @@
  * - Solo transform y opacity (Web Animations API), sin re-render de React.
  * - Con "reducir movimiento" no hay vuelo: el carrito solo da el salto.
  * - Si no hay carrito en pantalla, no hace nada.
+ * - Cada pantalla indica su carrito con `target` (selector CSS). La posición del botón se toma al
+ *   instante y el destino se busca dos fotogramas después: así funciona aunque el botón desaparezca
+ *   al agregar (pasa a controles de cantidad) o el resumen del pedido aparezca con el primer plato.
  */
 
 const SIZE = 56;
@@ -26,17 +29,23 @@ function bump(target: Element) {
   );
 }
 
-export function flyToCart(from: Element, image?: string | null) {
+export function flyToCart(from: Element, image?: string | null, target = "[data-cart-target]") {
   if (typeof window === "undefined") return;
-  const target = document.querySelector("[data-cart-target]");
-  if (!target) return;
+  const a = from.getBoundingClientRect();
+  requestAnimationFrame(() =>
+    requestAnimationFrame(() => {
+      const el = document.querySelector(target);
+      if (el) fly(a, el, image);
+    })
+  );
+}
 
+function fly(a: DOMRect, target: Element, image?: string | null) {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     bump(target);
     return;
   }
 
-  const a = from.getBoundingClientRect();
   const b = target.getBoundingClientRect();
   const x0 = a.left + a.width / 2 - SIZE / 2;
   const y0 = a.top + a.height / 2 - SIZE / 2;
