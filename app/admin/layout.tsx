@@ -1,7 +1,7 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import AdminShell from "@/components/admin/AdminShell";
-import { getTenant, getTenantRole, getVerifiedEmails, isPlatformAdmin, isPlatformHost } from "@/lib/tenant";
+import { getStaffMember, getTenant, getTenantRole, getVerifiedEmails, isPlatformAdmin, isPlatformHost } from "@/lib/tenant";
 import { platformUrl, tenantUrl } from "@/lib/tenant-host";
 import { first } from "@/lib/db";
 import { billingState } from "@/lib/billing";
@@ -28,7 +28,7 @@ export default async function AdminLayout({
     const owned = emails.length
       ? await first<{ slug: string }>(
           `SELECT r.slug FROM restaurant_members m JOIN restaurants r ON r.id = m.restaurant_id
-           WHERE m.email IN (${emails.map(() => "?").join(", ")}) LIMIT 1`,
+           WHERE m.active = 1 AND m.email IN (${emails.map(() => "?").join(", ")}) LIMIT 1`,
           ...emails
         )
       : null;
@@ -39,6 +39,9 @@ export default async function AdminLayout({
   // Solo miembros de ESTE restaurante (o administradores de la plataforma) pueden entrar
   const role = await getTenantRole(tenant);
   if (!role) {
+    // Meseros y chefs entran con su cuenta pero no administran: van a su propia vista
+    const staff = await getStaffMember(tenant);
+    if (staff) redirect(staff.role === "chef" ? "/cocina" : "/mesero");
     redirect("/?unauthorized=true");
   }
   // La cuenta de Brasaya no usa las opciones del restaurante: lo analiza desde su ficha en /panel

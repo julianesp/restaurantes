@@ -90,7 +90,7 @@ const navItems = [
     icon: ShoppingBag,
   },
   {
-    name: "Meseros",
+    name: "Equipo",
     href: "/admin/meseros",
     icon: Users,
   },

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getTenant, getTenantRole, isTenantServing } from "@/lib/tenant";
+import { getStaffMember, getTenant, getTenantRole, isTenantServing } from "@/lib/tenant";
 
 // GET /api/tenant — datos públicos del restaurante actual y si el usuario lo administra
 export async function GET() {
@@ -9,6 +9,8 @@ export async function GET() {
   }
 
   const membership = await getTenantRole(tenant);
+  // Mesero o chef con cuenta: no administra, pero la barra le muestra el acceso a su vista
+  const staff = membership ? null : await getStaffMember(tenant);
 
   return NextResponse.json({
     name: tenant.name,
@@ -21,5 +23,6 @@ export async function GET() {
       primary_color: tenant.settings?.primary_color ?? null,
     },
     isAdmin: !!membership,
+    staffRole: staff?.role ?? null,
   });
 }

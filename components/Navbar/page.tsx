@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ChevronDown, Menu, Settings, X, LogIn } from "lucide-react";
+import { ChefHat, ChevronDown, Menu, Settings, UtensilsCrossed, X, LogIn } from "lucide-react";
 import Link from "next/link";
 import BrandLogo from "../BrandLogo";
 import ReservationModal from "../ReservationModal";
@@ -69,16 +69,21 @@ const Navbar = () => {
 
   // El usuario es administrador si pertenece a ESTE restaurante (lo decide el servidor)
   const [isAdmin, setIsAdmin] = useState(false);
+  // Mesero o chef con cuenta: no administra, pero ve el acceso a su propia vista
+  const [staffRole, setStaffRole] = useState<"waiter" | "chef" | null>(null);
   useEffect(() => {
     if (!isSignedIn) {
       setIsAdmin(false);
+      setStaffRole(null);
       return;
     }
     let cancelled = false;
     fetch("/api/tenant")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
-        if (!cancelled) setIsAdmin(!!data?.isAdmin);
+        if (cancelled) return;
+        setIsAdmin(!!data?.isAdmin);
+        setStaffRole(data?.staffRole === "waiter" || data?.staffRole === "chef" ? data.staffRole : null);
       })
       .catch(() => {});
     return () => {
@@ -207,6 +212,15 @@ const Navbar = () => {
                   Admin
                 </Link>
               )}
+              {staffRole && (
+                <Link
+                  href={staffRole === "chef" ? "/cocina" : "/mesero"}
+                  className="btn-press hidden items-center gap-1.5 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 sm:inline-flex"
+                >
+                  {staffRole === "chef" ? <ChefHat aria-hidden className="h-4 w-4" /> : <UtensilsCrossed aria-hidden className="h-4 w-4" />}
+                  {staffRole === "chef" ? "Cocina" : "Mesero"}
+                </Link>
+              )}
               <UserButton appearance={{ elements: { avatarBox: "w-9 h-9" } }} />
             </>
           ) : (
@@ -260,6 +274,15 @@ const Navbar = () => {
               >
                 <Settings aria-hidden className="h-5 w-5" />
                 Panel de administración
+              </Link>
+            ) : staffRole ? (
+              <Link
+                href={staffRole === "chef" ? "/cocina" : "/mesero"}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="btn-press flex items-center justify-center gap-2 rounded-2xl bg-primary-600 px-4 py-3 font-semibold text-white"
+              >
+                {staffRole === "chef" ? <ChefHat aria-hidden className="h-5 w-5" /> : <UtensilsCrossed aria-hidden className="h-5 w-5" />}
+                {staffRole === "chef" ? "Ir a la cocina" : "Ir a mis mesas"}
               </Link>
             ) : (
               !isSignedIn && (
