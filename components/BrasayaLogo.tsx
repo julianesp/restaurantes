@@ -33,12 +33,21 @@ export function BrasayaMark({ size = 32, className = "" }: { size?: number; clas
   );
 }
 
-export default function BrasayaLogo({ size = 32, className = "" }: { size?: number; className?: string }) {
+export default function BrasayaLogo({
+  size = 32,
+  className = "",
+  outline = false,
+}: {
+  size?: number;
+  className?: string;
+  /** Contorno blanco alrededor del nombre (cabeceras transparentes sobre fotos) */
+  outline?: boolean;
+}) {
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
       <BrasayaMark size={size} />
       <span
-        className="font-display font-bold tracking-[-0.03em] text-gray-900 dark:text-gray-50"
+        className={`font-display font-bold tracking-[-0.03em] text-gray-900 dark:text-gray-50 ${outline ? "nav-outline-white" : ""}`}
         style={{ fontSize: size * 0.68 }}
       >
         Brasa<span className="text-[#AD5C0B] dark:text-[#F6982C]">ya</span>

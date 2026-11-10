@@ -1,0 +1,33 @@
+// Vapor del plato: solo hierve cuando el botón toca los carbones del footer (data-heat="on"
+// lo pone CartButton.tsx en el botón). Al alejarse, el plato vuelve a quedar quieto.
+
+.svg {
+  overflow: visible; // el vapor sale por encima del viewBox
+}
+
+.steam {
+  opacity: 0;
+  transition: opacity 0.4s ease-out;
+}
+
+// "hirviendo": vapor más rápido y más alto
+:global([data-heat="on"]) .steam {
+  animation: bowl-steam 1.6s ease-in-out infinite;
+}
+
+.s1 { animation-delay: 0s !important; }
+.s2 { animation-delay: 0.5s !important; }
+.s3 { animation-delay: 1s !important; }
+
+@keyframes bowl-steam {
+  0% { opacity: 0; translate: 0 3px; }
+  25% { opacity: 0.95; }
+  100% { opacity: 0; translate: 1.5px -9px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global([data-heat="on"]) .steam {
+    animation: none;
+    opacity: 0.6;
+  }
+}

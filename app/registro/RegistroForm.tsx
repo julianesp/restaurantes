@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import ColorChooser from "@/components/ColorChooser";
 
 type SlugState =
   | { status: "idle" }
@@ -24,6 +25,7 @@ export default function RegistroForm({ suffix }: { suffix: string }) {
   const [slugTouched, setSlugTouched] = useState(false);
   const [city, setCity] = useState("");
   const [phone, setPhone] = useState("");
+  const [color, setColor] = useState("");
   const [slugState, setSlugState] = useState<SlugState>({ status: "idle" });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -71,7 +73,7 @@ export default function RegistroForm({ suffix }: { suffix: string }) {
       const res = await fetch("/api/platform/restaurants", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, slug, city, phone, acceptTerms }),
+        body: JSON.stringify({ name, slug, city, phone, color, acceptTerms }),
       });
       const data = await res.json();
       if ((res.ok || res.status === 409) && data.url) {
@@ -128,6 +130,12 @@ export default function RegistroForm({ suffix }: { suffix: string }) {
           <label htmlFor="phone" className="block text-sm font-medium mb-1 text-gray-800 dark:text-gray-200">Teléfono</label>
           <input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className={input} />
         </div>
+      </div>
+
+      <div>
+        <span className="block text-sm font-medium mb-1 text-gray-800 dark:text-gray-200">Color de tu restaurante</span>
+        <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">Se verá en todas las páginas de tu sitio. Podrás cambiarlo cuando quieras.</p>
+        <ColorChooser value={color} onChange={setColor} />
       </div>
 
       {error && <p role="alert" className="text-sm text-red-600">{error}</p>}

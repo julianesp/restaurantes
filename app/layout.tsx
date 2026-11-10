@@ -11,7 +11,9 @@ import CartButton from "@/components/CartButton";
 import { FloatingThemeToggle } from "@/components/ThemeToggle";
 import UnauthorizedNotice from "@/components/UnauthorizedNotice";
 import ThemeScheduler from "@/components/ThemeScheduler";
-import { colombiaPeriod, themeStorageKey } from "@/lib/theme-schedule";
+import { headers } from "next/headers";
+import { colombiaPeriod, parseThemeMode, themeStorageKeyFor, THEME_MODE_COOKIE } from "@/lib/theme-schedule";
+import { ThemeModeProvider } from "@/components/ThemeMode";
 import { getTenant, isPlatformHost } from "@/lib/tenant";
 import { brandingFor, themeCss } from "@/lib/branding";
 import { TenantProvider } from "@/context/TenantContext";
@@ -81,6 +83,11 @@ export default async function RootLayout({
   const theme = themeCss(branding.primaryColor);
   // Tema por la hora de Colombia: claro 7:00-18:00, oscuro el resto (ver lib/theme-schedule.ts)
   const period = colombiaPeriod();
+  // Se lee del encabezado Cookie (cookies() de next/headers rompe el render en vinext)
+  const cookieHeader = (await headers()).get("cookie") ?? "";
+  const mode = parseThemeMode(
+    cookieHeader.split(";").map((c) => c.trim()).find((c) => c.startsWith(`${THEME_MODE_COOKIE}=`))?.slice(THEME_MODE_COOKIE.length + 1)
+  );
 
   return (
     <ClerkProvider localization={esES}>
@@ -93,13 +100,14 @@ export default async function RootLayout({
           {theme && <style dangerouslySetInnerHTML={{ __html: theme }} />}
           <ThemeProvider
             attribute="class"
-            defaultTheme={period.theme}
+            defaultTheme={mode === "auto" ? period.theme : mode}
             enableSystem={false}
             enableColorScheme={false}
             disableTransitionOnChange
-            storageKey={themeStorageKey(period)}
+            storageKey={themeStorageKeyFor(mode, period)}
             forcedTheme={undefined}
           >
+            <ThemeModeProvider initialMode={mode}>
             <TenantProvider branding={branding}>
               <CartProvider>
                 {children}
@@ -111,6 +119,7 @@ export default async function RootLayout({
                 <Analytics />
               </CartProvider>
             </TenantProvider>
+            </ThemeModeProvider>
           </ThemeProvider>
         </body>
       </html>

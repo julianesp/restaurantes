@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ColorChooser from "@/components/ColorChooser";
 import ImageUploader from "@/components/admin/ImageUploader";
 import PaymentAccountSettings from "@/components/admin/PaymentAccountSettings";
 import ScheduleEditor from "@/components/admin/ScheduleEditor";
@@ -120,15 +121,9 @@ export default function ConfiguracionPage() {
           </div>
 
           <div>
-            <label htmlFor="color" className="block text-sm font-medium mb-1 text-gray-800 dark:text-gray-200">Color principal</label>
-            <div className="flex items-center gap-3">
-              <input id="color" type="color" value={/^#[0-9a-f]{6}$/i.test(settings.primary_color || "") ? settings.primary_color : "#eb810f"}
-                onChange={(e) => set("primary_color", e.target.value)} className="h-10 w-14 rounded border border-gray-300 dark:border-gray-600" />
-              <span className="text-sm text-gray-600 dark:text-gray-300">{settings.primary_color || "Color por defecto"}</span>
-              {settings.primary_color && (
-                <button type="button" onClick={() => set("primary_color", "")} className="text-sm text-primary-600 underline">Restablecer</button>
-              )}
-            </div>
+            <span className="block text-sm font-medium mb-1 text-gray-800 dark:text-gray-200">Color principal</span>
+            <p className="mb-2 text-xs text-gray-500 dark:text-gray-400">Se usa en botones, enlaces y detalles de todas las páginas de tu sitio.</p>
+            <ColorChooser value={settings.primary_color || ""} onChange={(hex) => set("primary_color", hex)} livePreview />
           </div>
         </section>
 

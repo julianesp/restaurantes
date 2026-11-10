@@ -635,3 +635,13 @@ html {
 .dark .overflow-y-auto::-webkit-scrollbar-thumb:hover {
   background-color: rgba(75, 85, 99, 0.8);
 }
+
+/* Contornos de la cabecera: el texto de los enlaces y el nombre se leen sobre cualquier foto (tema claro).
+   Son clases propias (no utilidades de Tailwind) para que también apliquen en desarrollo. */
+.nav-outline-white {
+  text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff, 0 0 5px #fff;
+}
+/* En tema oscuro el texto es claro: sin contorno, solo una sombra suave */
+:where(.dark) .nav-outline-white {
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.35);
+}

@@ -46,3 +46,21 @@ export function colombiaPeriod(now = Date.now()): ThemePeriod {
 
 /** Clave de localStorage de la franja actual. */
 export const themeStorageKey = (period: ThemePeriod) => THEME_KEY_PREFIX + period.id;
+
+// ---------------------------------------------------------------------------
+// Modo elegido por el usuario: automático (por la hora), siempre claro o siempre oscuro
+// ---------------------------------------------------------------------------
+
+export type ThemeMode = "auto" | "light" | "dark";
+/** Cookie con la elección (la lee el servidor para pintar el tema correcto desde el primer byte). */
+export const THEME_MODE_COOKIE = "theme-mode";
+
+export const parseThemeMode = (value: string | undefined | null): ThemeMode =>
+  value === "light" || value === "dark" ? value : "auto";
+
+/**
+ * Clave de localStorage de next-themes según el modo. En automático es la de la franja (ver arriba);
+ * en claro/oscuro es fija (no empieza por THEME_KEY_PREFIX para que la limpieza de franjas no la borre).
+ */
+export const themeStorageKeyFor = (mode: ThemeMode, period: ThemePeriod) =>
+  mode === "auto" ? themeStorageKey(period) : `theme-fixed-${mode}`;

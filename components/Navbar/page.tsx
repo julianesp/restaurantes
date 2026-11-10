@@ -11,7 +11,6 @@ import ThemeToggle from "../ThemeToggle";
 import { UserButton, useUser } from "@clerk/nextjs";
 import SignOutButton from "@/components/SignOutButton";
 import { useBranding } from "@/context/TenantContext";
-import { useNavOverDark } from "../useNavOverDark";
 import { ROOT_DOMAIN } from "@/lib/tenant-host";
 
 type NavLink = { href: string; label: string };
@@ -22,10 +21,7 @@ const GROUPS: NavGroup[] = [
   {
     label: "Inicio",
     href: "/#inicio",
-    children: [
-      { href: "/#especialidades", label: "Especialidades" },
-      { href: "/#destacadas", label: "Destacados" },
-    ],
+    children: [],
   },
   {
     label: "Nosotros",
@@ -55,19 +51,15 @@ const MOBILE_LINKS: NavLink[] = [
   { href: "/#contacto", label: "Contacto" },
 ];
 
-// Texto oscuro sobre fondo claro; blanco cuando detrás hay una foto o zona oscura (navbar transparente)
-const linkBase = "rounded-full px-3.5 py-2 text-[15px] font-medium transition-colors duration-200";
-const linkOnLight =
-  "text-gray-800 hover:text-gray-950 hover:bg-gray-900/[0.06] dark:text-gray-200 dark:hover:text-white dark:hover:bg-white/[0.08]";
-const linkOnDark = "text-white/90 hover:text-white hover:bg-white/[0.12] [text-shadow:0_1px_2px_rgb(0_0_0_/_0.35)]";
+// Texto oscuro con contorno blanco en tema claro (se lee sobre fotos o fondos claros); claro en tema oscuro
+const linkClass =
+  "rounded-full px-3.5 py-2 text-[15px] font-medium transition-colors duration-200 text-gray-900 hover:text-black hover:bg-white/25 nav-outline-white dark:text-gray-100 dark:hover:text-white dark:hover:bg-white/[0.12]";
 
 const Navbar = () => {
   const { isSignedIn } = useUser();
   const { name, isDemo } = useBranding();
   // Restaurante de demostración: enlace para crear el propio en la plataforma
   const signupUrl = ROOT_DOMAIN ? `https://${ROOT_DOMAIN}/registro` : "/registro";
-  const overDark = useNavOverDark();
-  const linkClass = `${linkBase} ${overDark ? linkOnDark : linkOnLight}`;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
@@ -136,9 +128,7 @@ const Navbar = () => {
             <BrandLogo size={36} className="h-9 w-9 object-contain" />
           </span>
           <span
-            className={`truncate font-display text-lg font-semibold tracking-tight transition-colors duration-200 ${
-              overDark ? "text-white [text-shadow:0_1px_2px_rgb(0_0_0_/_0.35)]" : "text-gray-950 dark:text-white"
-            }`}
+            className="truncate font-display text-lg font-semibold tracking-tight text-gray-950 nav-outline-white transition-colors duration-200 dark:text-white"
           >
             {name}
           </span>
@@ -147,6 +137,14 @@ const Navbar = () => {
         {/* Enlaces (escritorio) */}
         <div className="hidden items-center gap-0.5 lg:flex">
           {GROUPS.map((group) => {
+            // Sin hijos (p. ej. "Inicio"): enlace simple, sin flecha ni submenú
+            if (group.children.length === 0) {
+              return (
+                <Link key={group.label} href={group.href} className={linkClass}>
+                  {group.label}
+                </Link>
+              );
+            }
             const open = openDropdown === group.label;
             return (
               <div

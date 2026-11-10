@@ -127,7 +127,7 @@ export default function MenuCategoriesBar() {
         {showLeftButton && (
           <button
             onClick={() => scroll("left")}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/95 dark:bg-gray-800/95 hover:bg-[#0c6b58] hover:text-white text-gray-700 dark:text-gray-300 p-2 rounded-full shadow-lg transition-all duration-200"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/95 dark:bg-gray-800/95 hover:bg-primary-600 hover:text-white text-gray-700 dark:text-gray-300 p-2 rounded-full shadow-lg transition-all duration-200"
             aria-label="Desplazar a la izquierda"
           >
             <ChevronLeft className="h-5 w-5" />
@@ -157,7 +157,7 @@ export default function MenuCategoriesBar() {
         {showRightButton && (
           <button
             onClick={() => scroll("right")}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/95 dark:bg-gray-800/95 hover:bg-[#0c6b58] hover:text-white text-gray-700 dark:text-gray-300 p-2 rounded-full shadow-lg transition-all duration-200"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/95 dark:bg-gray-800/95 hover:bg-primary-600 hover:text-white text-gray-700 dark:text-gray-300 p-2 rounded-full shadow-lg transition-all duration-200"
             aria-label="Desplazar a la derecha"
           >
             <ChevronRight className="h-5 w-5" />

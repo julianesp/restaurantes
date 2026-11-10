@@ -5,6 +5,7 @@ import { first, batch, newId, nowIso, isUniqueViolation } from "@/lib/db";
 import { RESERVED_SLUGS, SLUG_REGEX, tenantUrl } from "@/lib/tenant-host";
 import { LEGAL } from "@/lib/legal";
 import { isPlatformAdminEmail } from "@/lib/tenant";
+import { validHex } from "@/lib/branding";
 
 // Categorías iniciales para que el menú no empiece vacío
 const DEFAULT_CATEGORIES = [
@@ -69,6 +70,9 @@ export async function POST(request: Request) {
   const settings: Record<string, string> = {};
   if (phone) settings.phone = phone;
   if (city) settings.city = city;
+  // Color principal elegido al registrarse (#RRGGBB; si no es válido se usa el de Brasaya)
+  const color = validHex(String(body.color || "").trim());
+  if (color) settings.primary_color = color;
   // Prueba de la autorización (Ley 1581): quién aceptó, qué versión y cuándo
   settings.terms_version = LEGAL.version;
   settings.terms_accepted_at = now;

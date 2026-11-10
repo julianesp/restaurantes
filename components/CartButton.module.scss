@@ -1,0 +1,63 @@
+// Botón del pedido: al llegar al borde del footer (lleno de carbones) se "calienta".
+// CartButton.tsx pone data-heat="on" mientras toca el borde.
+
+.btn {
+  transition: background-color 0.5s ease-out, box-shadow 0.5s ease-out;
+}
+
+.btn[data-heat="on"] {
+  background-color: #c2410c;
+  box-shadow: 0 0 14px 3px rgb(255 120 30 / 0.55), 0 0 30px 8px rgb(255 70 0 / 0.25);
+  animation: cb-heat 1.6s ease-in-out infinite;
+}
+
+// El ícono vibra apenas, como el aire sobre una brasa
+.btn[data-heat="on"] .icon {
+  animation: cb-shimmer 0.9s ease-in-out infinite;
+}
+
+// Vahos de calor que suben desde el botón
+.wave {
+  position: absolute;
+  bottom: 100%;
+  width: 3px;
+  height: 14px;
+  border-radius: 999px;
+  background: linear-gradient(to top, rgb(255 190 110 / 0.75), rgb(255 190 110 / 0));
+  opacity: 0;
+  pointer-events: none;
+}
+
+.btn[data-heat="on"] .wave {
+  animation: cb-rise 1.8s ease-out infinite;
+}
+
+.w1 { left: 22%; animation-delay: 0s !important; }
+.w2 { left: 48%; animation-delay: 0.6s !important; }
+.w3 { left: 72%; animation-delay: 1.2s !important; }
+
+@keyframes cb-heat {
+  0%, 100% { background-color: #c2410c; filter: brightness(1); }
+  50% { background-color: #ea580c; filter: brightness(1.15); }
+}
+
+@keyframes cb-shimmer {
+  0%, 100% { translate: 0 0; }
+  25% { translate: 0.4px -0.6px; }
+  75% { translate: -0.4px 0.3px; }
+}
+
+@keyframes cb-rise {
+  0% { opacity: 0; translate: 0 6px; }
+  30% { opacity: 1; }
+  100% { opacity: 0; translate: 2px -14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn[data-heat="on"],
+  .btn[data-heat="on"] .icon,
+  .btn[data-heat="on"] .wave {
+    animation: none;
+  }
+  .wave { display: none; }
+}

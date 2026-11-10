@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
-import { useNavOverDark } from "@/components/useNavOverDark";
 
 /**
  * Cabecera fija y transparente del sitio de cada restaurante (misma idea que la de la landing de
@@ -12,12 +11,7 @@ import { useNavOverDark } from "@/components/useNavOverDark";
 export default function TenantHeader({
   name, logoUrl, canEdit,
 }: { name: string; logoUrl: string | null; canEdit: boolean }) {
-  const overDark = useNavOverDark(canEdit ? 100 : 64);
-  const link = `rounded-full px-3.5 py-2 transition-colors duration-200 ${
-    overDark
-      ? "text-white/90 hover:text-white hover:bg-white/[0.12] [text-shadow:0_1px_2px_rgb(0_0_0_/_0.35)]"
-      : "text-gray-800 hover:bg-gray-900/[0.06] dark:text-gray-200 dark:hover:bg-white/[0.08]"
-  }`;
+  const link = "rounded-full px-3.5 py-2 transition-colors duration-200 text-gray-900 hover:text-black hover:bg-white/25 nav-outline-white dark:text-gray-100 dark:hover:text-white dark:hover:bg-white/[0.12]";
 
   return (
     <header className="fixed inset-x-0 top-0 z-40">
@@ -35,9 +29,7 @@ export default function TenantHeader({
               <img src={logoUrl} alt="" className="h-9 w-9 shrink-0 rounded-xl object-cover" />
             )}
             <span
-              className={`truncate font-display text-lg font-bold ${
-                overDark ? "text-white [text-shadow:0_1px_2px_rgb(0_0_0_/_0.35)]" : "text-gray-950 dark:text-white"
-              }`}
+              className="truncate font-display text-lg font-bold text-gray-950 nav-outline-white dark:text-white"
             >
               {name}
             </span>
