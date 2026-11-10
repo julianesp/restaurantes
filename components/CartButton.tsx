@@ -32,6 +32,7 @@ export default function CartButton() {
     <>
       <button
         onClick={() => setIsCartOpen(true)}
+        data-cart-target
         className="fixed bottom-20 right-4 z-30 bg-primary-600 hover:bg-primary-700 text-white p-3.5 rounded-full shadow-lg shadow-primary-900/20 group"
         aria-label="Abrir carrito"
       >

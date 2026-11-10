@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useCart } from "../../context/CartContext";
 import { useBranding } from "@/context/TenantContext";
 import DishWhatsAppButton from "@/components/DishWhatsAppButton";
+import { flyToCart } from "@/lib/fly-to-cart";
 
 // Tipos de datos
 interface MenuItem {
@@ -64,7 +65,9 @@ export default function MenuClient({ initialMenuData }: MenuClientProps) {
     (cat) => cat.id === selectedCategory
   );
 
-  const handleAddToCart = (item: MenuItem, categoryId: string) => {
+  const handleAddToCart = (item: MenuItem, categoryId: string, from?: Element) => {
+    // La miniatura del plato vuela desde el botón hasta el carrito
+    if (from) flyToCart(from, item.image);
     addToCart({
       id: item.id,
       name: item.name,
@@ -229,7 +232,7 @@ export default function MenuClient({ initialMenuData }: MenuClientProps) {
                     <div className="flex gap-2">
                       <DishWhatsAppButton name={item.name} price={item.price} />
                       <button
-                        onClick={() => handleAddToCart(item, selectedCategory)}
+                        onClick={(e) => handleAddToCart(item, selectedCategory, e.currentTarget)}
                         className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold transition-all ${
                           addedItems.has(item.id)
                             ? "bg-green-500 text-white"
