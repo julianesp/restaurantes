@@ -27,7 +27,11 @@ const PUBLIC_WRITES: Record<string, string> = {
 };
 
 /** Rutas del personal (panel o mesero con sesión): staffCtx() en lugar de adminCtx(). */
-const STAFF_ROUTES = ["app/api/kitchen-chat GET", "app/api/kitchen-chat POST"];
+const STAFF_ROUTES = [
+  "app/api/kitchen-chat GET", "app/api/kitchen-chat POST",
+  // Cocina y meseros: cada rol ve/cambia solo lo suyo dentro de la ruta (ver tests/team-roles.test.ts)
+  "app/api/orders/table GET", "app/api/orders/table PATCH",
+];
 
 /** Rutas de la plataforma (todas, también GET): solo ADMIN_EMAILS mediante platformCtx(). */
 const PLATFORM_PREFIX = "app/api/platform/manage/";
@@ -35,7 +39,7 @@ const isPlatform = (key: string) => key.startsWith(PLATFORM_PREFIX);
 
 /** Lecturas con datos internos del restaurante: también deben exigir adminCtx(). */
 const ADMIN_ONLY_READS = [
-  "app/api/orders/table GET", // todos los pedidos, con notas de los clientes
+  "app/api/team GET", // correos del equipo
   "app/api/kitchen-chat GET", // chat interno meseros/cocina
   "app/api/waiters GET", // incluye los PIN de los meseros
   "app/api/suggestions GET",
